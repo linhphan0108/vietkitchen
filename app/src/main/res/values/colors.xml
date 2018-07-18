@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <!--common-->
+    <color name="colorPrimary">#F44336</color>
+    <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorAccent">#448AFF</color>
+    <color name="lightPrimaryColor">#FFCDD2</color>
+    <color name="textIconColor">#FFFFFF</color>
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <!--<color name="divider">#BDBDBD</color>-->
+    <color name="divider">#fafafa</color>
+    <color name="state_icon_unselected">#323232</color>
+
+    <!--home screen-->
+    <color name="tab_bar_bg">@color/divider</color>
 </resources>
