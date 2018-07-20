@@ -34,6 +34,7 @@ class HomeActivity : AppCompatActivity() {
     private fun setupViewPager(){
         homePagerAdapter = HomePagerAdapter(supportFragmentManager)
         viewPager.adapter = homePagerAdapter
+        viewPager.offscreenPageLimit = 2
     }
 
     private fun setupBottomTabBar(){
