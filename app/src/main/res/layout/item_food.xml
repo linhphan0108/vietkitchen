@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/margin_16dp"
+    android:paddingEnd="@dimen/margin_16dp"
+    android:paddingBottom="3dp"
+    card_view:cardCornerRadius="3dp"
+    card_view:cardElevation="3dp"
+    card_view:cardUseCompatPadding="true"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.Guideline
+            android:id="@+id/verticalGuideline"
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"
+            android:background="@color/colorPrimaryDark"/>
+
+        <ImageView
+            android:id="@+id/imgFoodThumb"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/verticalGuideline"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            />
+
+        <TextView
+            android:id="@+id/txtFoodName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/verticalGuideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="ga luoc la chanh"
+            />
+
+        <TextView
+            android:id="@+id/txtShortIntro"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="@id/verticalGuideline"
+            app:layout_constraintTop_toBottomOf="@id/txtFoodName"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:textSize="14sp"
+            android:textColor="@color/textSecondary"
+            tools:text="mua he an ga luoc la chanh"/>
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.v7.widget.CardView>

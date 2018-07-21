@@ -4,6 +4,7 @@
     <item
         android:id="@+id/action_home"
         android:enabled="true"
+        android:checked="true"
         android:icon="@drawable/ic_home_outline"
         android:title="@string/label_home"
         app:showAsAction="ifRoom" />

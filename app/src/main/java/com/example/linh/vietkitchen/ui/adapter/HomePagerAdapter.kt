@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import com.example.linh.vietkitchen.ui.home.CalendarFragment
 import com.example.linh.vietkitchen.ui.home.FavoriteFragment
-import com.example.linh.vietkitchen.ui.home.HomeFragment
+import com.example.linh.vietkitchen.ui.home.homeFragment.HomeFragment
 import com.example.linh.vietkitchen.ui.home.ProfileFragment
 
 class HomePagerAdapter(fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
