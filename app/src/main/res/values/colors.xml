@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--common-->
-    <color name="colorPrimary">#F44336</color>
-    <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorPrimary">#d32f2f</color>
+    <color name="colorPrimaryDark">#c62828</color>
+    <color name="colorPrimaryDarkStatusBar">#14000000</color>
     <color name="colorAccent">#448AFF</color>
     <color name="lightPrimaryColor">#FFCDD2</color>
     <color name="textIconColor">#FFFFFF</color>
-    <color name="textPrimary">#212121</color>
-    <color name="textSecondary">#757575</color>
+    <!--<color name="textPrimary">#212121</color>-->
+    <color name="textPrimary">#757575</color>
+    <color name="textSecondary">#9f9f9f</color>
     <!--<color name="divider">#BDBDBD</color>-->
     <color name="divider">#fafafa</color>
     <color name="state_icon_unselected">#323232</color>

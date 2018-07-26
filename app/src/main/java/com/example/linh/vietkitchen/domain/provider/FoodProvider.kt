@@ -7,7 +7,7 @@ import com.example.linh.vietkitchen.domain.model.Food
 import com.example.linh.vietkitchen.extension.firstResult
 import io.reactivex.Flowable
 
-class FoodProvider(private val sources: List<FoodDataSource> = SOURCES){
+class FoodProvider(sources: List<FoodDataSource> = SOURCES) : BaseProvider<FoodDataSource>(sources){
     companion object {
         val SOURCES by lazy { listOf(FoodLocalDataSource(), FoodCloudDataSource()) }
     }
@@ -16,6 +16,4 @@ class FoodProvider(private val sources: List<FoodDataSource> = SOURCES){
         val result = it.getAllFood()
         result
     }
-
-    private fun <T : Any> requestToSources(f: (FoodDataSource) -> T?): T = sources.firstResult { f(it) }
 }

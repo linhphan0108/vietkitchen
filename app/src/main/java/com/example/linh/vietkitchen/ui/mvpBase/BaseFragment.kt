@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import com.example.linh.vietkitchen.extension.DelegatesExt
 import timber.log.Timber
 
-abstract class BaseFragment<T : BaseViewContract, V : BasePresenter<T>> : Fragment(){
+abstract class BaseFragment<T : BaseViewContract, V : BasePresenterContract<T>> : Fragment(){
     protected var presenter: V by DelegatesExt.notNullSingleValue()
 
 

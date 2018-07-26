@@ -1,6 +1,7 @@
 package com.example.linh.vietkitchen.ui.home.homeFragment
 
 import android.content.Context
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -18,6 +19,9 @@ import com.example.linh.vietkitchen.ui.mvpBase.BaseFragment
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
+import android.support.v7.widget.RecyclerView
+
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,7 +37,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  *
  */
-class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentPresenter>(), HomeFragmentContractView {
+class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(), HomeFragmentContractView {
     companion object {
         val STORAGE_FOOD = "foods"
 
@@ -219,10 +223,12 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentPresente
         foodAdapter = FoodAdapter(listOf())
         rcvFood.layoutManager = LinearLayoutManager(context)
         rcvFood.itemAnimator = DefaultItemAnimator()
+        rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
         rcvFood.adapter = foodAdapter
     }
     //endregion inner methods
 
+    //region inner classes =========================================================================
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -238,4 +244,17 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentPresente
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
     }
+
+
+    inner class VerticalSpaceItemDecoration(private val verticalSpaceHeight: Int) : RecyclerView.ItemDecoration() {
+
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
+                                    state: RecyclerView.State) {
+            if (parent.getChildAdapterPosition(view) == 0){
+                outRect.top = verticalSpaceHeight
+            }
+            outRect.bottom = verticalSpaceHeight
+        }
+    }
+    //endregion inner classes
 }
