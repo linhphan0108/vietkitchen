@@ -5,13 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeActivity">
+    tools:context=".ui.home.homeActivity.HomeActivity"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <com.example.linh.vietkitchen.ui.custom.SmoothViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNav"/>
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottomNav"

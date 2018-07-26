@@ -1,9 +1,12 @@
 package com.example.linh.vietkitchen.ui.mvpBase
 
+import android.content.Context
+
 
 abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
 
-    var viewContract: T? = null
+    protected var viewContract: T? = null
+    protected var context: Context? = null
 
     private val isViewAttached: Boolean
         get() = viewContract != null
@@ -21,12 +24,15 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
 
     override fun attachView(view: T) {
         this.viewContract = view
+        this.context = view.viewContext
     }
 
     override fun detachView() {
 //        this.viewContract = null
 //        RxUtils.unsubscribeIfNotNull(mCompositeSubscription)
     }
+
+    fun getStringRes(intRes: Int) = this.context?.getString(intRes) ?: ""
 
 //    fun checkViewAttached() {
 //        if (!isViewAttached) {

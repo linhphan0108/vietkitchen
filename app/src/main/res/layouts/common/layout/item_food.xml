@@ -9,16 +9,17 @@
     android:paddingStart="@dimen/margin_16dp"
     android:paddingEnd="@dimen/margin_16dp"
     android:paddingBottom="3dp"
-    card_view:cardCornerRadius="3dp"
-    card_view:cardElevation="3dp"
-    card_view:cardUseCompatPadding="true"
+    card_view:cardCornerRadius="0dp"
+    card_view:cardElevation="0dp"
+    card_view:cardUseCompatPadding="false"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
 
         <android.support.constraint.Guideline
             android:id="@+id/verticalGuideline"

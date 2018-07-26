@@ -6,3 +6,6 @@ data class Food(val id: String?, val name: String, val intro: String, val ingred
                 val preliminaryProcessing: List<String>, val processing: List<String>, val cookingMethod: Map<String, Boolean>,
                 val benefit: Map<String, Boolean>?, val recommendedSeason: Map<String, Boolean>, val region: String?, val specialDay: String?,
                 val imageUrl: String)
+
+data class CategoryItem(val itemTitle: String)
+data class CategoryGroup(val headerTile: String, val itemsList: List<CategoryItem>)

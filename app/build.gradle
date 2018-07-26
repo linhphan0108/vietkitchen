@@ -20,6 +20,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            res.srcDirs = [
+                    'src/main/res/layouts/common',
+                    'src/main/res/layouts/home',
+                    'src/main/res/layouts',
+                    'src/main/res',
+
+            ]
+        }
+    }
 }
 
 dependencies {
@@ -42,16 +54,17 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-media-compat'
     }
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
+    implementation 'com.google.firebase:firebase-crash:16.0.1'
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.google.firebase:firebase-database:16.0.1'
-    implementation('com.github.FrangSierra:RxFirebase:1.5.0'){
+    implementation('com.github.FrangSierra:RxFirebase:1.5.0') {
         exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
         exclude group: 'io.reactivex.rxjava2', module: 'rxandroid'
     }
 
     //rxjava
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
-    implementation ('io.reactivex.rxjava2:rxandroid:2.0.2'){
+    implementation('io.reactivex.rxjava2:rxandroid:2.0.2') {
         exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
     }
 
