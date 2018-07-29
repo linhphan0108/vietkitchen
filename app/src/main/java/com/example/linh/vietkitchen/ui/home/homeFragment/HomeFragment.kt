@@ -165,6 +165,7 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
 
     override fun onFoodsRequestSuccess(foods: List<Food>) {
         foodAdapter.updateItemThenNotify(foods.toMutableList())
+        swipeRefresh.isRefreshing = false
     }
 
     override fun onFoodsRequestFailed(msg: String) {
