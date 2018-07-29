@@ -9,9 +9,11 @@ import timber.log.Timber
 
 class HomeFragmentPresenter(private val requestFoodCommand : RequestFoodCommand = RequestFoodCommand())
     : BasePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
+
     private var  d : CompositeDisposable = CompositeDisposable()
 
     override fun requestFoods(){
+        viewContract?.showProgress()
         d.add(requestFoodCommand.execute()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -22,11 +24,18 @@ class HomeFragmentPresenter(private val requestFoodCommand : RequestFoodCommand 
                     }else{
                         viewContract?.onFoodsRequestSuccess(it)
                     }
+                    viewContract?.hideProgress()
 
                 }, {
                     Timber.e(it)
+                    viewContract?.hideProgress()
                 }))
     }
+
+    override fun refreshFoods() {
+        requestFoods()
+    }
+
 
     override fun detachView() {
         super.detachView()

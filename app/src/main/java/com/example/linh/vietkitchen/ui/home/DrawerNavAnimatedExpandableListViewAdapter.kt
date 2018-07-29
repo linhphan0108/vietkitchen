@@ -48,7 +48,7 @@ class DrawerNavAnimatedExpandableListViewAdapter : AnimatedExpandableListAdapter
 
     override fun getRealChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup): View {
         val childText = getChild(groupPosition, childPosition)
-        val viewChild = convertView ?: LayoutInflater.from(parent?.ctx).inflate(R.layout.item_child_drawer_nav, parent, false)
+        val viewChild = convertView ?: LayoutInflater.from(parent.ctx).inflate(R.layout.item_child_drawer_nav, parent, false)
         val txtListChild = viewChild as TextView
         txtListChild.text = childText
         return viewChild
