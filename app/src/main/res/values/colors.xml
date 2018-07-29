@@ -13,6 +13,15 @@
     <!--<color name="divider">#BDBDBD</color>-->
     <color name="divider">#fafafa</color>
     <color name="state_icon_unselected">#323232</color>
+    <color name="color_wave_refresh">#f44336</color>
+    <color name="color_wave_refresh_progress_1">#448AFF</color>
+    <color name="color_wave_refresh_progress_2">#fff344</color>
+    <color name="color_wave_refresh_progress_3">#50ff44</color>
+
+    <!--shimmer loading effect-->
+    <color name="shimmer_background">#dddddd</color>
+    <color name="demo_light_transparent">#16000000</color>
+    <color name="default_shimmer_color">#e3e1e3</color>
 
     <!--home screen-->
     <color name="tab_bar_bg">@color/divider</color>

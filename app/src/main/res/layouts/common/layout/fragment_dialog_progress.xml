@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_rounded_corners_bg"
+    xmlns:gpb="http://schemas.android.com/apk/res-auto">
+    <com.example.linh.vietkitchen.ui.custom.SlackLoadingView
+        android:id="@+id/slackLoadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
+        android:paddingRight="4dp"
+        android:paddingEnd="4dp"
+        gpb:layout_constraintLeft_toLeftOf="parent"
+        gpb:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_16dp"
+        android:layout_marginLeft="@dimen/margin_16dp"
+        android:text="@string/label_loading"
+        gpb:layout_constraintLeft_toRightOf="@id/slackLoadingView"
+        gpb:layout_constraintBottom_toBottomOf="parent"/>
+</android.support.constraint.ConstraintLayout>
