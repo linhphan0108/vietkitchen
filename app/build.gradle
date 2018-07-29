@@ -76,6 +76,8 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.hannesdorfmann:adapterdelegates3:3.0.1'
+    implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'
+    implementation 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.6'
 }
 
 apply plugin: 'com.google.gms.google-services'

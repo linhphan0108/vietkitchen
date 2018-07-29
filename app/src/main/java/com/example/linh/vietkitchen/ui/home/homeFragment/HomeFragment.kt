@@ -20,7 +20,12 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 import android.support.v7.widget.RecyclerView
-
+import com.example.linh.vietkitchen.extension.color
+import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
+import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import java.util.concurrent.TimeUnit
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -39,7 +44,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(), HomeFragmentContractView {
     companion object {
-        val STORAGE_FOOD = "foods"
+        const val STORAGE_FOOD = "foods"
 
         /**
          * Use this factory method to create a new instance of
@@ -91,6 +96,7 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         Timber.e("on activity created")
+        setupSwipeRefreshLayout()
         setupRecyclerView()
         presenter.requestFoods()
     }
@@ -158,7 +164,8 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
     }
 
     override fun onFoodsRequestSuccess(foods: List<Food>) {
-        foodAdapter.updateItemThenNotify(foods)
+        foodAdapter.updateItemThenNotify(foods.toMutableList())
+        swipeRefresh.isRefreshing = false
     }
 
     override fun onFoodsRequestFailed(msg: String) {
@@ -166,11 +173,11 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
     }
 
     override fun showProgress() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        foodAdapter.startShimmerAnimation()
     }
 
     override fun hideProgress() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        foodAdapter.stopLoadMoreAnimation()
     }
     //endregion MVP callbacks
 
@@ -220,11 +227,30 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
     }
 
     private fun setupRecyclerView(){
-        foodAdapter = FoodAdapter(listOf())
+        foodAdapter = FoodAdapter()
         rcvFood.layoutManager = LinearLayoutManager(context)
         rcvFood.itemAnimator = DefaultItemAnimator()
         rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
         rcvFood.adapter = foodAdapter
+        rcvFood.addOnScrollListener(object : EndlessScrollListener(){
+            override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
+                foodAdapter.startLoadMoreAnimation()
+                return true
+            }
+        })
+    }
+
+    private fun setupSwipeRefreshLayout(){
+        val waveColor = context?.color(R.color.color_wave_refresh) ?: 0
+        val progressColor1 = context?.color(R.color.color_wave_refresh_progress_1) ?: 0
+        val progressColor2 = context?.color(R.color.color_wave_refresh_progress_2) ?: 0
+        val progressColor3 = context?.color(R.color.color_wave_refresh_progress_3) ?: 0
+        swipeRefresh.setColorSchemeColors(progressColor1, progressColor2, progressColor3)
+        swipeRefresh.setWaveColor(waveColor)
+        swipeRefresh.isRefreshing = true
+        swipeRefresh.setOnRefreshListener {
+            presenter.refreshFoods()
+        }
     }
     //endregion inner methods
 
