@@ -11,4 +11,5 @@ interface HomeFragmentContractView : BaseViewContract {
 
 interface HomeFragmentContractPresenter : BasePresenterContract<HomeFragmentContractView> {
     fun requestFoods()
+    fun refreshFoods()
 }

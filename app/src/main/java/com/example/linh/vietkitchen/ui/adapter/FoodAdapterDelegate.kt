@@ -5,12 +5,13 @@ import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.model.Food
 import com.example.linh.vietkitchen.extension.ctx
+import com.example.linh.vietkitchen.ui.model.Entity
 import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
 
 
-open class FoodAdapterDelegate : AbsListItemAdapterDelegate<Food, Any, FoodViewHolder>() {
+open class FoodAdapterDelegate : AbsListItemAdapterDelegate<Food, Entity, FoodViewHolder>() {
 
-    override fun isForViewType(item: Any, items: MutableList<Any>, position: Int): Boolean {
+    override fun isForViewType(item: Entity, items: MutableList<Entity>, position: Int): Boolean {
         return items[position] is Food
     }
 

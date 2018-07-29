@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context=".ui.home.homeFragment.HomeFragment">
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+             <!--xmlns:tools="http://schemas.android.com/tools"-->
+             <!--android:layout_width="match_parent"-->
+             <!--android:layout_height="match_parent"-->
+             <!--&gt;-->
+<!--<android.support.v4.widget.SwipeRefreshLayout-->
+    <!--android:id="@+id/swipeRefresh"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--tools:context=".ui.home.homeFragment.HomeFragment"-->
+    <!--xmlns:android="http://schemas.android.com/apk/res/android">-->
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rcvFood"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/divider"/>
+<jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/swipeRefresh"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-</FrameLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rcvFood"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/divider"/>
+</jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
+    <!--</android.support.v4.widget.SwipeRefreshLayout>-->
+<!--</FrameLayout>-->

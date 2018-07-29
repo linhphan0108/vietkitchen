@@ -1,15 +1,18 @@
 package com.example.linh.vietkitchen.ui.adapter
 
-import com.hannesdorfmann.adapterdelegates3.*
+import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.ShimmerAdapter
+import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.ShimmerItemDelegate
+import com.example.linh.vietkitchen.ui.model.Entity
 
-class FoodAdapter(items: List<Any>) : ListDelegationAdapter<List<Any>>() {
+class FoodAdapter(items: MutableList<Entity> = mutableListOf()) : ShimmerAdapter() {
     init {
         delegatesManager.addDelegate(FoodAdapterDelegate())
+        delegatesManager.addDelegate(ShimmerItemDelegate())
         setItems(items)
     }
 
-    fun updateItemThenNotify(items: List<Any>){
-        this.items = items
+    fun updateItemThenNotify(items: MutableList<Entity>){
+        setItems(items)
         notifyDataSetChanged()
     }
 }
