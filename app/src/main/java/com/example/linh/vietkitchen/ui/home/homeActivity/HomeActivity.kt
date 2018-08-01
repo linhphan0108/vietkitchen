@@ -53,7 +53,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     //endregion lifecycle
 
     //region MVP callbacks==========================================================================
-    override fun getFragmentLayoutRes() = R.layout.activity_home
+    override fun getActivityLayoutRes() = R.layout.activity_home
     override fun getViewContract(): HomeActivityContractView = this
 
     override val viewContext: Context?

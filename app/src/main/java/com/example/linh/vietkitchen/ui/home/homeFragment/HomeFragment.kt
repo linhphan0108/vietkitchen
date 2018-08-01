@@ -10,10 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.domain.model.Food
+import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.adapter.FoodAdapter
+import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
 import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.home.homeActivity.OnDrawerNavItemChangedListener
@@ -55,7 +55,7 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
     private var param1: String? = null
     private var param2: String? = null
 
-    lateinit var foodAdapter: FoodAdapter
+    lateinit var recipeAdapter: RecipeAdapter
 
     //region lifecycle =============================================================================
     override fun getFragmentLayoutRes() = R.layout.fragment_home
@@ -136,41 +136,41 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
         return this
     }
 
-    override fun onFoodsRequestSuccess(foods: List<Food>) {
-        foodAdapter.updateItemThenNotify(foods.toMutableList())
+    override fun onFoodsRequestSuccess(recipes: List<Recipe>) {
+        recipeAdapter.updateItemThenNotify(recipes.toMutableList())
         swipeRefresh.isRefreshing = false
     }
 
     override fun onFoodsRequestFailed(msg: String) {
         toast(msg)
-        foodAdapter.stopShimmerAnimation()
+        recipeAdapter.stopShimmerAnimation()
     }
 
     override fun onRefreshRecipe() {
-        foodAdapter.startShimmerAnimation()
+        recipeAdapter.startShimmerAnimation()
     }
 
     override fun onLoadingMore() {
-        foodAdapter.startLoadMoreAnimation()
+        recipeAdapter.startLoadMoreAnimation()
     }
 
-    override fun onLoadMoreSuccess(recipes: List<Food>) {
+    override fun onLoadMoreSuccess(recipes: List<Recipe>) {
         toast("onLoadMoreSuccess ${recipes.size}")
-        foodAdapter.stopLoadMoreAnimation()
-        foodAdapter.setMoreItems(recipes.toMutableList())
+        recipeAdapter.stopLoadMoreAnimation()
+        recipeAdapter.setMoreItems(recipes.toMutableList())
     }
 
     override fun onLoadMoreFailed() {
-        foodAdapter.stopLoadMoreAnimation()
+        recipeAdapter.stopLoadMoreAnimation()
     }
 
     override fun onLoadMoreReachEndRecord() {
-        foodAdapter.stopLoadMoreAnimation()
+        recipeAdapter.stopLoadMoreAnimation()
         toast("onLoadMoreReachEndRecord")
     }
 
     override fun showProgress() {
-        foodAdapter.startShimmerAnimation()
+        recipeAdapter.startShimmerAnimation()
     }
 
     override fun hideProgress() {
@@ -186,11 +186,11 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
 
     //region inner methods =========================================================================
     private fun setupRecyclerView(){
-        foodAdapter = FoodAdapter()
+        recipeAdapter = RecipeAdapter()
         rcvFood.layoutManager = LinearLayoutManager(context)
         rcvFood.itemAnimator = DefaultItemAnimator()
         rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
-        rcvFood.adapter = foodAdapter
+        rcvFood.adapter = recipeAdapter
         rcvFood.addOnScrollListener(object : EndlessScrollListener(3){
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
                 presenter.loadMoreRecipe()
