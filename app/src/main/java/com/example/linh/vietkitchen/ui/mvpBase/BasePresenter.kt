@@ -1,12 +1,15 @@
 package com.example.linh.vietkitchen.ui.mvpBase
 
 import android.content.Context
+import io.reactivex.disposables.CompositeDisposable
 
 
 abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
 
     protected var viewContract: T? = null
     protected var context: Context? = null
+    protected val  compositeDisposable : CompositeDisposable by lazy {
+        CompositeDisposable()}
 
     private val isViewAttached: Boolean
         get() = viewContract != null
@@ -28,8 +31,8 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
     }
 
     override fun detachView() {
-//        this.viewContract = null
-//        RxUtils.unsubscribeIfNotNull(mCompositeSubscription)
+        viewContract = null
+        compositeDisposable.clear()
     }
 
     fun getStringRes(intRes: Int) = this.context?.getString(intRes) ?: ""

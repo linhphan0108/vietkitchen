@@ -2,7 +2,6 @@ package com.example.linh.vietkitchen.ui.mvpBase
 
 import android.content.Context
 import android.os.Bundle
-import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +21,7 @@ abstract class BaseFragment<T : BaseViewContract, V : BasePresenterContract<T>> 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Timber.e("on create view")
         presenter.attachView(getViewContract())
-        return inflater.inflate(getFragmentLayoutRes(), container, false)
+        return inflateFragmentView(inflater, container, savedInstanceState)
 
     }
 
@@ -34,6 +33,9 @@ abstract class BaseFragment<T : BaseViewContract, V : BasePresenterContract<T>> 
     abstract fun initPresenter(): V
 
     abstract fun getViewContract() : T
+
+    protected open fun inflateFragmentView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+            = inflater.inflate(getFragmentLayoutRes(), container, false)
 
     abstract fun getFragmentLayoutRes(): Int
 }

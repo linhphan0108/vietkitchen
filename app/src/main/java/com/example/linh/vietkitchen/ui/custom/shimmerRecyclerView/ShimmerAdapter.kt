@@ -23,6 +23,14 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
         }
     }
 
+    fun setMoreItems(items: MutableList<Entity>){
+        val lastSize = itemCount
+        val length = items.size
+        this.items.addAll(items)
+        notifyItemRangeInserted(lastSize, length)
+
+    }
+
     fun startShimmerAnimation(numberShimmerItem: Int = 6) {
         isShimmerAnimationReFresh = true
         val shimmerItems = mutableListOf<ShimmerItem>()
@@ -30,6 +38,11 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
             shimmerItems.add(ShimmerItem())
         }
         setItems(shimmerItems.toMutableList())
+        notifyDataSetChanged()
+    }
+
+    fun stopShimmerAnimation(){
+        setItems(mutableListOf())
         notifyDataSetChanged()
     }
 

@@ -2,7 +2,6 @@ package com.example.linh.vietkitchen.ui.home.homeActivity
 
 import android.annotation.TargetApi
 import android.content.Context
-import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -11,22 +10,25 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
-import android.view.*
+import android.view.MenuItem
+import android.view.View
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
+import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
+import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
 import kotlinx.android.synthetic.main.activity_home_content.*
-import com.example.linh.vietkitchen.util.TouchEventUtil
-import timber.log.Timber
 
 
 class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContractPresenter>(),
-        NavigationView.OnNavigationItemSelectedListener, HomeActivityContractView {
+        NavigationView.OnNavigationItemSelectedListener, HomeActivityContractView,
+        OnItemClickListener, ToolbarActions {
     private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
+    var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
 
     //region lifecycle =============================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,15 +88,15 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         return true
     }
 
-    //region drawer navigation callbacks
-//    override fun onChildClick(parent: ExpandableListView?, v: View?, groupPosition: Int, childPosition: Int, id: Long): Boolean {
-//        return false
-//    }
-//
-//    override fun onGroupClick(parent: ExpandableListView?, v: View?, groupPosition: Int, id: Long): Boolean {
-//    }
-    //endregion drawer navigation callbacks
+    override fun changeToolbarTitle(title: String) {
+        toolbar.title = title
+    }
 
+    //drawer navigation callback
+    override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: DrawerNavChildItem?) {
+        val category = data?.itemTitle
+        onDrawerNavItemChangedListener?.onDrawerNavChanged(category)
+    }
     //endregion callbacks
 
     //region inner methods =========================================================================
@@ -138,7 +140,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
 //        val headerView = LayoutInflater.from(this).inflate(R.layout.activity_home_nav_header, null)
 //        drawerNavView.addHeaderView(headerView)
 //        drawerNavView.getHeaderView(0).visibility = View.GONE
-        drawerNavAdapter = DrawerNavRcAdapter(drawerNavExpandableRc)
+        drawerNavAdapter = DrawerNavRcAdapter(drawerNavExpandableRc, childItemClickListener= this)
         drawerNavExpandableRc.layoutManager = LinearLayoutManager(this)
         drawerNavExpandableRc.itemAnimator = DefaultItemAnimator()
         drawerNavExpandableRc.adapter = drawerNavAdapter
@@ -150,3 +152,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     }
     //endregion inner methods
 }
+
+//region inner classes ========================================================================
+interface OnDrawerNavItemChangedListener{
+    fun onDrawerNavChanged(category: String?)
+}
+//endregion inner classes

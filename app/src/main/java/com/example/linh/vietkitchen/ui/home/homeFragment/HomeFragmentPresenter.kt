@@ -1,44 +1,98 @@
 package com.example.linh.vietkitchen.ui.home.homeFragment
 
+import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestFoodCommand
+import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
+import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-class HomeFragmentPresenter(private val requestFoodCommand : RequestFoodCommand = RequestFoodCommand())
+class HomeFragmentPresenter(private val requestFoodCommand : RequestFoodCommand = RequestFoodCommand(),
+                            private val putRecipeCommand: PutRecipeCommand = PutRecipeCommand())
     : BasePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
 
-    private var  d : CompositeDisposable = CompositeDisposable()
+    private var lastRecipeId: String? = null
+    private var isLoadMoreRecipe = false
+    private var isFreshRecipe = false
+    private var isReachLastRecord = false
 
-    override fun requestFoods(){
-        viewContract?.showProgress()
-        d.add(requestFoodCommand.execute()
+    private var requestRecipeDisposable: Disposable? = null
+
+    override fun detachView() {
+        super.detachView()
+        requestRecipeDisposable?.dispose()
+    }
+
+    override fun requestFoods(category: String?){
+        if (isLoadMoreRecipe){
+            viewContract?.onLoadingMore()
+        }else {
+            viewContract?.onRefreshRecipe()
+        }
+        requestFoodCommand.category = category
+        requestFoodCommand.startAtId = lastRecipeId
+        requestRecipeDisposable = requestFoodCommand.execute()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({
-
                     if (it != null && it.isEmpty()) {
-                        viewContract?.onFoodsRequestFailed("Oops! something went wrong")
+                        viewContract?.onFoodsRequestFailed("Oops! something went wrong, no data found")
                     }else{
-                        viewContract?.onFoodsRequestSuccess(it)
+                        if (it.last().id.equals(lastRecipeId)){
+                            isReachLastRecord = true
+                            isLoadMoreRecipe = false
+                            isFreshRecipe = false
+                            viewContract?.onLoadMoreReachEndRecord()
+                            return@subscribe
+                        }
+                        lastRecipeId = it.last().id
+                        if(isLoadMoreRecipe){
+                            viewContract?.onLoadMoreSuccess(it)
+                            isLoadMoreRecipe = false
+                        }else {
+                            viewContract?.onFoodsRequestSuccess(it)
+                            isFreshRecipe = false
+                        }
                     }
                     viewContract?.hideProgress()
 
                 }, {
                     Timber.e(it)
-                    viewContract?.hideProgress()
-                }))
+                    if(isLoadMoreRecipe){
+                        viewContract?.onLoadMoreFailed()
+                        isLoadMoreRecipe = false
+                    }else{
+                        viewContract?.onFoodsRequestFailed("Opps some things went wrong. ${it.message}")
+                        isFreshRecipe = false
+                    }
+                })
     }
 
-    override fun refreshFoods() {
+    override fun loadMoreRecipe() {
+        if(isLoadMoreRecipe || isFreshRecipe || isReachLastRecord) return
+        isLoadMoreRecipe = true
         requestFoods()
     }
 
-
-    override fun detachView() {
-        super.detachView()
-        d.clear()
+    override fun refreshFoods(category: String?) {
+        requestRecipeDisposable?.dispose()
+        isFreshRecipe = true
+        isLoadMoreRecipe = false
+        lastRecipeId = null
+        isReachLastRecord = false
+        requestFoods(category)
     }
+
+    override fun putARecipe() {
+        compositeDisposable.add(putRecipeCommand.execute()
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    Timber.d("a recipe was put into firebase server")
+                })
+    }
+
 }

@@ -12,4 +12,5 @@ interface HomeActivityContractView : BaseViewContract {
 
 interface HomeActivityContractPresenter : BasePresenterContract<HomeActivityContractView> {
     fun requestCategory()
+    fun putARecipe()
 }

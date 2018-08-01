@@ -10,4 +10,4 @@ class Food(val id: String?, val name: String, val intro: String, val ingredient:
                 val imageUrl: String) : Entity()
 
 data class CategoryItem(val itemTitle: String)
-data class CategoryGroup(val headerTile: String, val itemsList: List<CategoryItem>)
+data class CategoryGroup(val headerTile: String, val itemsList: List<CategoryItem>? = null)

@@ -7,9 +7,9 @@ import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
 
-class DrawerNavChildItemDelegate : AbsListItemAdapterDelegate<DrawerNavChildItem, Entity, DrawerNavChildViewHolder>() {
+class DrawerNavChildItemDelegate(private val listener: OnItemClickListener? = null) : AbsListItemAdapterDelegate<DrawerNavChildItem, Entity, DrawerNavChildViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup)
-            = DrawerNavChildViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_child_drawer_nav, parent, false))
+            = DrawerNavChildViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_child_drawer_nav, parent, false), listener)
 
     override fun isForViewType(item: Entity, items: MutableList<Entity>, position: Int)
             = item is DrawerNavChildItem
