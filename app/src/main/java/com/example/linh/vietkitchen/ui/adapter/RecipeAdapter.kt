@@ -4,9 +4,9 @@ import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.ShimmerAdapter
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.ShimmerItemDelegate
 import com.example.linh.vietkitchen.ui.model.Entity
 
-class FoodAdapter(items: MutableList<Entity> = mutableListOf()) : ShimmerAdapter() {
+class RecipeAdapter(items: MutableList<Entity> = mutableListOf()) : ShimmerAdapter() {
     init {
-        delegatesManager.addDelegate(FoodAdapterDelegate())
+        delegatesManager.addDelegate(RecipeAdapterDelegate())
         delegatesManager.addDelegate(ShimmerItemDelegate())
         setItems(items)
     }

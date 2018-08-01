@@ -1,17 +1,16 @@
 package com.example.linh.vietkitchen.data.cloud
 
-import com.example.linh.vietkitchen.data.cloud.mapper.FoodMapper
-import com.example.linh.vietkitchen.data.local.Food
-import com.example.linh.vietkitchen.data.local.Ingredient
-import com.example.linh.vietkitchen.domain.datasource.FoodDataSource
-import com.google.firebase.database.*
-import com.example.linh.vietkitchen.domain.model.Food as FoodDomain
+import com.example.linh.vietkitchen.data.cloud.mapper.RecipeMapper
+import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Query
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import timber.log.Timber
+import com.example.linh.vietkitchen.domain.model.Recipe as FoodDomain
 
-class FoodCloudDataSource(private val mapper: FoodMapper = FoodMapper()) : FoodDataSource {
+class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) : RecipeDataSource {
     companion object {
         const val STORAGE_RECIPES = "recipes"
         const val STORAGE_RECIPES_CHILD_TAGS = "tags/"
@@ -20,7 +19,7 @@ class FoodCloudDataSource(private val mapper: FoodMapper = FoodMapper()) : FoodD
     private val database  by lazy { FirebaseDatabase.getInstance()}
     private val dbRef by lazy{ database.getReference(STORAGE_RECIPES)}
 
-    override fun getAllFood(tag: String?, limit: Int, startAtId: String?): Flowable<List<com.example.linh.vietkitchen.domain.model.Food>>? {
+    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<com.example.linh.vietkitchen.domain.model.Recipe>>? {
         val query: Query = if(tag.isNullOrBlank()){
             dbRef.orderByKey()
         }else{
@@ -67,7 +66,7 @@ class FoodCloudDataSource(private val mapper: FoodMapper = FoodMapper()) : FoodD
 //        }
 //    }
 
-    override fun putFoodWithDumpData(): Completable? {
+    override fun putRecipeWithDumpData(): Completable? {
         return Completable.create { emitter ->
             dbRef.push().setValue(createADumpFood())
                     .addOnSuccessListener {
@@ -81,7 +80,7 @@ class FoodCloudDataSource(private val mapper: FoodMapper = FoodMapper()) : FoodD
 //        return RxFirebaseDatabase.setValue(dbRef, createADumpFood())
     }
 
-    private fun createADumpFood(): Food {
+    private fun createADumpFood(): Recipe {
         val name = "bò xào rau củ"
         val intro = "Chè hạt sen nhãn nhục không chỉ có vị thơm mát, ngọt dịu của hạt sen hòa quyện với nhãn nhục, mà còn là món ăn bổ dưỡng cho cơ thể. Như bạn cũng biết nhãn nhục ăn quá nhiều sẽ bị nóng nhưng có một cách để ăn nhãn nhục không lo bị nóng đó là chúng ta đem kết hợp nhãn nhục với hạt sen. ";
         val ingredients = mapOf(
@@ -106,7 +105,7 @@ class FoodCloudDataSource(private val mapper: FoodMapper = FoodMapper()) : FoodD
                 Pair("bò xào", true)
         )
         val imageUrl = "http://media.phunutoday.vn/files/upload_images/2016/08/29/cach-lam-bo-xao-rau-cu-thom-ngon-hap-dan-phunutoday_vn.jpg"
-        return Food( name, intro, ingredients, spices, preliminaryProcessing, processing, method,
+        return Recipe( name, intro, ingredients, spices, preliminaryProcessing, processing, method,
                 benefit, season, region, specialDay, tags, imageUrl)
     }
 }

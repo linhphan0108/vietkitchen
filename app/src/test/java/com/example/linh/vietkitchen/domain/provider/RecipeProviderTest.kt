@@ -1,36 +1,34 @@
 package com.example.linh.vietkitchen.domain.provider
 
-import com.example.linh.vietkitchen.domain.datasource.FoodDataSource
-import com.example.linh.vietkitchen.domain.model.Food
+import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
+import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Ingredient
 import io.reactivex.Flowable
-import org.junit.Assert
 import org.junit.Assert.assertNotNull
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
-class FoodProviderTest {
+class RecipeProviderTest {
     @Test fun testRequestFoodReturnValue(){
-        val ds = mock(FoodDataSource::class.java)
+        val ds = mock(RecipeDataSource::class.java)
         val food = createDumpFood()
         val flowable = Flowable.just(listOf(food))
-        `when`(ds.getAllFood()).then{flowable}
-        val provider = FoodProvider(listOf(ds))
+        `when`(ds.getAllRecipes()).then{flowable}
+        val provider = RecipeProvider(listOf(ds))
         assertNotNull(provider.requestFoods())
     }
 
     @Test fun testRequestFoodNoValue(){
-        val ds = mock(FoodDataSource::class.java)
-        val flowable = Flowable.empty<List<Food>>()
-        `when`(ds.getAllFood()).then{flowable}
-        val provider = FoodProvider(listOf(ds))
+        val ds = mock(RecipeDataSource::class.java)
+        val flowable = Flowable.empty<List<Recipe>>()
+        `when`(ds.getAllRecipes()).then{flowable}
+        val provider = RecipeProvider(listOf(ds))
         assertNotNull(provider.requestFoods())
 
     }
 
-    private fun createDumpFood(): Food {
+    private fun createDumpFood(): Recipe {
         val id = "vaaskdfhskjdf"
         val name = "Chè hạt sen nhãn nhục"
         val intro = "Chè hạt sen nhãn nhục không chỉ có vị thơm mát, ngọt dịu của hạt sen hòa quyện với nhãn nhục, mà còn là món ăn bổ dưỡng cho cơ thể. Như bạn cũng biết nhãn nhục ăn quá nhiều sẽ bị nóng nhưng có một cách để ăn nhãn nhục không lo bị nóng đó là chúng ta đem kết hợp nhãn nhục với hạt sen. ";
@@ -57,7 +55,7 @@ class FoodProviderTest {
         val region = "việt nam"
         val specialDay = "mùa hè"
         val imageUrl = "https://daubepgiadinh.vn/wp-content/uploads/2018/05/che-hat-sen-nhan-nhuc.jpg"
-        return Food(id, name, intro, ingredients, spices, preliminaryProcessing, processing, method,
+        return Recipe(id, name, intro, ingredients, spices, preliminaryProcessing, processing, method,
                 benefit, season, region, specialDay, imageUrl)
     }
 }

@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.home.homeFragment
 
 import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
-import com.example.linh.vietkitchen.domain.command.RequestFoodCommand
+import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-class HomeFragmentPresenter(private val requestFoodCommand : RequestFoodCommand = RequestFoodCommand(),
+class HomeFragmentPresenter(private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),
                             private val putRecipeCommand: PutRecipeCommand = PutRecipeCommand())
     : BasePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
 
@@ -32,9 +32,9 @@ class HomeFragmentPresenter(private val requestFoodCommand : RequestFoodCommand 
         }else {
             viewContract?.onRefreshRecipe()
         }
-        requestFoodCommand.category = category
-        requestFoodCommand.startAtId = lastRecipeId
-        requestRecipeDisposable = requestFoodCommand.execute()
+        requestRecipeCommand.category = category
+        requestRecipeCommand.startAtId = lastRecipeId
+        requestRecipeDisposable = requestRecipeCommand.execute()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({

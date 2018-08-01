@@ -1,6 +1,6 @@
 package com.example.linh.vietkitchen.data.cloud.mapper
 
-import com.example.linh.vietkitchen.data.local.Ingredient
+import com.example.linh.vietkitchen.data.cloud.Ingredient
 import com.example.linh.vietkitchen.domain.model.Ingredient as IngredientDomain
 
 class IngredientMapper {
