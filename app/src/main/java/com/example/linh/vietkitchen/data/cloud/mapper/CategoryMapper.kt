@@ -8,15 +8,18 @@ class CategoryMapper{
     fun convertToDomain(categorySnapshot: DataSnapshot): List<CategoryGroup>{
         val categoryGroups = mutableListOf<CategoryGroup>()
         categorySnapshot.children.forEach {
-            val categoryItems = mutableListOf<CategoryItem>()
-            val groupSnapshot = it
-            groupSnapshot.children.forEach{
-                val itemTitle: String = it.key.toString()
-                categoryItems.add(CategoryItem(itemTitle))
+            it.children.forEach{
+                val groupSnapshot = it
+                val categoryItems = mutableListOf<CategoryItem>()
+                groupSnapshot.children.forEach{
+                    val itemTitle: String = it.key.toString()
+                    categoryItems.add(CategoryItem(itemTitle))
+                }
+                val groupTitle = groupSnapshot.key.toString()
+                categoryGroups.add(CategoryGroup(groupTitle, categoryItems))
             }
-            val groupTitle = groupSnapshot.key.toString()
-            categoryGroups.add(CategoryGroup(groupTitle, categoryItems))
         }
+        //add the total item
         return categoryGroups
     }
 }

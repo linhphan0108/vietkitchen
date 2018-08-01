@@ -2,50 +2,35 @@ package com.example.linh.vietkitchen.ui.home.homeFragment
 
 import android.content.Context
 import android.graphics.Rect
-import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.model.Food
+import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.adapter.FoodAdapter
-import com.example.linh.vietkitchen.ui.mvpBase.BaseFragment
-import com.google.firebase.storage.FirebaseStorage
+import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
+import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
+import com.example.linh.vietkitchen.ui.home.homeActivity.OnDrawerNavItemChangedListener
+import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
+import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
+import com.example.linh.vietkitchen.ui.mvpBase.ToolbarFragment
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
-import android.support.v7.widget.RecyclerView
-import com.example.linh.vietkitchen.extension.color
-import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
-import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
-import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import java.util.concurrent.TimeUnit
 
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [HomeFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
-class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(), HomeFragmentContractView {
-    companion object {
-        const val STORAGE_FOOD = "foods"
 
+class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(),
+        HomeFragmentContractView, OnDrawerNavItemChangedListener {
+    companion object {
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
@@ -69,13 +54,8 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
 
     private var param1: String? = null
     private var param2: String? = null
-    private var listener: OnFragmentInteractionListener? = null
 
     lateinit var foodAdapter: FoodAdapter
-
-    val storage by lazy { FirebaseStorage.getInstance() }
-    val storageRef by lazy {  storage.reference.child(STORAGE_FOOD) }
-
 
     //region lifecycle =============================================================================
     override fun getFragmentLayoutRes() = R.layout.fragment_home
@@ -98,7 +78,7 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
         Timber.e("on activity created")
         setupSwipeRefreshLayout()
         setupRecyclerView()
-        presenter.requestFoods()
+        presenter.refreshFoods()
     }
 
     override fun onStart() {
@@ -108,6 +88,7 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
 
     override fun onResume() {
         super.onResume()
+        toolbarActions?.changeToolbarTitle("home fragment")
         Timber.e("on resume")
     }
 
@@ -131,24 +112,16 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
         Timber.e("on destroy")
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-//            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+        if (context is HomeActivity){
+            context.onDrawerNavItemChangedListener = this
         }
         Timber.e("on attach")
     }
 
     override fun onDetach() {
         super.onDetach()
-        listener = null
         Timber.e("on Detach")
     }
     //endregion lifecycle
@@ -170,6 +143,30 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
 
     override fun onFoodsRequestFailed(msg: String) {
         toast(msg)
+        foodAdapter.stopShimmerAnimation()
+    }
+
+    override fun onRefreshRecipe() {
+        foodAdapter.startShimmerAnimation()
+    }
+
+    override fun onLoadingMore() {
+        foodAdapter.startLoadMoreAnimation()
+    }
+
+    override fun onLoadMoreSuccess(recipes: List<Food>) {
+        toast("onLoadMoreSuccess ${recipes.size}")
+        foodAdapter.stopLoadMoreAnimation()
+        foodAdapter.setMoreItems(recipes.toMutableList())
+    }
+
+    override fun onLoadMoreFailed() {
+        foodAdapter.stopLoadMoreAnimation()
+    }
+
+    override fun onLoadMoreReachEndRecord() {
+        foodAdapter.stopLoadMoreAnimation()
+        toast("onLoadMoreReachEndRecord")
     }
 
     override fun showProgress() {
@@ -177,64 +174,26 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
     }
 
     override fun hideProgress() {
-        foodAdapter.stopLoadMoreAnimation()
     }
     //endregion MVP callbacks
 
-    //region inner methods =========================================================================
-    private fun createAnPutDumpDataToFirebaseDb(){
-//        val name = "Chè hạt sen nhãn nhục"
-//        val intro = "Chè hạt sen nhãn nhục không chỉ có vị thơm mát, ngọt dịu của hạt sen hòa quyện với nhãn nhục, mà còn là món ăn bổ dưỡng cho cơ thể. Như bạn cũng biết nhãn nhục ăn quá nhiều sẽ bị nóng nhưng có một cách để ăn nhãn nhục không lo bị nóng đó là chúng ta đem kết hợp nhãn nhục với hạt sen. ";
-//        val ingredients = mapOf(
-//                Pair("Hạt sen tươi", Ingredient(200, "g")),
-//                Pair("Nhãn nhục", Ingredient(100, "g")),
-//                Pair("Đường phèn", Ingredient(100, "g")))
-//        val spices = "hành lá, ngò rí, hành củ, hạt tiêu"
-//        val preliminaryProcessing = listOf(
-//                "Nếu dùng hạt sen tươi, bạn bóc sạch vỏ, tách bỏ tim sen, nếu dùng hạt sen khô, bạn ngâm mềm trước khi nấu",
-//                "Nhãn nhục mua về bạn cũng bóc vỏ, bỏ hạt rồi để riêng ra chén. Nếu dùng nhãn nhục khô, bạn rửa sạch, ngâm vào nước lạnh cho nở rồi xả lại dưới vòi nước cho sạch cát và bụi, để vào rổ cho ráo nước.")
-//        val processing = listOf(
-//                "Sau khi sơ chế, bạn tiến hành nấu mềm hạt sen, đối với hạt sen tươi nấu mềm sẽ giúp hạt sen tươi bớt mủ, nấu hạt sen khô giúp hạt nềm đều khi nấu và tránh bị sượng. Sau khi hầm chín hạt sen, bạn vớt hạt sen ra ngoài. Nếu muốn nước chè không bị đục, sau khi hầm hạt sen xong, bạn xả sơ hạt sen qua nước lạnh.",
-//                "Sau khi hầm hạt sen xong, bạn khéo léo nhét hạt sen vào bên trong nhãn nhục. Bạn làm cho hết hạt sen và nhãn nhục.\n" +
-//                        "\n" +
-//                        "Đường phèn bạn cho vào nồi nước cho sôi và đường tan hết. Tiếp theo, bạn cho hạt sen nhãn nhục vào nấu khoảng 10 phút. Bạn lưu ý không nấu quá lâu vì sẽ làm mất đi độ giòn của nhãn nhục. Nếm thử xem vừa miệng rồi thì tắt bếp.\n" +
-//                        "\n" +
-//                        "Bạn có thể thưởng thức chè hạt sen nhãn nhục nóng hoặc lạnh đều rất ngon. Vậy là chúng tôi đã giới thiệu xong cách nấu chè hạt sen nhãn nhục thơm mát, bổ dưỡng để cả gia đình thưởng thức rồi. Về cơ bản thì cách nấu chè không có gì khó, chỉ mất thời gian một chút ở khâu chuẩn bị nguyên liệu. Đừng ngại bỏ chút thời gian để vào bếp và chế biến cho gia đình nhé, vừa ngon lại vừa đảm bảo an toàn vệ sinh.\n" +
-//                        "\n" +
-//                        "Chúc bạn thành công khi thực hiện.")
-//        val method = mapOf(Pair("chè", true))
-//        val benefit = mapOf(Pair("giải nhiệt", true))
-//        val season = mapOf(Pair("mùa hè", true))
-//        val region = "việt nam"
-//        val specialDay = "mùa hè"
-//        val imageUrl = "https://daubepgiadinh.vn/wp-content/uploads/2018/05/che-hat-sen-nhan-nhuc.jpg"
-//        val f = Food(name, intro, ingredients, spices, preliminaryProcessing, processing, method,
-//                benefit, season, region, specialDay, imageUrl)
-
-
-//        dbRef.push().setValue(f)
-//                .addOnCompleteListener { task ->
-//                    if (task.isSuccessful){
-//                        toast("data pushed")
-//                    }else{
-//                        toast("failed to push data")
-//                    }
-//                }
-//                .addOnFailureListener { exception ->
-//                    toast("on failure listener called")
-//                    exception.printStackTrace()
-//                }
+    //region callbacks =============================================================================
+    override fun onDrawerNavChanged(category: String?) {
+        presenter.refreshFoods(category)
     }
 
+    //endregion callbacks
+
+    //region inner methods =========================================================================
     private fun setupRecyclerView(){
         foodAdapter = FoodAdapter()
         rcvFood.layoutManager = LinearLayoutManager(context)
         rcvFood.itemAnimator = DefaultItemAnimator()
         rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
         rcvFood.adapter = foodAdapter
-        rcvFood.addOnScrollListener(object : EndlessScrollListener(){
+        rcvFood.addOnScrollListener(object : EndlessScrollListener(3){
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
-                foodAdapter.startLoadMoreAnimation()
+                presenter.loadMoreRecipe()
                 return true
             }
         })
@@ -255,23 +214,6 @@ class HomeFragment : BaseFragment<HomeFragmentContractView, HomeFragmentContract
     //endregion inner methods
 
     //region inner classes =========================================================================
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
-    }
-
-
     inner class VerticalSpaceItemDecoration(private val verticalSpaceHeight: Int) : RecyclerView.ItemDecoration() {
 
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
