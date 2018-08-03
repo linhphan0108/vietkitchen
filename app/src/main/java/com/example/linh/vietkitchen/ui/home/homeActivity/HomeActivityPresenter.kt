@@ -17,7 +17,6 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
     : BasePresenter<HomeActivityContractView>() , HomeActivityContractPresenter {
     override fun requestCategory() {
         requestCategoryCommand.execute()
-                .observeOn(Schedulers.io())
                 .map {
                     Timber.e("on map: ${Looper.myLooper() == Looper.getMainLooper()}")
                     val categories = categoryMapper.convertToUI(it).toMutableList()
