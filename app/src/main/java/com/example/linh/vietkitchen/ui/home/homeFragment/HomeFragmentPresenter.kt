@@ -35,7 +35,6 @@ class HomeFragmentPresenter(private val requestRecipeCommand : RequestRecipeComm
         requestRecipeCommand.category = category
         requestRecipeCommand.startAtId = lastRecipeId
         requestRecipeDisposable = requestRecipeCommand.execute()
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({
                     if (it != null && it.isEmpty()) {
@@ -69,6 +68,7 @@ class HomeFragmentPresenter(private val requestRecipeCommand : RequestRecipeComm
                         isFreshRecipe = false
                     }
                 })
+
     }
 
     override fun loadMoreRecipe() {
@@ -88,7 +88,7 @@ class HomeFragmentPresenter(private val requestRecipeCommand : RequestRecipeComm
 
     override fun putARecipe() {
         compositeDisposable.add(putRecipeCommand.execute()
-                .observeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     Timber.d("a recipe was put into firebase server")

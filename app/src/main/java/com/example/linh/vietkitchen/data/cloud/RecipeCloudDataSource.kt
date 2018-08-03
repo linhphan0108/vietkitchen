@@ -2,11 +2,12 @@ package com.example.linh.vietkitchen.data.cloud
 
 import com.example.linh.vietkitchen.data.cloud.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
+import com.example.linh.vietkitchen.util.LoggerUtil
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.Query
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import com.example.linh.vietkitchen.domain.model.Recipe as FoodDomain
 
@@ -19,21 +20,33 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
     private val database  by lazy { FirebaseDatabase.getInstance()}
     private val dbRef by lazy{ database.getReference(STORAGE_RECIPES)}
 
-    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<com.example.linh.vietkitchen.domain.model.Recipe>>? {
-        val query: Query = if(tag.isNullOrBlank()){
-            dbRef.orderByKey()
+    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<FoodDomain>>? {
+        val query = if(tag.isNullOrBlank()){
+            if(startAtId.isNullOrBlank()){
+                dbRef.orderByKey()
+            }else{
+                dbRef.orderByKey()
+                        .startAt(startAtId)
+            }
         }else{
-            dbRef.orderByChild(STORAGE_RECIPES_CHILD_TAGS + tag)
-                    .equalTo(true)
-        }
-        if(!startAtId.isNullOrBlank()){
-            query.startAt(startAtId)
-        }
-        query.limitToFirst(limit)
-        return RxFirebaseDatabase.observeValueEvent(query){
-            Timber.d("onFetchData data's length ${it.children.count()}")
-            mapper.convertToDomain(it.children)
-        }
+            if(startAtId.isNullOrBlank()) {
+                dbRef.orderByChild(STORAGE_RECIPES_CHILD_TAGS + tag)
+                        .equalTo(true)
+            }else{
+                dbRef.orderByChild(STORAGE_RECIPES_CHILD_TAGS + tag)
+                        .equalTo(true)
+                        .startAt(startAtId)
+            }
+        }.limitToFirst(limit)
+        return RxFirebaseDatabase.observeValueEvent(query)
+                .observeOn(Schedulers.computation())
+                .map{
+                    Timber.d("onFetchData data's length ${it.children.count()}")
+                    Timber.d("latest key ${it.children.last().key}")
+                    LoggerUtil.logThread()
+                    mapper.convertToDomain(it.children)
+                }
+
     }
 
     //an example how to use an Rxjava  DisposableObserver natively
