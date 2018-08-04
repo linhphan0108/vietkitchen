@@ -21,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.example.linh.vietkitchen.ui.detailActivity.RecipeDetailActivity"
+        <activity android:name="com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity"
             android:screenOrientation="portrait"/>
     </application>
 

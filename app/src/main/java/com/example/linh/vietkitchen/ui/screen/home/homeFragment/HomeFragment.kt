@@ -19,7 +19,7 @@ import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
-import com.example.linh.vietkitchen.ui.detailActivity.RecipeDetailActivity
+import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
 import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.home.homeActivity.OnDrawerNavItemChangedListener
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
