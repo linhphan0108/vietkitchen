@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.ui.home.detailActivity
+package com.example.linh.vietkitchen.ui.detailActivity
 
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 

@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.ui.home.detailActivity
+package com.example.linh.vietkitchen.ui.detailActivity
 
 import android.content.Context
 import android.content.Intent
