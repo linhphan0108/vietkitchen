@@ -7,10 +7,10 @@
     <color name="colorAccent">#448AFF</color>
     <color name="lightPrimaryColor">#FFCDD2</color>
     <color name="textIconColor">#FFFFFF</color>
-    <!--<color name="textPrimary">#212121</color>-->
+    <!--<color notes="textPrimary">#212121</color>-->
     <color name="textPrimary">#757575</color>
     <color name="textSecondary">#9f9f9f</color>
-    <!--<color name="divider">#BDBDBD</color>-->
+    <!--<color notes="divider">#BDBDBD</color>-->
     <color name="divider">#fafafa</color>
     <color name="state_icon_unselected">#323232</color>
     <color name="color_wave_refresh">#f44336</color>
@@ -25,4 +25,11 @@
 
     <!--home screen-->
     <color name="tab_bar_bg">@color/divider</color>
+
+    <!--detail activity-->
+    <color name="translucent_scrim_bottom">#da000000</color>
+    <color name="translucent_scrim_bottom_center">#b6000000</color>
+    <color name="textAccent">@color/colorAccent</color>
+    <color name="detail_content_text_color">#fff</color>
+
 </resources>

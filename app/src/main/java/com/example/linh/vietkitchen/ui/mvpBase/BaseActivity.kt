@@ -8,7 +8,7 @@ abstract class BaseActivity<T : BaseViewContract, V : BasePresenterContract<T>> 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(getFragmentLayoutRes())
+        setContentView(getActivityLayoutRes())
         presenter = initPresenter()
         presenter.attachView(getViewContract())
     }
@@ -22,5 +22,5 @@ abstract class BaseActivity<T : BaseViewContract, V : BasePresenterContract<T>> 
 
     abstract fun getViewContract() : T
 
-    abstract fun getFragmentLayoutRes(): Int
+    abstract fun getActivityLayoutRes(): Int
 }

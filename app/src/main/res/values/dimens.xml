@@ -19,4 +19,20 @@
     <dimen name="placeholderImage">140dp</dimen>
     <dimen name="placeholderTextHeight">12dp</dimen>
     <dimen name="padding_10">10dp</dimen>
+
+    <!--detail activity-->
+    <dimen name="margin_small">10dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="padding_top_scrollview">180dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_bottom">30dp</dimen>
+    <dimen name="list_item_title">32sp</dimen>
+    <dimen name="list_item_title_margin_top">180dp</dimen>
+    <dimen name="title_size">28sp</dimen>
+    <dimen name="body_size">14sp</dimen>
+    <dimen name="margin_progress_bar">-6dp</dimen>
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="splashscreen_logo">150dp</dimen>
+    <dimen name="splashscreen_progressbar">6dp</dimen>
+    <dimen name="appbar_logo">30dp</dimen>
 </resources>
