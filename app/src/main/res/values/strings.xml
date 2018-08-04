@@ -17,4 +17,13 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+    <!--detail activity-->
+    <string name="demo_desc">Blah Blah Blah Blah Blah Blah Blah!!!!!!</string>
+    <string name="recipe_picture_content_description">recipe picture</string>
+    <string name="label_spices">spices:</string>
+    <string name="label_ingredients">ingredients:</string>
+    <string name="label_process">process:</string>
+    <string name="label_pre_process">Pre process:</string>
+
 </resources>

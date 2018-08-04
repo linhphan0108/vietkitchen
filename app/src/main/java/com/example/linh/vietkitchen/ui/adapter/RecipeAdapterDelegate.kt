@@ -9,7 +9,7 @@ import com.example.linh.vietkitchen.ui.model.Entity
 import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
 
 
-open class RecipeAdapterDelegate : AbsListItemAdapterDelegate<Recipe, Entity, RecipeViewHolder>() {
+open class RecipeAdapterDelegate(val listener: OnItemClickListener?) : AbsListItemAdapterDelegate<Recipe, Entity, RecipeViewHolder>() {
 
     override fun isForViewType(item: Entity, items: MutableList<Entity>, position: Int): Boolean {
         return items[position] is Recipe
@@ -21,6 +21,6 @@ open class RecipeAdapterDelegate : AbsListItemAdapterDelegate<Recipe, Entity, Re
 
     override fun onCreateViewHolder(parent: ViewGroup): RecipeViewHolder {
         val itemView = LayoutInflater.from(parent.ctx).inflate(R.layout.item_recipe, parent, false)
-        return RecipeViewHolder(itemView)
+        return RecipeViewHolder(itemView, listener)
     }
 }

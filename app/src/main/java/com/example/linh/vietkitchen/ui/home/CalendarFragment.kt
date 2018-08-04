@@ -75,7 +75,7 @@ class CalendarFragment : Fragment() {
      * for more information.
      */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
+        // TODO: Update argument type and notes
         fun onFragmentInteraction(uri: Uri)
     }
 

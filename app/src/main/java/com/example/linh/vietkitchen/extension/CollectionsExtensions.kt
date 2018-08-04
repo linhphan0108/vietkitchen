@@ -12,3 +12,12 @@ inline fun <T, R : Any> Iterable<T>.firstResult(predicate: (T) -> R?): R {
     }
     throw NoSuchElementException("No element matching predicate was found.")
 }
+
+fun List<String>.toString(separator: String): String{
+    val result = StringBuilder()
+    this.forEach {
+        result.append("$it$separator")
+    }
+    return if (result.isEmpty()) ""
+    else result.substring(0, result.length - separator.length)
+}

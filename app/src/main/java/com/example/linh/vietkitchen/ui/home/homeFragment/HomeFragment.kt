@@ -1,7 +1,10 @@
 package com.example.linh.vietkitchen.ui.home.homeFragment
 
+import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Context
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -13,8 +16,10 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
+import com.example.linh.vietkitchen.ui.home.detailActivity.RecipeDetailActivity
 import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.home.homeActivity.OnDrawerNavItemChangedListener
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
@@ -29,7 +34,8 @@ private const val ARG_PARAM2 = "param2"
 
 
 class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(),
-        HomeFragmentContractView, OnDrawerNavItemChangedListener {
+        HomeFragmentContractView, OnDrawerNavItemChangedListener, OnItemClickListener {
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -151,7 +157,7 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
     }
 
     override fun onLoadingMore() {
-        recipeAdapter.startLoadMoreAnimation()
+//        recipeAdapter.startLoadMoreAnimation()
     }
 
     override fun onLoadMoreSuccess(recipes: List<Recipe>) {
@@ -182,11 +188,22 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
         presenter.refreshFoods(category)
     }
 
+    //recycler view callback
+    override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe) {
+        val intent = RecipeDetailActivity.createIntent(context, layoutPosition.toString(), data)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            itemView.transitionName = layoutPosition.toString()
+            val activityOptions = ActivityOptions.makeSceneTransitionAnimation(context as Activity, itemView, itemView.transitionName)
+            context?.startActivity(intent, activityOptions.toBundle())
+        }else{
+            context?.startActivity(intent)
+        }
+    }
     //endregion callbacks
 
     //region inner methods =========================================================================
     private fun setupRecyclerView(){
-        recipeAdapter = RecipeAdapter()
+        recipeAdapter = RecipeAdapter(listener = this)
         rcvFood.layoutManager = LinearLayoutManager(context)
         rcvFood.itemAnimator = DefaultItemAnimator()
         rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
