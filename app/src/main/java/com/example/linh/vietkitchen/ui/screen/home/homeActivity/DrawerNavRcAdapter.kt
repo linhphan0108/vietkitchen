@@ -3,6 +3,7 @@ package com.example.linh.vietkitchen.ui.home.homeActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavHeader
 import com.example.linh.vietkitchen.ui.model.Entity
@@ -14,7 +15,7 @@ class DrawerNavRcAdapter(private val recyclerView: RecyclerView,
                          items: List<Entity> = listOf())
     : ListDelegationAdapter<MutableList<Entity>>(), OnGroupItemClickListener {
     init {
-        delegatesManager.addDelegate(DrawerNavHeaderLayoutDelegate())
+        delegatesManager.addDelegate(DrawerNavHeaderLayoutDelegate(userInfo))
         delegatesManager.addDelegate(DrawerNavGroupItemDelegate(this))
         delegatesManager.addDelegate(DrawerNavChildItemDelegate(childItemClickListener))
         setItems(items.toMutableList())

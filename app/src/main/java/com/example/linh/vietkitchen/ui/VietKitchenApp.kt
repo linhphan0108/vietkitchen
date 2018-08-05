@@ -2,11 +2,24 @@ package com.example.linh.vietkitchen.ui
 
 import android.support.multidex.MultiDexApplication
 import com.example.linh.vietkitchen.BuildConfig
+import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.util.NotLoggingTree
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.leakcanary.LeakCanary
 import timber.log.Timber
 
 class VietKitchenApp : MultiDexApplication(){
+    companion object {
+        val userInfo: UserInfo by lazy {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser != null){
+                 UserInfo(currentUser.uid, currentUser.displayName, currentUser.email, currentUser.photoUrl)
+            }else{
+                throw NullPointerException("user info not found!")
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
 

@@ -2,4 +2,5 @@
 <resources>
     <string name="draw_nav_group_item_all">tất cả</string>
     <string name="app_name">Bếp Việt</string>
+    <string name="app_name_version">Bếp Việt %s</string>
 </resources>
