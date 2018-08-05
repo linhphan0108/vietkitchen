@@ -1,12 +1,12 @@
 package com.example.linh.vietkitchen.ui
 
-import android.app.Application
+import android.support.multidex.MultiDexApplication
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.util.NotLoggingTree
 import com.squareup.leakcanary.LeakCanary
 import timber.log.Timber
 
-class VietKitchenApp : Application(){
+class VietKitchenApp : MultiDexApplication(){
     override fun onCreate() {
         super.onCreate()
 
