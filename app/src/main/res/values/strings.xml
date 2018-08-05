@@ -1,12 +1,14 @@
 <resources>
-    <string name="app_name">VietKitchen</string>
+    <string name="app_name">Viet Kitchen</string>
+    <string name="app_name_version">VietKitchen %s</string>
     <string name="label_home">home</string>
     <string name="label_favorites">favorites</string>
     <string name="label_calendar">calendar</string>
     <string name="label_profile">profile</string>
     <string name="message_error">Oops! something went wrong.</string>
-    <string name="label_loading">loading…</string>
+    <string name="label_loading">loading</string>
     <string name="draw_nav_group_item_all">all</string>
+    <string name="fui_progress_dialog_signing_up">Creating your shiny new account…</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

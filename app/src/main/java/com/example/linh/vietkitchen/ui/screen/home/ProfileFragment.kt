@@ -9,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.extension.toast
+import com.firebase.ui.auth.AuthUI
+import kotlinx.android.synthetic.main.fragment_profile.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -42,6 +45,18 @@ class ProfileFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        btnLogOut.setOnClickListener{ view ->
+            AuthUI.getInstance()
+                .signOut(context!!)
+                .addOnCompleteListener {
+                    activity?.toast("logged out")
+                    activity?.finish()
+                }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

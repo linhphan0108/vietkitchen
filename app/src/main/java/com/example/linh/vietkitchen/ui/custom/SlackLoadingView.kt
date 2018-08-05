@@ -9,17 +9,17 @@ import android.graphics.Paint
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
+import android.view.View
 import android.view.animation.LinearInterpolator
+import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.util.ScreenUtil
-import timber.log.Timber
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * 作者： 巴掌 on 16/8/11 23:54
  * Github: https://github.com/JeasonWong
  */
-class SlackLoadingView : BaseCustomView {
+class SlackLoadingView : BaseCustomView, View.OnAttachStateChangeListener {
     //静止状态
     private val STATUS_STILL = 0
     //加载状态
@@ -58,6 +58,8 @@ class SlackLoadingView : BaseCustomView {
     //第几部动画
     private var mStep: Int = 0
 
+    private var mRatioBetweenViewSizeAndLineLength = 2.7f
+
     constructor(context: Context): super(context)
     constructor(context: Context, attrs: AttributeSet): super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int): super(context, attrs, defStyleAttr)
@@ -66,6 +68,22 @@ class SlackLoadingView : BaseCustomView {
             : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun onConstructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
+        val typedArray = context.theme.obtainStyledAttributes(attrs,
+                R.styleable.SlackLoadingView,0, 0)
+        val lineLengthMultiple = typedArray.getFloat(R.styleable.SlackLoadingView_lineLengthMultiple, 0f)
+        typedArray.recycle()
+        addOnAttachStateChangeListener(this)
+    }
+
+    override fun onViewDetachedFromWindow(v: View?) {
+        mAnimList.forEach {
+            it.removeAllListeners()
+            it.end()
+            it.cancel()
+        }
+    }
+
+    override fun onViewAttachedToWindow(v: View?) {
     }
 
     init {
@@ -73,11 +91,11 @@ class SlackLoadingView : BaseCustomView {
     }
 
     override fun getDefaultWidthSize(): Int {
-        return (mEntireLineLength * 2.3f).toInt()
+        return (mEntireLineLength * mRatioBetweenViewSizeAndLineLength).toInt()
     }
 
     override fun getDefaultHeightSize(): Int {
-        return (mEntireLineLength * 2.3f).toInt()
+        return (mEntireLineLength * mRatioBetweenViewSizeAndLineLength).toInt()
     }
 
     private fun initView() {
@@ -99,6 +117,7 @@ class SlackLoadingView : BaseCustomView {
         super.onSizeChanged(w, h, oldw, oldh)
         mWidth = w
         mHeight = h
+        mEntireLineLength = (Math.min(w, h) / mRatioBetweenViewSizeAndLineLength).toInt()
         initData()
     }
 
@@ -124,6 +143,8 @@ class SlackLoadingView : BaseCustomView {
         }
 
     }
+
+
 
     private fun drawCRLC(canvas: Canvas, startX: Float, startY: Float, stopX: Float, stopY: Float, paint: Paint, rotate: Int) {
         canvas.rotate(rotate.toFloat(), (mWidth / 2).toFloat(), (mHeight / 2).toFloat())
@@ -178,7 +199,7 @@ class SlackLoadingView : BaseCustomView {
         animationSet.interpolator = LinearInterpolator()
         animationSet.addListener(object : AnimatorListener() {
             override fun onAnimationEnd(animation: Animator) {
-                Timber.d("动画1结束")
+//                Timber.d("动画1结束")
                 if (mStatus == STATUS_LOADING) {
                     mStep++
                     startCRAnim()
@@ -206,7 +227,7 @@ class SlackLoadingView : BaseCustomView {
         }
         canvasRotateAnim.addListener(object : AnimatorListener() {
             override fun onAnimationEnd(animation: Animator) {
-                Timber.d("动画2结束")
+//                Timber.d("动画2结束")
                 if (mStatus == STATUS_LOADING) {
                     mStep++
                     startCRCCAnim()
@@ -246,7 +267,7 @@ class SlackLoadingView : BaseCustomView {
         animationSet.interpolator = LinearInterpolator()
         animationSet.addListener(object : AnimatorListener() {
             override fun onAnimationEnd(animation: Animator) {
-                Timber.d("动画3结束")
+//                Timber.d("动画3结束")
                 if (mStatus == STATUS_LOADING) {
                     mStep++
                     startLCAnim()
@@ -274,7 +295,7 @@ class SlackLoadingView : BaseCustomView {
         }
         lineWidthAnim.addListener(object : AnimatorListener() {
             override fun onAnimationEnd(animation: Animator) {
-                Timber.d("动画4结束")
+//                Timber.d("动画4结束")
                 if (mStatus == STATUS_LOADING) {
                     mStep++
                     startCRLCAnim()

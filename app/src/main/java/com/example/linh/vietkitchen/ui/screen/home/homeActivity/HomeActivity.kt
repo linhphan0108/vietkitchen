@@ -2,6 +2,7 @@ package com.example.linh.vietkitchen.ui.home.homeActivity
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -26,6 +27,13 @@ import kotlinx.android.synthetic.main.activity_home_content.*
 class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContractPresenter>(),
         NavigationView.OnNavigationItemSelectedListener, HomeActivityContractView,
         OnItemClickListener, ToolbarActions {
+
+    companion object {
+        fun createIntent(context: Context): Intent{
+            return Intent(context, HomeActivity::class.java)
+        }
+    }
+
     private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null

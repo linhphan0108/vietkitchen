@@ -21,6 +21,7 @@ import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
 
 private const val BK_THUMB_IMAGE_TRANSITION_NAME = "BK_THUMB_IMAGE_TRANSITION_NAME"
+private const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
 private const val BK_RECIPE = "BK_RECIPE"
 
 class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetailPresenter>(), RecipeDetailViewContract, Animation.AnimationListener {
@@ -30,7 +31,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
             val bundle = Bundle()
             bundle.putString(BK_THUMB_IMAGE_TRANSITION_NAME, thumbImageTransitionName)
             bundle.putParcelable(BK_RECIPE, recipe)
-            intent.putExtras(bundle)
+            intent.putExtra(EXTRA_BUNDLE, bundle)
             return intent
         }
     }
@@ -49,7 +50,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bundle = intent.extras
+        val bundle = intent.getBundleExtra(EXTRA_BUNDLE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             imgBlurBg.transitionName = bundle.getString(BK_THUMB_IMAGE_TRANSITION_NAME)
         }

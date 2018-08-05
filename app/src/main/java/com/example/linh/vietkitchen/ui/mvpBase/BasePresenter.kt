@@ -1,6 +1,7 @@
 package com.example.linh.vietkitchen.ui.mvpBase
 
 import android.content.Context
+import android.support.v7.app.AppCompatActivity
 import io.reactivex.disposables.CompositeDisposable
 
 
@@ -8,6 +9,7 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
 
     protected var viewContract: T? = null
     protected var context: Context? = null
+    protected var activity: AppCompatActivity? = null
     protected val  compositeDisposable : CompositeDisposable by lazy {
         CompositeDisposable()}
 
@@ -28,6 +30,7 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
     override fun attachView(view: T) {
         this.viewContract = view
         this.context = view.viewContext
+        activity = view.viewContext as AppCompatActivity
     }
 
     override fun detachView() {

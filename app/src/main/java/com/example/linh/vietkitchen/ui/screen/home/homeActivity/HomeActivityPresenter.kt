@@ -16,7 +16,7 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
                             private val categoryMapper: CategoryMapper = CategoryMapper())
     : BasePresenter<HomeActivityContractView>() , HomeActivityContractPresenter {
     override fun requestCategory() {
-        requestCategoryCommand.execute()
+        compositeDisposable.add(requestCategoryCommand.execute()
                 .map {
                     Timber.e("on map: ${Looper.myLooper() == Looper.getMainLooper()}")
                     val categories = categoryMapper.convertToUI(it).toMutableList()
@@ -31,7 +31,7 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
                 }, {
                     Timber.e(it)
                     viewContract?.onRequestCategoriesFailed(getStringRes(R.string.message_error))
-                })
+                }))
     }
 
     override fun putARecipe() {

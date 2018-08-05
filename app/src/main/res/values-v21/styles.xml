@@ -1,18 +1,24 @@
 <resources>
-    <style name="AppTheme.NoActionBar">
+    <style name="AppTheme" parent="AppTheme.Base" >
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDarkStatusBar</item>
+        <!--<item name="android:statusBarColor">@color/colorPrimaryDarkStatusBar</item>-->
         <!--<item name="android:windowTranslucentNavigation">true</item>-->
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
 
         <!-- enable window content transitions -->
         <item name="android:windowContentTransitions">true</item>
         <!-- enable overlapping of exiting and entering activities-->
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
+    </style>
+
+    <style name="NoTranslucentStatusBar" parent="AppTheme">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
     </style>
 </resources>

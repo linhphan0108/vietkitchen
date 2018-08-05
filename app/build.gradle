@@ -8,7 +8,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.linh.vietkitchen"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -26,6 +26,8 @@ android {
         main {
             res.srcDirs = [
                     'src/main/res/layouts/common',
+                    'src/main/res/layouts/splashScreen',
+                    'src/main/res/layouts/login',
                     'src/main/res/layouts/home',
                     'src/main/res/layouts/detail',
                     'src/main/res/layouts',
@@ -64,6 +66,15 @@ dependencies {
         exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
         exclude group: 'io.reactivex.rxjava2', module: 'rxandroid'
     }
+    implementation 'com.firebaseui:firebase-ui-auth:4.0.0'
+    // Required only if Facebook login support is required
+    // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
+//    implementation 'com.facebook.android:facebook-android-sdk:4.35.0'
+    // Required only if Twitter login support is required
+    // Find the latest Twitter SDK releases here: https://goo.gl/E5wZvQ
+//    implementation 'com.twitter.sdk.android:twitter-core:3.2.0'{
+//        transitive = true
+//    }
 
     //rxjava
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
@@ -87,6 +98,7 @@ dependencies {
     implementation 'com.hannesdorfmann:adapterdelegates3:3.0.1'
     implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'
     implementation 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.6'
+    implementation 'com.github.bhargavms:DotLoader:1.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
