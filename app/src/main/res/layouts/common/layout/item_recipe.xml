@@ -41,7 +41,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             android:scaleType="centerCrop"
-            tools:src="@drawable/img_drawer_nav_header"/>
+            tools:src="@tools:sample/avatars"/>
 
         <TextView
             android:id="@+id/txtFoodName"
@@ -51,7 +51,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="ga luoc la chanh"
+            tools:text="@tools:sample/full_names"
             />
 
         <TextView
@@ -66,7 +66,7 @@
             android:ellipsize="end"
             android:textSize="14sp"
             android:textColor="@color/textSecondary"
-            tools:text="mua he an ga luoc la chanh"/>
+            tools:text="@tools:sample/lorem/random"/>
 
         <com.like.LikeButton
             android:id="@+id/btnFavorite"

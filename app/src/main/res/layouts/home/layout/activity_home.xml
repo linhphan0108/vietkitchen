@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:dividerHeight="0dp"
+            tools:listitem="@layout/item_drawer_sample_switcher"
             />
     </android.support.design.widget.NavigationView>
 
