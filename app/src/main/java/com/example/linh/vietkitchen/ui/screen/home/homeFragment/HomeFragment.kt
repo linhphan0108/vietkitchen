@@ -1,8 +1,7 @@
-package com.example.linh.vietkitchen.ui.home.homeFragment
+package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +10,9 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
-import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
-import com.example.linh.vietkitchen.ui.home.homeActivity.OnDrawerNavItemChangedListener
+import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
+import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnDrawerNavItemChangedListener
+import com.example.linh.vietkitchen.ui.home.homeFragment.HomeFragmentPresenter
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
 import com.example.linh.vietkitchen.ui.model.Recipe
@@ -52,7 +52,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     private var param1: String? = null
     private var param2: String? = null
-    lateinit var rcvLoadmoreListener: EndlessScrollListener
+    lateinit var rcvLoadMoreListener: EndlessScrollListener
 
     //region lifecycle =============================================================================
     override fun getFragmentLayoutRes() = R.layout.fragment_home
@@ -198,27 +198,26 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         swipeRefresh.setWaveColor(waveColor)
         swipeRefresh.isRefreshing = true
         swipeRefresh.setOnRefreshListener {
-            rcvLoadmoreListener.onRefresh()
+            rcvLoadMoreListener.onRefresh()
             presenter.refreshFoods()
         }
     }
     //endregion inner methods
 
     //region inner classes =========================================================================
-    override fun setupRecyclerView() {
-        super.setupRecyclerView()
-        rcvFood.layoutManager = LinearLayoutManager(context)
-        rcvFood.itemAnimator = DefaultItemAnimator()
-        rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
-        rcvFood.adapter = recipeAdapter
-        rcvLoadmoreListener = object : EndlessScrollListener(3) {
+    private fun setupRecyclerView() {
+//        recyclerView.itemAnimator = DefaultItemAnimator()
+        rcvRecipes.layoutManager = LinearLayoutManager(context)
+        rcvRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
+        rcvRecipes.adapter = recipeAdapter
+        rcvLoadMoreListener = object : EndlessScrollListener(3) {
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
-                rcvFood.post { presenter.loadMoreRecipe() }
-                Timber.d("rcvLoadmoreListener")
+                rcvRecipes.post { presenter.loadMoreRecipe() }
+                Timber.d("rcvLoadMoreListener")
                 return true
             }
         }
-        rcvFood.addOnScrollListener(rcvLoadmoreListener)
+        rcvRecipes.addOnScrollListener(rcvLoadMoreListener)
     }
     //endregion inner classes
 }

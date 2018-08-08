@@ -1,8 +1,7 @@
-package com.example.linh.vietkitchen.ui.home
+package com.example.linh.vietkitchen.ui.screen.home
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseExpandableListAdapter
 import android.graphics.Typeface
 import android.widget.TextView
 import android.view.LayoutInflater

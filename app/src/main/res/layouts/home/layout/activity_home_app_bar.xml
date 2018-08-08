@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.homeActivity.HomeActivity"
+    tools:context=".ui.screen.home.homeActivity.HomeActivity"
     tools:showIn="@layout/activity_home">
 
     <android.support.design.widget.AppBarLayout

@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.ui.home.homeActivity
+package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -15,6 +15,7 @@ import android.view.MenuItem
 import android.view.View
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
+import com.example.linh.vietkitchen.ui.home.homeActivity.*
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe

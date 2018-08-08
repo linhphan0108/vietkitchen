@@ -1,18 +1,18 @@
-package com.example.linh.vietkitchen.ui.home
+package com.example.linh.vietkitchen.ui.screen.home.favorite
 
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.VietKitchenApp
+import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
-import com.example.linh.vietkitchen.ui.screen.home.favorite.FavoriteContractPresenter
-import com.example.linh.vietkitchen.ui.screen.home.favorite.FavoriteContractView
-import com.example.linh.vietkitchen.ui.screen.home.favorite.FavoritePresenter
 import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_favorite.*
+import kotlinx.android.synthetic.main.fragment_home.*
 
 class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContractPresenter>(), FavoriteContractView {
     companion object {
@@ -52,6 +52,7 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
 
     override fun onRequestLikedRecipesSuccess(recipes: List<Recipe>) {
         recipeAdapter.updateItemThenNotify(recipes.toMutableList())
+        checkNoData()
     }
 
     override fun onRequestLikedRecipesFailed() {
@@ -59,10 +60,12 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
 
     override fun onLikeEventObserve(recipe: Recipe) {
         recipeAdapter.onLike(recipe)
+        checkNoData()
     }
 
     override fun onUnlikeEventObserve(recipe: Recipe) {
         recipeAdapter.onUnLike(recipe, true)
+        checkNoData()
     }
 
     override val viewContext: Context?
@@ -76,13 +79,19 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
     //endregion MVP callbacks
 
     //region inner methods =========================================================================
+    private fun checkNoData(){
+        if (recipeAdapter.itemCount <= 0){
+            txtNoData.visibility = View.VISIBLE
+        }else{
+            txtNoData.visibility = View.GONE
+        }
+    }
     //endregion inner methods
 
     //region inner classes =========================================================================
-    override fun setupRecyclerView(){
-        super.setupRecyclerView()
+    private fun setupRecyclerView() {
         rcvLikedRecipes.layoutManager = LinearLayoutManager(context)
-        rcvLikedRecipes.itemAnimator = DefaultItemAnimator()
+//        rcvLikedRecipes.itemAnimator = DefaultItemAnimator()
         rcvLikedRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
         rcvLikedRecipes.adapter = recipeAdapter
     }

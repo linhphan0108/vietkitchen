@@ -3,7 +3,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context=".ui.home.FavoriteFragment">
+             tools:context=".ui.screen.home.favorite.FavoriteFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rcvLikedRecipes"
@@ -11,5 +11,16 @@
         android:layout_height="wrap_content"
         android:background="@color/divider"
         tools:listitem="@layout/item_recipe"/>
+
+    <TextView
+        android:id="@+id/txtNoData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="22sp"
+        android:background="@color/divider"
+        android:text="@string/no_favorite_recipe"
+        android:visibility="gone"/>
 
 </FrameLayout>

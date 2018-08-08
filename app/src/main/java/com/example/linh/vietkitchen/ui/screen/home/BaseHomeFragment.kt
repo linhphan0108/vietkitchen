@@ -4,7 +4,9 @@ import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.model.Recipe
@@ -18,6 +20,12 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
 
     private var lastItemClicked = -1
     lateinit var recipeAdapter: RecipeAdapter
+    lateinit var txtNoDataSuper: TextView
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setupAdapter()
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_DETAIL_RECIPE){
@@ -60,9 +68,8 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
     }
 
     //region inner methods =========================================================================
-    protected open fun setupRecyclerView() {
+    protected open fun setupAdapter() {
         recipeAdapter = RecipeAdapter(listener = this)
     }
     //endregion inner methods
-
 }
