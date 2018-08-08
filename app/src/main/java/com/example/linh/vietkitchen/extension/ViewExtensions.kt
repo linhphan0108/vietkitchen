@@ -18,3 +18,10 @@ fun View.slideExit() {
 fun View.slideEnter() {
     if (translationY < 0f) animate().translationY(0f)
 }
+
+fun View.lookTemporary(delay: Long = 200){
+    this.isEnabled = false
+    this.postDelayed({
+        this.isEnabled = true
+    },delay)
+}

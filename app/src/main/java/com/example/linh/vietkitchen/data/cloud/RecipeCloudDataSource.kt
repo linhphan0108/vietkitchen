@@ -2,38 +2,43 @@ package com.example.linh.vietkitchen.data.cloud
 
 import com.example.linh.vietkitchen.data.cloud.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
+import com.example.linh.vietkitchen.exception.FirebaseDataException
+import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS_PATH
+import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
+import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
 import com.example.linh.vietkitchen.util.LoggerUtil
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import durdinapps.rxfirebase2.RxFirebaseDatabase
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.FlowableOnSubscribe
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import com.example.linh.vietkitchen.domain.model.Recipe as FoodDomain
+import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
 class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) : RecipeDataSource {
-    companion object {
-        const val STORAGE_RECIPES = "recipes"
-        const val STORAGE_RECIPES_CHILD_TAGS = "tags/"
-    }
-
     private val database  by lazy { FirebaseDatabase.getInstance()}
-    private val dbRef by lazy{ database.getReference(STORAGE_RECIPES)}
+    private val dbRefRecipe by lazy{ database.getReference(STORAGE_RECIPES_PATH)}
+    private val dbRefUser by lazy { database.getReference(STORAGE_USER_PATH) }
 
-    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<FoodDomain>>? {
+    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<RecipeDomain>>? {
         val query = if(tag.isNullOrBlank()){
             if(startAtId.isNullOrBlank()){
-                dbRef.orderByKey()
+                dbRefRecipe.orderByKey()
             }else{
-                dbRef.orderByKey()
+                dbRefRecipe.orderByKey()
                         .startAt(startAtId)
             }
         }else{
             if(startAtId.isNullOrBlank()) {
-                dbRef.orderByChild(STORAGE_RECIPES_CHILD_TAGS + tag)
+                dbRefRecipe.orderByChild(STORAGE_RECIPES_CHILD_TAGS_PATH + tag)
                         .equalTo(true)
             }else{
-                dbRef.orderByChild(STORAGE_RECIPES_CHILD_TAGS + tag)
+                dbRefRecipe.orderByChild(STORAGE_RECIPES_CHILD_TAGS_PATH + tag)
                         .equalTo(true)
                         .startAt(startAtId)
             }
@@ -48,6 +53,51 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 }
 
     }
+
+    override fun getLikedRecipes(ids: List<String>): Flowable<List<com.example.linh.vietkitchen.domain.model.Recipe>>? {
+        return Flowable.fromIterable(ids)
+                .observeOn(Schedulers.computation())
+                .flatMap {key ->
+                    Flowable.create(FlowableOnSubscribe<DataSnapshot> {emitter ->
+                        val query = dbRefRecipe.child(key)
+                        query.addListenerForSingleValueEvent(object: ValueEventListener{
+                            override fun onCancelled(p0: DatabaseError) {
+                                emitter.onError(FirebaseDataException(p0))
+                            }
+                            override fun onDataChange(p0: DataSnapshot) {
+                                emitter.onNext(p0)
+                                emitter.onComplete()
+                            }
+                        })
+                    }, BackpressureStrategy.DROP)
+                }.map {mapper.convertToDomain(it)}
+                .toList().toFlowable()
+    }
+
+//    override fun getLikedRecipes(uid: String): Flowable<List<RecipeDomain>>? {
+//        return getLikedRecipesId(uid)
+//                .flatMap {listIds ->
+//                    if (listIds.isNotEmpty()) {
+//                        Flowable.fromIterable(listIds)
+//                    } else {
+//                        throw EmptyException()
+//                    }
+//                }.flatMap {key ->
+//                    Flowable.create(FlowableOnSubscribe<DataSnapshot> {emitter ->
+//                        val query = dbRefRecipe.child(key)
+//                        query.addListenerForSingleValueEvent(object: ValueEventListener{
+//                            override fun onCancelled(p0: DatabaseError) {
+//                                emitter.onError(FirebaseDataException(p0))
+//                            }
+//                            override fun onDataChange(p0: DataSnapshot) {
+//                                emitter.onNext(p0)
+//                            }
+//                        })
+//                    }, BackpressureStrategy.DROP)
+//                }.map {mapper.convertToDomain(it)}
+//                .toList().toFlowable()
+//
+//    }
 
     //an example how to use an Rxjava  DisposableObserver natively
     //for retrieving data from firebase server
@@ -81,7 +131,7 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
 
     override fun putRecipeWithDumpData(): Completable? {
         return Completable.create { emitter ->
-            dbRef.push().setValue(createADumpFood())
+            dbRefRecipe.push().setValue(createADumpFood())
                     .addOnSuccessListener {
                         emitter.onComplete()
                     }
@@ -90,7 +140,7 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                     }
         }
 
-//        return RxFirebaseDatabase.setValue(dbRef, createADumpFood())
+//        return RxFirebaseDatabase.setValue(dbRefRecipe, createADumpFood())
     }
 
     private fun createADumpFood(): Recipe {

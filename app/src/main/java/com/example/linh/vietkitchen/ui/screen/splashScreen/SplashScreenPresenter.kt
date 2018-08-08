@@ -3,6 +3,7 @@ package com.example.linh.vietkitchen.ui.screen.splashScreen
 import android.app.Activity
 import android.content.Intent
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.domain.command.RequestRecipesIdCommand
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import com.example.linh.vietkitchen.ui.screen.splashScreenonActivityResult.SplashScreenContractPresenter
@@ -11,11 +12,12 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import java.util.*
 
-class SplashScreenPresenter : BasePresenter<SplashScreenContractView>(), SplashScreenContractPresenter {
-
+class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesIdCommand = RequestRecipesIdCommand())
+    : BasePresenter<SplashScreenContractView>(), SplashScreenContractPresenter {
     companion object {
         private const val RC_SIGN_IN = 123
     }
@@ -108,5 +110,16 @@ class SplashScreenPresenter : BasePresenter<SplashScreenContractView>(), SplashS
                         .setTheme(R.style.NoTranslucentStatusBar)
                         .build(),
                 RC_SIGN_IN)
+    }
+
+    override fun requestLikedRecipesId(uid: String) {
+        requestRecipesIdCommand.uid = uid
+        requestRecipesIdCommand.execute()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe ({ recipesId ->
+                    viewContract?.onRequestLikedRecipesIdSuccess(recipesId)
+                }, {
+                    viewContract?.onRequestLikedRecipesIdFailed()
+                })
     }
 }

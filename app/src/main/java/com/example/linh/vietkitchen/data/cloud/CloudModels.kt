@@ -30,3 +30,5 @@ data class Recipe(var id: String?=null, val name: String, val intro: String, val
 data class Category(var groups: List<Map<String, List<Map<String, Boolean>>>>?){
     constructor(): this(null)
 }
+
+data class UserInfo(val favorites: Int, val schedules: Int)

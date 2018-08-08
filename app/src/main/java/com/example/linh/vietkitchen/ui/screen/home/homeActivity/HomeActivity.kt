@@ -17,8 +17,11 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
 import kotlinx.android.synthetic.main.activity_home_content.*
@@ -37,6 +40,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
+    internal var likeOrUnLikePublisher: Subject<Recipe> = PublishSubject.create()
 
     //region lifecycle =============================================================================
     override fun onCreate(savedInstanceState: Bundle?) {

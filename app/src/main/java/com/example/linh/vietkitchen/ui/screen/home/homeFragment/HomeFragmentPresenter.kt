@@ -2,17 +2,22 @@ package com.example.linh.vietkitchen.ui.home.homeFragment
 
 import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
+import com.example.linh.vietkitchen.ui.model.UserInfo
+import com.example.linh.vietkitchen.ui.screen.home.BaseHomePresenter
+import com.example.linh.vietkitchen.ui.screen.home.mapper.RecipeMapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-class HomeFragmentPresenter(private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),
+class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.userInfo,
+                            private val recipeMapper: RecipeMapper = RecipeMapper(),
+                            private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),
                             private val putRecipeCommand: PutRecipeCommand = PutRecipeCommand())
-    : BasePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
+    : BaseHomePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
 
     private var lastRecipeId: String? = null
     private var isLoadMoreRecipe = false
@@ -35,6 +40,9 @@ class HomeFragmentPresenter(private val requestRecipeCommand : RequestRecipeComm
         requestRecipeCommand.category = category
         requestRecipeCommand.startAtId = lastRecipeId
         requestRecipeDisposable = requestRecipeCommand.execute()
+                .map {
+                    recipeMapper.convertToUi(it)
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({
                     if (it != null && it.isEmpty()) {
@@ -94,5 +102,4 @@ class HomeFragmentPresenter(private val requestRecipeCommand : RequestRecipeComm
                     Timber.d("a recipe was put into firebase server")
                 })
     }
-
 }

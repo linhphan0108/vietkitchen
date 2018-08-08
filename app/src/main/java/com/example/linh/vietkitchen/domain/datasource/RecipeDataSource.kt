@@ -8,4 +8,6 @@ import io.reactivex.Flowable
 interface RecipeDataSource{
     fun getAllRecipes(tag: String? = null, limit: Int = PAGINATION_LENGTH, startAtId: String? = null) : Flowable<List<Recipe>>?
     fun putRecipeWithDumpData(): Completable?
+//    fun getLikedRecipes(uid: String) : Flowable<List<Recipe>>?
+    fun getLikedRecipes(ids : List<String>): Flowable<List<Recipe>>?
 }
