@@ -13,7 +13,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.domain.model.Recipe
+import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.extension.capWords
 import com.example.linh.vietkitchen.extension.toString
 import com.example.linh.vietkitchen.ui.GlideApp

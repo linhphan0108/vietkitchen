@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
+import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.ui.screen.splashScreenonActivityResult.SplashScreenContractPresenter
 import com.example.linh.vietkitchen.ui.screen.splashScreenonActivityResult.SplashScreenContractView
@@ -14,14 +16,13 @@ import kotlinx.android.synthetic.main.activity_splash_screen.*
 import java.util.concurrent.TimeUnit
 
 
-
-
 class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreenContractPresenter>(),
         SplashScreenContractView {
     companion object {
         private const val TIME_WAITING_IN_SPLASH_SCREEN = 7000//in millisecond
     }
 
+    lateinit var userInfo: UserInfo
     var timeStartedSplashScreen: Long = 0
 
     //region lifecycle callbacks ===================================================================
@@ -58,6 +59,24 @@ class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreen
     override fun getActivityLayoutRes() = R.layout.activity_splash_screen
 
     override fun onHasLoggedIn() {
+        userInfo = VietKitchenApp.userInfo
+        presenter.requestLikedRecipesId(userInfo.uid)
+    }
+
+    override fun onHasNotLoggedIn() {
+    }
+
+    override fun onRequestLikedRecipesIdSuccess(recipesId: List<String>) {
+        userInfo.likedRecipesIds = recipesId.toMutableList()
+        gotoNextScreen()
+    }
+
+    override fun onRequestLikedRecipesIdFailed() {
+    }
+    //endregion MVP callbacks
+
+    //region inner methods =========================================================================
+    private fun gotoNextScreen(){
         val currentTime = System.currentTimeMillis()
         val duration = currentTime - timeStartedSplashScreen
         if (duration >= TIME_WAITING_IN_SPLASH_SCREEN){
@@ -71,12 +90,6 @@ class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreen
                     }
         }
     }
-
-    override fun onHasNotLoggedIn() {
-    }
-    //endregion MVP callbacks
-
-    //region inner methods =========================================================================
     private fun gotoHomeScreen(){
         startActivityWithAnimation(HomeActivity.createIntent(this))
         finish()

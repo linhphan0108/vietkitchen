@@ -1,30 +1,23 @@
 package com.example.linh.vietkitchen.ui.home.homeFragment
 
-import android.app.Activity
-import android.app.ActivityOptions
 import android.content.Context
-import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
-import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
-import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
 import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.home.homeActivity.OnDrawerNavItemChangedListener
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
-import com.example.linh.vietkitchen.ui.mvpBase.ToolbarFragment
+import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
+import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
@@ -33,9 +26,8 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 
-class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(),
-        HomeFragmentContractView, OnDrawerNavItemChangedListener, OnItemClickListener {
-
+class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(),
+        HomeFragmentContractView, OnDrawerNavItemChangedListener {
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -60,8 +52,6 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
 
     private var param1: String? = null
     private var param2: String? = null
-
-    lateinit var recipeAdapter: RecipeAdapter
 
     //region lifecycle =============================================================================
     override fun getFragmentLayoutRes() = R.layout.fragment_home
@@ -175,6 +165,14 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
         toast("onLoadMoreReachEndRecord")
     }
 
+    override fun onLikeEventObserve(recipe: Recipe) {
+        recipeAdapter.onLike(recipe)
+    }
+
+    override fun onUnlikeEventObserve(recipe: Recipe) {
+        recipeAdapter.onUnLike(recipe)
+    }
+
     override fun showProgress() {
         recipeAdapter.startShimmerAnimation()
     }
@@ -187,35 +185,9 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
     override fun onDrawerNavChanged(category: String?) {
         presenter.refreshFoods(category)
     }
-
-    //recycler view callback
-    override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe) {
-        val intent = RecipeDetailActivity.createIntent(context, layoutPosition.toString(), data)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            itemView.transitionName = layoutPosition.toString()
-            val activityOptions = ActivityOptions.makeSceneTransitionAnimation(context as Activity, itemView, itemView.transitionName)
-            context?.startActivity(intent, activityOptions.toBundle())
-        }else{
-            context?.startActivity(intent)
-        }
-    }
     //endregion callbacks
 
     //region inner methods =========================================================================
-    private fun setupRecyclerView(){
-        recipeAdapter = RecipeAdapter(listener = this)
-        rcvFood.layoutManager = LinearLayoutManager(context)
-        rcvFood.itemAnimator = DefaultItemAnimator()
-        rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
-        rcvFood.adapter = recipeAdapter
-        rcvFood.addOnScrollListener(object : EndlessScrollListener(3){
-            override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
-                presenter.loadMoreRecipe()
-                return true
-            }
-        })
-    }
-
     private fun setupSwipeRefreshLayout(){
         val waveColor = context?.color(R.color.color_wave_refresh) ?: 0
         val progressColor1 = context?.color(R.color.color_wave_refresh_progress_1) ?: 0
@@ -231,15 +203,18 @@ class HomeFragment : ToolbarFragment<HomeFragmentContractView, HomeFragmentContr
     //endregion inner methods
 
     //region inner classes =========================================================================
-    inner class VerticalSpaceItemDecoration(private val verticalSpaceHeight: Int) : RecyclerView.ItemDecoration() {
-
-        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
-                                    state: RecyclerView.State) {
-            if (parent.getChildAdapterPosition(view) == 0){
-                outRect.top = verticalSpaceHeight
+    override fun setupRecyclerView() {
+        super.setupRecyclerView()
+        rcvFood.layoutManager = LinearLayoutManager(context)
+        rcvFood.itemAnimator = DefaultItemAnimator()
+        rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
+        rcvFood.adapter = recipeAdapter
+        rcvFood.addOnScrollListener(object : EndlessScrollListener(3) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
+                presenter.loadMoreRecipe()
+                return true
             }
-            outRect.bottom = verticalSpaceHeight
-        }
+        })
     }
     //endregion inner classes
 }

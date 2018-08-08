@@ -1,10 +1,10 @@
 package com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh
 
-import com.example.linh.vietkitchen.domain.model.Recipe
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
-import com.example.linh.vietkitchen.ui.mvpBase.BaseViewContract
+import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.ui.screen.home.BaseHomeContractPresenter
+import com.example.linh.vietkitchen.ui.screen.home.BaseHomeContractView
 
-interface HomeFragmentContractView : BaseViewContract {
+interface HomeFragmentContractView : BaseHomeContractView {
     fun onFoodsRequestSuccess(recipes: List<Recipe>)
     fun onFoodsRequestFailed(msg: String)
     fun onLoadingMore()
@@ -14,7 +14,7 @@ interface HomeFragmentContractView : BaseViewContract {
     fun onLoadMoreReachEndRecord()
 }
 
-interface HomeFragmentContractPresenter : BasePresenterContract<HomeFragmentContractView> {
+interface HomeFragmentContractPresenter : BaseHomeContractPresenter<HomeFragmentContractView> {
     fun requestFoods(category: String? = null)
     fun refreshFoods(category: String? = null)
     fun loadMoreRecipe()

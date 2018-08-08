@@ -21,4 +21,12 @@ class RecipeProvider(sources: List<RecipeDataSource> = SOURCES) : BaseProvider<R
     fun putFood(): Completable = requestToSources{
         it.putRecipeWithDumpData()
     }
+
+//    fun requestLikedRecipes(uid: String) = requestToSources {
+//        it.getLikedRecipes(uid)
+//    }
+
+    fun requestLikedRecipes(ids: List<String>) = requestToSources {
+        it.getLikedRecipes(ids)
+    }
 }

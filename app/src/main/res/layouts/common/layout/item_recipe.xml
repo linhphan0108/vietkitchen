@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,9 +8,9 @@
     android:paddingStart="@dimen/margin_16dp"
     android:paddingEnd="@dimen/margin_16dp"
     android:paddingBottom="3dp"
-    card_view:cardCornerRadius="0dp"
-    card_view:cardElevation="0dp"
-    card_view:cardUseCompatPadding="false"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp"
+    app:cardUseCompatPadding="false"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
@@ -41,7 +40,8 @@
             app:layout_constraintEnd_toStartOf="@id/verticalGuideline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            />
+            android:scaleType="centerCrop"
+            tools:src="@drawable/img_drawer_nav_header"/>
 
         <TextView
             android:id="@+id/txtFoodName"
@@ -67,6 +67,19 @@
             android:textSize="14sp"
             android:textColor="@color/textSecondary"
             tools:text="mua he an ga luoc la chanh"/>
+
+        <com.like.LikeButton
+            android:id="@+id/btnFavorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="@dimen/margin_8dp"
+            android:layout_marginRight="@dimen/margin_8dp"
+            app:icon_type="heart"
+            app:icon_size="16dp"
+            app:anim_scale_factor="3"
+            />
 
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>
