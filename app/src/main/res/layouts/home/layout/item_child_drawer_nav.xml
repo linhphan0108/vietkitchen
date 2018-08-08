@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/drawer_nav_child_height"
     android:orientation="horizontal"
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="0dp"
@@ -18,7 +18,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/txtListItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:minHeight="40dp"
         android:paddingStart="28dp"
         android:paddingLeft="24dp"
@@ -29,5 +29,6 @@
         android:textSize="14sp"
         android:maxLines="1"
         android:background="@color/divider"
+        tools:text="@sample/item_nav_child_title"
         />
 </android.support.v7.widget.CardView>
