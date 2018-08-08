@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.screen.login.LoginActivity"/>
-        <activity android:name=".ui.home.homeActivity.HomeActivity"
+        <activity android:name=".ui.screen.home.homeActivity.HomeActivity"
                   android:theme="@style/AppTheme"
                   android:screenOrientation="portrait"/>
         <activity android:name=".ui.screen.detailActivity.RecipeDetailActivity"

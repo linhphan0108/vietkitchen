@@ -3,8 +3,8 @@ package com.example.linh.vietkitchen.ui.adapter
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
-import com.example.linh.vietkitchen.ui.home.FavoriteFragment
-import com.example.linh.vietkitchen.ui.home.homeFragment.HomeFragment
+import com.example.linh.vietkitchen.ui.screen.home.homeFragment.HomeFragment
+import com.example.linh.vietkitchen.ui.screen.home.favorite.FavoriteFragment
 import com.example.linh.vietkitchen.ui.screen.home.profile.ProfileFragment
 
 class HomePagerAdapter(fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {

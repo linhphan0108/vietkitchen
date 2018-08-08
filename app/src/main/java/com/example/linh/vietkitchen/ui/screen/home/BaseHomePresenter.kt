@@ -3,7 +3,7 @@ package com.example.linh.vietkitchen.ui.screen.home
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
-import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivity
+import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers

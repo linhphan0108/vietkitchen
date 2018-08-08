@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.ui.home
+package com.example.linh.vietkitchen.ui.screen.home
 
 import android.content.Context
 import android.net.Uri

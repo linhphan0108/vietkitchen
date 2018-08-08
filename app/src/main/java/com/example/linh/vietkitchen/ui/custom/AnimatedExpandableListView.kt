@@ -22,7 +22,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.widget.ExpandableListAdapter
 import android.widget.ExpandableListView
-import com.example.linh.vietkitchen.ui.home.AnimatedExpandableListAdapter
+import com.example.linh.vietkitchen.ui.screen.home.AnimatedExpandableListAdapter
 
 /**
  * This class defines an ExpandableListView which supports animations for

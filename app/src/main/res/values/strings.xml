@@ -9,6 +9,8 @@
     <string name="label_loading">loading</string>
     <string name="draw_nav_group_item_all">all</string>
     <string name="fui_progress_dialog_signing_up">Creating your shiny new account…</string>
+    <string name="no_data">no data found</string>
+    <string name="no_favorite_recipe">no data</string>
     <string name="default_snack_bar_action">action</string>
     <string name="label_ok">OK</string>
 
