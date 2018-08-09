@@ -11,3 +11,8 @@ fun String.capWords(): String{
     return if (result.isEmpty()) ""
     else result.substring(0, result.length - 1)
 }
+
+//fun String.capFirstWorld(): String{
+//    if (isEmpty()) return this
+//    val firstChar = substring(0, 1).capitalize()
+//}

@@ -68,6 +68,7 @@ class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreen
 
     override fun onRequestLikedRecipesIdSuccess(recipesId: List<String>) {
         userInfo.likedRecipesIds = recipesId.toMutableList()
+        userInfo.numberFavoriteRecipes = recipesId.size
         gotoNextScreen()
     }
 

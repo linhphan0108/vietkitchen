@@ -14,10 +14,11 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
     fun bindView(recipe: Recipe, payloads: MutableList<Any>) {
         if (payloads.size > 0){
             payloads.forEach {
-                val casted = it as PayLoads
-                when(casted){
-                    PayLoads.LIKE_CHANGE ->
-                        itemView.btnFavorite.isLiked = recipe.hasLiked
+                if(it is PayLoads) {
+                    when (it) {
+                        PayLoads.LIKE_CHANGE ->
+                            itemView.btnFavorite.isLiked = recipe.hasLiked
+                    }
                 }
             }
         }else {
