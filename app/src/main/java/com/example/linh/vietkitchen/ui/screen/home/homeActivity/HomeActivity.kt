@@ -6,8 +6,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -115,7 +115,22 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     private fun setupViewPager(){
         homePagerAdapter = HomePagerAdapter(supportFragmentManager)
         viewPager.adapter = homePagerAdapter
-        viewPager.offscreenPageLimit = 3
+        viewPager.offscreenPageLimit = 2
+        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+            override fun onPageScrollStateChanged(state: Int) {}
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+
+            override fun onPageSelected(position: Int) {
+                bottomNav.selectedItemId = when(position){
+                    0 -> R.id.action_home
+                    1 -> R.id.action_favorite
+                    2 -> R.id.action_profile
+                    else -> R.id.action_home
+                }
+            }
+
+        })
     }
 
     private fun setupBottomTabBar(){
@@ -127,9 +142,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
                 R.id.action_favorite -> {
                     viewPager.currentItem = 1
                 }
-                R.id.action_calendar -> {
-                    viewPager.currentItem = 2
-                }
+//                R.id.action_calendar -> {
+//                    viewPager.currentItem = 2
+//                }
                 R.id.action_profile -> {
                     viewPager.currentItem = 3
                 }
@@ -156,11 +171,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         drawerNavExpandableRc.layoutManager = LinearLayoutManager(this)
         drawerNavExpandableRc.itemAnimator = DefaultItemAnimator()
         drawerNavExpandableRc.adapter = drawerNavAdapter
-    }
-
-    private fun showSnakeBar(){
-        Snackbar.make(drawerLayout, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
     }
     //endregion inner methods
 }

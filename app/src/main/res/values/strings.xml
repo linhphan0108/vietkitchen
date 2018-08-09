@@ -20,6 +20,13 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <!--profile screen-->
+    <string name="label_displayName">display name: %s</string>
+    <string name="label_email">email: %s</string>
+    <string name="label_favorite_recipes">liked recipes: %d</string>
+    <string name="label_notification">nhận thông báo</string>
+    <string name="label_logout">log out</string>
+
     <!--detail activity-->
     <string name="demo_desc">Blah Blah Blah Blah Blah Blah Blah!!!!!!</string>
     <string name="recipe_picture_content_description">recipe picture</string>

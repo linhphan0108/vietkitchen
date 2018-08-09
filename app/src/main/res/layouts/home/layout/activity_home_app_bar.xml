@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll"
-            android:background="?attr/colorPrimary"
+            android:background="@color/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     </android.support.design.widget.AppBarLayout>
@@ -33,6 +33,7 @@
         android:layout_marginEnd="@dimen/fab_margin_end"
         android:layout_marginRight="@dimen/fab_margin_end"
         android:layout_marginBottom="@dimen/fab_margin_bottom"
-        app:srcCompat="@android:drawable/ic_dialog_email"/>
+        app:srcCompat="@android:drawable/ic_dialog_email"
+        android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -14,12 +14,12 @@
         android:icon="@drawable/ic_heart_outline"
         android:title="@string/label_favorites"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_calendar"
-        android:enabled="true"
-        android:icon="@drawable/ic_calendar_clock"
-        android:title="@string/label_calendar"
-        app:showAsAction="ifRoom" />
+    <!--<item-->
+        <!--android:id="@+id/action_calendar"-->
+        <!--android:enabled="true"-->
+        <!--android:icon="@drawable/ic_calendar_clock"-->
+        <!--android:title="@string/label_calendar"-->
+        <!--app:showAsAction="ifRoom" />-->
     <item
         android:id="@+id/action_profile"
         android:enabled="true"
