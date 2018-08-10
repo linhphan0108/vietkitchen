@@ -73,8 +73,8 @@
             android:paddingTop="@dimen/padding_8dp"
             android:paddingBottom="@dimen/padding_8dp"
             android:textSize="14sp"
-            android:drawableStart="@drawable/ic_at_outline"
-            android:drawableLeft="@drawable/ic_at_outline"
+            android:drawableStart="@drawable/ic_at_outline_fix"
+            android:drawableLeft="@drawable/ic_at_outline_fix"
             android:drawablePadding="@dimen/padding_8dp"
             tools:text="@string/label_email"/>
 
