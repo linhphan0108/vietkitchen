@@ -53,7 +53,10 @@ class ProfileFragment : BaseFragment<ProfileContractView, ProfileContractPresent
     override fun onClick(v: View) {
         when(v.id){
             R.id.txtLogOut -> {
-                presenter.logout()
+                showSnackBar(v, R.string.message_snack_bar_logout, action = getString(R.string.label_logout),
+                        listener = View.OnClickListener {
+                    presenter.logout()
+                })
             }
         }
     }
@@ -68,10 +71,14 @@ class ProfileFragment : BaseFragment<ProfileContractView, ProfileContractPresent
                     .error(R.mipmap.ic_launcher_round)
                     .apply(RequestOptions.circleCropTransform())
                     .into(imgAvatar)
-            txtDisplayName.text = getString(R.string.label_displayName, displayName).capitalize()
-            txtEmail.text = getString(R.string.label_email, email).capitalize()
+            txtDisplayName.text = displayName
+            txtEmail.text = email
             txtFavorite.text = getString(R.string.label_favorite_recipes, numberFavoriteRecipes).capitalize()
+            swNotification.isChecked = allowNotification
         }
         txtLogOut.setOnClickListener(this)
+        swNotification.setOnCheckedChangeListener { _, isChecked ->
+            presenter.onAllowNotificationChanged(isChecked)
+        }
     }
 }

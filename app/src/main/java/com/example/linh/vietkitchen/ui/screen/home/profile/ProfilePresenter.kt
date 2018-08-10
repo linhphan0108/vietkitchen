@@ -4,6 +4,10 @@ import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import com.firebase.ui.auth.AuthUI
 
 class ProfilePresenter : BasePresenter<ProfileContractView>(), ProfileContractPresenter {
+    override fun onAllowNotificationChanged(hasAllow: Boolean) {
+
+    }
+
     override fun logout() {
         AuthUI.getInstance()
                 .signOut(context!!)
