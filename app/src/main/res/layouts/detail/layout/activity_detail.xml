@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="none"
-        tools:layout_marginTop="-700dp">
+        tools:layout_marginTop="-200dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -55,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="invisible"
+                android:visibility="visible"
                 tools:visibility="visible">
 
                 <TextView
@@ -88,7 +88,7 @@
                 android:layout_marginBottom="@dimen/margin_medium"
                 android:padding="@dimen/padding_medium"
                 android:orientation="horizontal"
-                android:visibility="invisible"
+                android:visibility="visible"
                 tools:visibility="visible">
 
                 <LinearLayout
@@ -165,7 +165,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="invisible"
+                android:visibility="visible"
                 tools:visibility="visible">
 
                 <TextView
@@ -180,7 +180,7 @@
                     android:id="@+id/txtStepsToPreProcess"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/padding_bottom"
+                    android:paddingBottom="@dimen/padding_8dp"
                     android:paddingTop="@dimen/padding_medium"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
                     android:textColor="@color/detail_content_text_color"
@@ -192,7 +192,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="invisible"
+                android:visibility="visible"
                 tools:visibility="visible">
 
                 <TextView
@@ -207,22 +207,22 @@
                     android:id="@+id/txtStepsToProcess"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/padding_bottom"
+                    android:paddingBottom="@dimen/padding_8dp"
                     android:paddingTop="@dimen/padding_medium"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
                     android:textColor="@color/detail_content_text_color"
                     android:textSize="@dimen/body_size"
                     tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
             </LinearLayout>
-            <ImageView
-                android:id="@+id/imgResult"
-                android:layout_width="320dp"
-                android:layout_height="320dp"
-                android:scaleType="center"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:src="@drawable/img_drawer_nav_header"/>
+            <!--<ImageView-->
+                <!--android:id="@+id/imgResult"-->
+                <!--android:layout_width="320dp"-->
+                <!--android:layout_height="320dp"-->
+                <!--android:scaleType="center"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:visibility="visible"-->
+                <!--tools:visibility="visible"-->
+                <!--tools:src="@drawable/img_drawer_nav_header"/>-->
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

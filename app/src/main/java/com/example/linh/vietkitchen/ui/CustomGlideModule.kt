@@ -47,8 +47,8 @@ class CustomGlideModule : AppGlideModule() {
                 .centerCrop()
                 .encodeFormat(Bitmap.CompressFormat.PNG)
                 .encodeQuality(100)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .format(DecodeFormat.PREFER_RGB_565)
-                .skipMemoryCache(false)
+                .skipMemoryCache(true)
     }
 }
