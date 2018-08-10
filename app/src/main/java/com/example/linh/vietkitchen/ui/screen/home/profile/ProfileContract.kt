@@ -10,4 +10,5 @@ interface ProfileContractView : BaseViewContract{
 
 interface ProfileContractPresenter : BasePresenterContract<ProfileContractView>{
     fun logout()
+    fun onAllowNotificationChanged(hasAllow: Boolean)
 }

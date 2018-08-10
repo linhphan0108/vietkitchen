@@ -27,8 +27,8 @@
 
             <ImageView
                 android:id="@+id/imgAvatar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
                 android:layout_marginEnd="@dimen/margin_16dp"
                 android:layout_marginRight="@dimen/margin_16dp"
                 tools:src="@mipmap/ic_launcher_round"
@@ -48,6 +48,11 @@
             android:paddingTop="@dimen/padding_8dp"
             android:paddingBottom="@dimen/padding_8dp"
             android:textSize="14sp"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:drawableStart="@drawable/ic_account_card_details"
+            android:drawableLeft="@drawable/ic_account_card_details"
+            android:drawablePadding="@dimen/padding_8dp"
             tools:text="@string/label_displayName"
            />
 
@@ -68,6 +73,9 @@
             android:paddingTop="@dimen/padding_8dp"
             android:paddingBottom="@dimen/padding_8dp"
             android:textSize="14sp"
+            android:drawableStart="@drawable/ic_at_outline"
+            android:drawableLeft="@drawable/ic_at_outline"
+            android:drawablePadding="@dimen/padding_8dp"
             tools:text="@string/label_email"/>
 
         <View
@@ -86,6 +94,11 @@
             android:paddingTop="@dimen/padding_8dp"
             android:paddingBottom="@dimen/padding_8dp"
             android:textSize="14sp"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_heart_outline"
+            android:drawableStart="@drawable/ic_heart_outline"
+            android:drawablePadding="@dimen/padding_8dp"
             tools:text="@string/label_favorite_recipes"/>
 
         <View
@@ -105,17 +118,22 @@
             android:paddingTop="@dimen/padding_8dp"
             android:paddingBottom="@dimen/padding_8dp"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             >
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/label_notification"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/ic_bell_outline"
+                android:drawableStart="@drawable/ic_bell_outline"
+                android:drawablePadding="@dimen/padding_8dp"/>
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/swNotification"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:checked="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 />
@@ -140,6 +158,11 @@
             android:text="@string/label_logout"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:drawableStart="@drawable/ic_logout_variant"
+            android:drawableLeft="@drawable/ic_logout_variant"
+            android:drawablePadding="@dimen/padding_8dp"
             android:background="?attr/selectableItemBackground"
             />
     </LinearLayout>
