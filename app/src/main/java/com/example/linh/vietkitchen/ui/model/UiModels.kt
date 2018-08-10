@@ -2,6 +2,10 @@ package com.example.linh.vietkitchen.ui.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import android.text.Spannable
+import android.text.TextUtils
+import com.example.linh.vietkitchen.domain.model.ProcessStep as DomainProcess
+
 
 open class Ingredient(val notes: String?, val quantity: Int, val unit: String) : Parcelable {
     constructor(parcel: Parcel) : this(
@@ -32,7 +36,7 @@ open class Ingredient(val notes: String?, val quantity: Int, val unit: String) :
 }
 
 class Recipe(val id: String?, val name: String, val intro: String, val ingredient: Map<String, Ingredient>, val spice: String,
-             val preliminaryProcessing: List<String>, val processing: List<String>, val cookingMethod: Map<String, Boolean>,
+             val preliminaryProcessing: String, val processing: String, val cookingMethod: Map<String, Boolean>,
              val benefit: Map<String, Boolean>?, val recommendedSeason: Map<String, Boolean>, val region: String?, val specialDay: String?,
              val imageUrl: String, var hasLiked: Boolean) : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
@@ -41,8 +45,8 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
             parcel.readString(),//intro
             readIngredient(parcel),//ingredient
             parcel.readString(),//spice
-            parcel.createStringArrayList(),//preliminaryProcessing
-            parcel.createStringArrayList(),//processing
+            parcel.readString(),//preliminaryProcessing
+            parcel.readString(),//processing
             readMapStringBoolean(parcel),//cookingMethod
             readMapStringBoolean(parcel),//benefit
             readMapStringBoolean(parcel),//recommendedSeason
@@ -58,8 +62,8 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
         parcel.writeString(intro)//intro
         writeIngredient(ingredient, parcel, flags)//ingredient
         parcel.writeString(spice)////spice
-        parcel.writeStringList(preliminaryProcessing)//preliminaryProcessing
-        parcel.writeStringList(processing)//processing
+        parcel.writeString(preliminaryProcessing)//preliminaryProcessing
+        parcel.writeString(processing)//processing
         writeMapStringBoolean(cookingMethod, parcel, flags)//cookingMethod
         writeMapStringBoolean(benefit, parcel, flags)//benefit
         writeMapStringBoolean(recommendedSeason, parcel, flags)//recommendedSeason
@@ -119,9 +123,57 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
                 parcel.writeInt(if (value) 1 else 0)
             }
         }
+
+        fun writeMap(map: Map<String, String>, out: Parcel, flags: Int){
+            out.writeInt(map.size)
+            for ((key, value) in map){
+                out.writeString(key)
+                out.writeString(value)
+            }
+        }
+
+        fun readMap(parcel: Parcel) : Map<String, String>{
+            val map = mutableMapOf<String, String>()
+            val size = parcel.readInt()
+            for (i in 0 until  size) {
+                map[parcel.readString()] = parcel.readString()
+            }
+            return map
+        }
+
+        fun readListProcess(parcel: Parcel): List<ProcessStep> {
+            val result = mutableListOf<ProcessStep>()
+            parcel.readTypedList(result, ProcessStep.CREATOR)
+            return result.toList()
+        }
     }
 
 }
 
+data class ProcessStep(val step: String = "", val imageUrl: String = "") : Parcelable{
+    constructor(parcel: Parcel) : this(
+            parcel.readString(),
+            parcel.readString())
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(step)
+        parcel.writeString(imageUrl)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ProcessStep> {
+        override fun createFromParcel(parcel: Parcel): ProcessStep {
+            return ProcessStep(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ProcessStep?> {
+            return arrayOfNulls(size)
+        }
+    }
+
+}
 data class CategoryItem(val itemTitle: String)
 data class CategoryGroup(val headerTile: String, val itemsList: List<CategoryItem>? = null)

@@ -144,7 +144,7 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
     }
 
     private fun createADumpFood(): Recipe {
-        val name = "bò xào rau củ"
+        val name = "chè hạt sen với đường phèn"
         val intro = "Chè hạt sen nhãn nhục không chỉ có vị thơm mát, ngọt dịu của hạt sen hòa quyện với nhãn nhục, mà còn là món ăn bổ dưỡng cho cơ thể. Như bạn cũng biết nhãn nhục ăn quá nhiều sẽ bị nóng nhưng có một cách để ăn nhãn nhục không lo bị nóng đó là chúng ta đem kết hợp nhãn nhục với hạt sen. ";
         val ingredients = mapOf(
                 Pair("sườn già", Ingredient(200, "g")),
@@ -152,10 +152,22 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 Pair("khoai tây", Ingredient(200, "g")),
                 Pair("bắp mỹ", Ingredient(200, "g")))
         val spices = "Muối, Mì chính(có thể thay bằng bột canh), Lá mùi tàu, hạt tiêu"
-        val preliminaryProcessing = listOf<String>()
-        val processing = listOf("Rửa xương lợn đã được mua. Sau đó cho vào xoong, cho nước vào và đun qua để xoong sôi lên 1 tí rồi tắt bếp. Đổ xương ra rổ và rửa lại(công đoạn này giúp loại bỏ bụi bẩn khi ngta bán ngoài chợ và giúp cho nước xương được trong. Lưu ý là không đun lâu như vậy sẽ làm mất chất trong xương lợn và khiến món ăn không được ngọt, ngon)",
-                "Sau đó lại cho xương vào và đổ nước, hầm xương 25-35p",
-                "Bí đao gọt vỏ cắt miếng. Sau khi xương hầm xong thì cho bí đao vào. Bí đao rất nhanh chín nên ta để sôi 5p rồi tắt bếp đi. Chín quá khi nguội nó sẽ chua bí đao, sau đó ta nêm gia vị vào cho hợp khẩu vị. Phần cuối cùng là ta cắt lá mùi tàu vào cho thơm. Như vậy là xong! Chúc mọi người có món ăn ngon!!!")
+        val preliminaryProcessing = listOf<ProcessStep>(
+                ProcessStep("- Trước tiên, các bạn sơ chế hạt sen bằng cách lấy bỏ tâm của hạt sen ra, cắt bỏ phần đầu đen rồi rửa thật sạch. Lưu ý, nếu như dùng hạt sen khô thì ngâm hạt sen rồi lấy bỏ tâm sen đi nhé!",
+                        "https://cachnauche.com/uploads/1/quy-trinh-cach-nau-che-hat-sen-duong-phen.jpg")
+        )
+        val processing = listOf(
+            ProcessStep("Sau khi làm sạch hạt sen các bạn cho vào nồi, đổ nước ngập luộc lửa vừa vừa đến khi chín mềm thì tắt bếp. Cách khác thay vì luộc các bạn có thể hấp cách thủy đến khi chin mềm là được.",
+                    "https://cachnauche.com/uploads/1/quy-trinh-cach-nau-che-hat-sen-duong-phen-1.jpg"),
+                ProcessStep("- Đây là bước rất quan trọng, các bạn đem lượng đường phèn đã mua hòa với nước, bắc lên bếp đun vừa lửa cho tan đường rồi để một lúc cho nồi nước lắng cặn xuống dưới.\n" +
+                        "\n" +
+                        "- Sau đó đổ phần nước trong của đường phèn sang một chiếc nồi khác, rồi cho hạt sen đã luộc mềm lúc trước vào cùng và nấu lên.\n" +
+                        "\n" +
+                        "- Chú ý bước này các bạn để lửa riu riu cho hạt sen thấm vừa nước đường mà không bị nát đun tiếp đến khi sôi thì tắt bếp vag hoàn thành món chè.\n" +
+                        "\n" +
+                        "Đến lúc thưởng thức thành quả rồi đây…! Các bạn múc chè sen ra bát, nếu thích có dừa cho thơm và đẹp mắt thì rắc lên trên. Trong cách nấu chè hạt sen đường phèn ngon này tùy theo sở thích của từng người có thể ăn nóng hoặc nguội đều vô cùng tuyệt vời. Mùa hè này mà ăn lạnh thêm ít đá bào thì tuyệt lắm nhé.",
+                        "https://cachnauche.com/uploads/1/cach-nau-che-hat-sen-duong-phen.jpg")
+        )
         val method = mapOf(Pair("chè", true))
         val benefit = mapOf(Pair("giải nhiệt", true))
         val season = mapOf(Pair("mùa hè", true))
@@ -167,7 +179,7 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 Pair("thịt bò xào", true),
                 Pair("bò xào", true)
         )
-        val imageUrl = "http://media.phunutoday.vn/files/upload_images/2016/08/29/cach-lam-bo-xao-rau-cu-thom-ngon-hap-dan-phunutoday_vn.jpg"
+        val imageUrl = "https://cachnauche.com/uploads/1/cach-nau-che-hat-sen-duong-phen.jpg"
         return Recipe( name, intro, ingredients, spices, preliminaryProcessing, processing, method,
                 benefit, season, region, specialDay, tags, imageUrl)
     }

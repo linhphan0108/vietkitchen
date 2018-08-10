@@ -25,9 +25,9 @@ class SlackLoadingView : BaseCustomView, View.OnAttachStateChangeListener {
     //加载状态
     private val STATUS_LOADING = 1
     //线条最大长度
-    private val MAX_LINE_LENGTH = ScreenUtil.dp2px(context, 80f)
+    private val MAX_LINE_LENGTH = ScreenUtil.dp2px(context, 80)
     //线条最短长度
-    private val MIN_LINE_LENGTH = ScreenUtil.dp2px(context, 16f)
+    private val MIN_LINE_LENGTH = ScreenUtil.dp2px(context, 16)
     //最大间隔时长
     private val MAX_DURATION = 3000
     //最小间隔时长
@@ -286,7 +286,7 @@ class SlackLoadingView : BaseCustomView, View.OnAttachStateChangeListener {
      * 线条变化动画
      */
     private fun startLCAnim() {
-        val lineWidthAnim = ValueAnimator.ofFloat((mEntireLineLength - ScreenUtil.dp2px(context, 1f)).toFloat(), (-mEntireLineLength).toFloat())
+        val lineWidthAnim = ValueAnimator.ofFloat((mEntireLineLength - ScreenUtil.dp2px(context, 1)).toFloat(), (-mEntireLineLength).toFloat())
         lineWidthAnim.duration = mDuration.toLong()
         lineWidthAnim.interpolator = LinearInterpolator()
         lineWidthAnim.addUpdateListener { animation ->

@@ -2,6 +2,9 @@ package com.example.linh.vietkitchen.ui.screen.detailActivity
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -15,16 +18,30 @@ import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.extension.capWords
-import com.example.linh.vietkitchen.extension.toString
 import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
+import android.text.Html
+import android.text.Spannable
+import android.view.Gravity
+import android.widget.TextView
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
+import com.example.linh.vietkitchen.extension.ctx
+import com.example.linh.vietkitchen.util.ScreenUtil
+import timber.log.Timber
+
 
 private const val BK_THUMB_IMAGE_TRANSITION_NAME = "BK_THUMB_IMAGE_TRANSITION_NAME"
 private const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
 private const val BK_RECIPE = "BK_RECIPE"
+private val SCREEN_WIDTH = ScreenUtil.screenWidth()
+//    private val IMAGE_HEIGH = (SCREEN_WIDTH * 3)/4
+private val IMAGE_ROUNDED_CORNERS_RADIUS = ScreenUtil.dp2px(8)
 
-class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetailPresenter>(), RecipeDetailViewContract, Animation.AnimationListener {
+class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetailPresenter>(),
+        RecipeDetailViewContract, Animation.AnimationListener {
     companion object {
         fun createIntent(context: Context?, thumbImageTransitionName: String, recipe: Recipe): Intent{
             val intent = Intent(context, RecipeDetailActivity::class.java)
@@ -55,16 +72,16 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
             imgBlurBg.transitionName = bundle.getString(BK_THUMB_IMAGE_TRANSITION_NAME)
         }
         val recipe = bundle.getParcelable<Recipe>(BK_RECIPE)
-        initAnimationObjects()
+//        initAnimationObjects()
         populateUI(recipe)
     }
 
-    override fun onBackPressed() {
-        if (enableBackBtn) {
-            llStepsToPreProcess.startAnimation(slideOutDown)
-            enableBackBtn = false
-        }
-    }
+//    override fun onBackPressed() {
+//        if (enableBackBtn) {
+//            llStepsToPreProcess.startAnimation(slideOutDown)
+//            enableBackBtn = false
+//        }
+//    }
 
     //region MVP callbacks =========================================================================
     override val viewContext: Context?
@@ -103,8 +120,8 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
             }
             llStepsToProcess.visibility = View.VISIBLE
             llStepsToProcess.animation = slideUpAnimOne
-            imgResult.visibility = View.VISIBLE
-            imgResult.animation = slideUpAnimOne
+//            imgResult.visibility = View.VISIBLE
+//            imgResult.animation = slideUpAnimOne
             enableBackBtn = true
         }
         if (animation === slideOutDown) {
@@ -180,9 +197,10 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
                 })
                 .into(imgBlurBg)
-        GlideApp.with(this)
-                .load(recipe.imageUrl)
-                .into(imgResult)
+//        GlideApp.with(this)
+//                .load(recipe.imageUrl)
+//                .override(SCREEN_WIDTH, SCREEN_WIDTH)
+//                .into(imgResult)
         with(recipe) {
             val builder = StringBuilder()
             for ((key, value) in ingredient){
@@ -190,19 +208,88 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
                 if (value.notes.isNullOrBlank()) builder.append("${value.notes}\n")
                 builder.append("${value.quantity}${value.unit}\n")
             }
-            val preProcessSteps = preliminaryProcessing.toString("\n")
+
             TxtTitle.text = name.capWords()
             txtDescription.text = intro
             txtIngredients.text = builder.substring(0, builder.length - 1)
             txtSpices.text = spice
-            if (preProcessSteps.isNullOrBlank()) {
+
+            val w = SCREEN_WIDTH - ScreenUtil.dp2px(this@RecipeDetailActivity, 64)//minus the parent's padding
+            val h = (w * 3) / 4
+
+            if (preliminaryProcessing.isBlank()) {
                 llStepsToPreProcess.visibility = View.GONE
                 shouldHidePreProcessLayout = true
             }else{
-                txtStepsToPreProcess.text = preProcessSteps
+                val imageGetterPre = ImageGetter(txtStepsToPreProcess, w, h, IMAGE_ROUNDED_CORNERS_RADIUS)
+                txtStepsToPreProcess.text  = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    Html.fromHtml(preliminaryProcessing, Html.FROM_HTML_MODE_LEGACY, imageGetterPre, null) as Spannable
+                } else {
+
+                    Html.fromHtml(preliminaryProcessing, imageGetterPre, null) as Spannable
+                }
             }
-            txtStepsToProcess.text = processing.toString("\n")
+
+            val imageGetter = ImageGetter(txtStepsToProcess, w, h, IMAGE_ROUNDED_CORNERS_RADIUS)
+            txtStepsToProcess.text = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                Html.fromHtml(processing, Html.FROM_HTML_MODE_LEGACY, imageGetter, null) as Spannable
+            } else {
+
+                Html.fromHtml(processing, imageGetter, null) as Spannable
+            }
         }
     }
     //endregion inner methods
+}
+
+class ImageGetter(private val textView: TextView, private val w: Int, private val h: Int, val cornerRadius: Int = 0)
+    : Html.ImageGetter{
+    override fun getDrawable(source: String?): Drawable {
+        val holder = BitmapDrawablePlaceHolder(textView, w, h)
+        Timber.d("ImageGetter $source")
+        GlideApp.with(textView.ctx)
+                .asBitmap()
+                .load(source)
+                .fitCenter()
+                .override(w, h)
+                .transforms(RoundedCorners(cornerRadius))
+                .into(holder.target)
+        return holder
+    }
+
+}
+
+class BitmapDrawablePlaceHolder(val textView: TextView, private val w: Int,
+                                private val h: Int) : BitmapDrawable() {
+    private var left: Int = (SCREEN_WIDTH - w ) /2
+
+    init {
+        setBounds(left, 0, w, h)
+    }
+
+    var drawable: BitmapDrawable? = null
+        set(value) {
+        field = value
+        value?.let {
+            it.setBounds(left, 0, w, h)
+            it.gravity = Gravity.TOP
+            textView.invalidate()
+        }
+
+    }
+
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
+        if (drawable != null) {
+            drawable!!.draw(canvas)
+        }else{
+//            holder.draw(canvas)
+        }
+    }
+
+    val target = object: SimpleTarget<Bitmap>(w, h){
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+            drawable = BitmapDrawable(textView.ctx.resources, resource)
+        }
+    }
 }

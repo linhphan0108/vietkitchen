@@ -50,9 +50,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         setupBottomTabBar()
         setupViewPager()
         presenter.requestCategory()
-//        createAnPutDumpDataToFirebaseDb()
-//        fetchData()
-//        Timber.d("message has logged by timber")
+        fab.setOnClickListener {
+            presenter.putARecipe()
+        }
     }
 
     override fun onBackPressed() {
