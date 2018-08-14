@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.homeActivity.HomeActivity">
+    tools:context=".ui.home.homeActivity.HomeActivity"
+    tools:showIn="@layout/activity_home">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -18,22 +19,34 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll"
-            android:background="@color/colorPrimary"
+            android:fitsSystemWindows="true"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/activity_home_content"/>
 
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:itemBackground="@color/tab_bar_bg"
+        app:itemIconTint="@drawable/bottom_nav_color_state"
+        app:itemTextColor="@drawable/bottom_nav_color_state"
+        app:menu="@menu/bottom_navigation"
+        app:layout_scrollFlags="snap"/>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin_end"
         android:layout_marginRight="@dimen/fab_margin_end"
         android:layout_marginBottom="@dimen/fab_margin_bottom"
         app:srcCompat="@android:drawable/ic_dialog_email"
+        app:layout_scrollFlags="scroll"
         android:visibility="visible"/>
 
 </android.support.design.widget.CoordinatorLayout>

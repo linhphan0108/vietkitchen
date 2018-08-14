@@ -36,7 +36,7 @@ open class Ingredient(val notes: String?, val quantity: Int, val unit: String) :
 }
 
 class Recipe(val id: String?, val name: String, val intro: String, val ingredient: Map<String, Ingredient>, val spice: String,
-             val preliminaryProcessing: String, val processing: String, val cookingMethod: Map<String, Boolean>,
+             val preliminaryProcessing: CharSequence, val processing: CharSequence, val cookingMethod: Map<String, Boolean>,
              val benefit: Map<String, Boolean>?, val recommendedSeason: Map<String, Boolean>, val region: String?, val specialDay: String?,
              val imageUrl: String, var hasLiked: Boolean) : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
@@ -45,8 +45,8 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
             parcel.readString(),//intro
             readIngredient(parcel),//ingredient
             parcel.readString(),//spice
-            parcel.readString(),//preliminaryProcessing
-            parcel.readString(),//processing
+            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//preliminaryProcessing
+            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//processing
             readMapStringBoolean(parcel),//cookingMethod
             readMapStringBoolean(parcel),//benefit
             readMapStringBoolean(parcel),//recommendedSeason
@@ -62,8 +62,8 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
         parcel.writeString(intro)//intro
         writeIngredient(ingredient, parcel, flags)//ingredient
         parcel.writeString(spice)////spice
-        parcel.writeString(preliminaryProcessing)//preliminaryProcessing
-        parcel.writeString(processing)//processing
+        TextUtils.writeToParcel(preliminaryProcessing, parcel, flags)//preliminaryProcessing
+        TextUtils.writeToParcel(processing, parcel, flags)//processing
         writeMapStringBoolean(cookingMethod, parcel, flags)//cookingMethod
         writeMapStringBoolean(benefit, parcel, flags)//benefit
         writeMapStringBoolean(recommendedSeason, parcel, flags)//recommendedSeason

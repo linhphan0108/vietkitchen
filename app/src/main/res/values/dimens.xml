@@ -7,6 +7,7 @@
     <dimen name="fab_margin_end">16dp</dimen>
     <dimen name="fab_margin_bottom">58dp</dimen>
     <dimen name="rcv_item_decoration">8dp</dimen>
+    <dimen name="app_bar_height">220dp</dimen>
 
     <dimen name="tab_bar_height">48dp</dimen>
     <dimen name="margin_16dp">16dp</dimen>
@@ -27,7 +28,7 @@
     <!--detail activity-->
     <dimen name="margin_small">10dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
-    <dimen name="padding_top_scrollview">180dp</dimen>
+    <dimen name="padding_top_scrollview">16dp</dimen>
     <dimen name="padding_medium">8dp</dimen>
     <dimen name="padding_bottom">30dp</dimen>
     <dimen name="list_item_title">32sp</dimen>

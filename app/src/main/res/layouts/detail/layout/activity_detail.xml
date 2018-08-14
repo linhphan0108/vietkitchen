@@ -1,47 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                tools:context=".ui.screen.detailActivity.RecipeDetailActivity">
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.screen.detailActivity.RecipeDetailActivity">
 
-    <ImageView
-        android:id="@+id/imgBlurBg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/recipe_picture_content_description"
-        android:scaleType="centerCrop"
-        tools:src="@drawable/img_drawer_nav_header"/>
-
-    <ProgressBar
-        android:id="@+id/thumbProgressbar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="bottom|center"
-        android:layout_marginTop="@dimen/margin_progress_bar"
-        android:indeterminate="true"/>
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:fitsSystemWindows="true"
+        >
 
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="@android:color/transparent"
+            android:fitsSystemWindows="true"
+            >
 
-    <View
-        android:id="@+id/bottomScrim"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/scrim_bottom"/>
+            <com.example.linh.vietkitchen.ui.custom.SquareImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:layout_collapseMode="parallax"
+                tools:src="@drawable/img_drawer_nav_header"
+                android:background="@android:color/white"
+                android:fitsSystemWindows="true"
+                />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/scrim_top"/>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:layout_collapseMode="pin"
+                tools:title="canh xương hầm khoai tây"
+                />
 
-    <ScrollView
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/detailsScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
+        android:clipToPadding="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:layout_marginTop="-200dp">
 
         <LinearLayout
@@ -59,7 +71,7 @@
                 tools:visibility="visible">
 
                 <TextView
-                    android:id="@+id/TxtTitle"
+                    android:id="@+id/txtTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
@@ -75,7 +87,6 @@
                     android:id="@+id/txtDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/detail_content_text_color"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
                     tools:text="@string/demo_desc"/>
             </LinearLayout>
@@ -117,7 +128,6 @@
                         android:layout_gravity="start"
                         android:gravity="start"
                         android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/detail_content_text_color"
                         tools:text="xương\nbí"/>
 
                 </LinearLayout>
@@ -125,7 +135,7 @@
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@android:color/white"/>
+                    android:background="@color/divider"/>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -153,7 +163,6 @@
                         android:layout_height="wrap_content"
                         android:gravity="start"
                         android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/detail_content_text_color"
                         tools:text="salt\nsugar"/>
 
                 </LinearLayout>
@@ -176,14 +185,13 @@
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold"/>
 
-                <TextView
+                <com.example.linh.vietkitchen.ui.custom.ImageSpanTextView
                     android:id="@+id/txtStepsToPreProcess"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/padding_8dp"
                     android:paddingTop="@dimen/padding_medium"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
-                    android:textColor="@color/detail_content_text_color"
                     tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
             </LinearLayout>
 
@@ -203,26 +211,16 @@
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold"/>
 
-                <TextView
+                <com.example.linh.vietkitchen.ui.custom.ImageSpanTextView
                     android:id="@+id/txtStepsToProcess"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/padding_8dp"
                     android:paddingTop="@dimen/padding_medium"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
-                    android:textColor="@color/detail_content_text_color"
                     android:textSize="@dimen/body_size"
                     tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
             </LinearLayout>
-            <!--<ImageView-->
-                <!--android:id="@+id/imgResult"-->
-                <!--android:layout_width="320dp"-->
-                <!--android:layout_height="320dp"-->
-                <!--android:scaleType="center"-->
-                <!--android:layout_gravity="center"-->
-                <!--android:visibility="visible"-->
-                <!--tools:visibility="visible"-->
-                <!--tools:src="@drawable/img_drawer_nav_header"/>-->
         </LinearLayout>
-    </ScrollView>
-</RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>

@@ -47,6 +47,9 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
 
     override fun getFragmentLayoutRes() = R.layout.fragment_favorite
 
+    override fun onRequestLikedRecipesNoData() {
+    }
+
     override fun onRequestLikedRecipesSuccess(recipes: List<Recipe>) {
         recipeAdapter.updateItemThenNotify(recipes.toMutableList())
     }

@@ -1,6 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home.favorite
 
 import com.example.linh.vietkitchen.domain.command.RequestLikedRecipesCommand
+import com.example.linh.vietkitchen.exception.FirebaseNoDataException
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomePresenter
 import com.example.linh.vietkitchen.ui.screen.home.mapper.RecipeMapper
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,7 +26,11 @@ class FavoritePresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
                 .subscribe ({
                     viewContract?.onRequestLikedRecipesSuccess(it)
                 }, {
-                    viewContract?.onRequestLikedRecipesFailed()
+                    if (it is FirebaseNoDataException){
+                        viewContract?.onRequestLikedRecipesNoData()
+                    }else {
+                        viewContract?.onRequestLikedRecipesFailed()
+                    }
                     Timber.e(it)
                 }))
     }

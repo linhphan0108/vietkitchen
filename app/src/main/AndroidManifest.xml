@@ -24,6 +24,7 @@
         </activity>
         <activity android:name=".ui.screen.login.LoginActivity"/>
         <activity android:name=".ui.home.homeActivity.HomeActivity"
+                  android:theme="@style/AppTheme"
                   android:screenOrientation="portrait"/>
         <activity android:name=".ui.screen.detailActivity.RecipeDetailActivity"
                   android:screenOrientation="portrait"/>

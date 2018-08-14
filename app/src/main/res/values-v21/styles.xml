@@ -5,9 +5,9 @@
         <item name="android:windowActionBar">false</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <!--<item name="android:statusBarColor">@color/colorPrimaryDarkStatusBar</item>-->
+        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <!--<item name="android:windowTranslucentNavigation">true</item>-->
-        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
 
         <!-- enable window content transitions -->
         <item name="android:windowContentTransitions">true</item>
@@ -19,6 +19,7 @@
     <style name="NoTranslucentStatusBar" parent="AppTheme">
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
     </style>
 </resources>

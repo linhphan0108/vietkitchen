@@ -7,6 +7,7 @@ import com.example.linh.vietkitchen.ui.screen.home.BaseHomeContractView
 interface FavoriteContractView : BaseHomeContractView{
     fun onRequestLikedRecipesSuccess(recipes: List<Recipe>)
     fun onRequestLikedRecipesFailed()
+    fun onRequestLikedRecipesNoData()
 }
 
 interface FavoriteContractPresenter : BaseHomeContractPresenter<FavoriteContractView>{

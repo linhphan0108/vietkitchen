@@ -36,5 +36,6 @@
     <string name="label_ingredients">ingredients:</string>
     <string name="label_process">process:</string>
     <string name="label_pre_process">Pre process:</string>
+    <string name="context_annotation"><annotation src="@drawable/https://i.imgur.com/0jQAdlZ.jpg">&#2228;</annotation></string>
 
 </resources>

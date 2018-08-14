@@ -8,9 +8,12 @@ import com.example.linh.vietkitchen.domain.model.Recipe as FoodDomain
 class RecipeMapper(private val ingredientMapper: IngredientMapper = IngredientMapper()) {
 
     fun convertToDomain(children: Iterable<DataSnapshot>): List<FoodDomain> {
-//        val foods: MutableList<FoodDomain> = mutableListOf()
-        return children.map {
-            convertToDomain(it)
+        return if (children.none()){
+            listOf()
+        }else {
+            children.map {
+                convertToDomain(it)
+            }
         }
     }
 

@@ -7,3 +7,5 @@ class FirebaseDataException(private var error: DatabaseError) : Exception() {
         return "RxFirebaseDataException{error=" + this.error + '}'.toString()
     }
 }
+
+class FirebaseNoDataException(message: String) : Exception(message)
