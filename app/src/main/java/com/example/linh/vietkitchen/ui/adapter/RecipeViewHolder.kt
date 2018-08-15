@@ -24,7 +24,7 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
         }else {
             with(recipe) {
                 GlideApp.with(itemView.context)
-                        .load(recipe.imageUrl)
+                        .load(recipe.thumbUrl)
                         .into(itemView.imgFoodThumb)
                 itemView.txtFoodName.text = name
                 itemView.txtShortIntro.text = intro

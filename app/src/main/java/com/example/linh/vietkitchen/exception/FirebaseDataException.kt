@@ -8,4 +8,4 @@ class FirebaseDataException(private var error: DatabaseError) : Exception() {
     }
 }
 
-class FirebaseNoDataException(message: String) : Exception(message)
+class FirebaseNoDataException(message: String = "") : Exception(message)

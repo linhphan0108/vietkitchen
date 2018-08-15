@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.command.RequestRecipesIdCommand
-import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import com.example.linh.vietkitchen.ui.screen.splashScreenonActivityResult.SplashScreenContractPresenter
 import com.example.linh.vietkitchen.ui.screen.splashScreenonActivityResult.SplashScreenContractView
@@ -32,7 +31,7 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
                 val metadata = FirebaseAuth.getInstance().currentUser?.metadata
                 if (metadata?.creationTimestamp == metadata?.lastSignInTimestamp) {
                     // The user is new, show them a fancy intro screen!
-                    activity?.toast("logged in first time")
+                    Timber.d("logged in first time")
                 } else {
                     // This is an existing user, show them a welcome back screen.
                 }
@@ -74,7 +73,7 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
     )
 
     private fun silentLogin() {
-        activity?.toast("login silently")
+        Timber.d("login silently")
         val providers = getSelectedProviders()
         AuthUI.getInstance().silentSignIn(context!!, providers)
 //                .continueWithTask {
@@ -98,7 +97,7 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
     }
 
     private fun loginNormally(){
-        activity?.toast("login normally")
+        Timber.d("login normally")
         // Choose authentication providers
         val providers = getSelectedProviders()
         // Create and launch sign-in intent

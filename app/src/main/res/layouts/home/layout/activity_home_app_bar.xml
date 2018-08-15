@@ -44,7 +44,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin_end"
         android:layout_marginRight="@dimen/fab_margin_end"
-        android:layout_marginBottom="@dimen/fab_margin_bottom"
+        android:layout_marginBottom="@dimen/fab_margin_bottom_home"
         app:srcCompat="@android:drawable/ic_dialog_email"
         app:layout_scrollFlags="scroll"
         android:visibility="visible"/>

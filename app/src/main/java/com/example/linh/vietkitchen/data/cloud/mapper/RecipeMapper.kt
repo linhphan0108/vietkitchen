@@ -28,6 +28,6 @@ class RecipeMapper(private val ingredientMapper: IngredientMapper = IngredientMa
         }
         return FoodDomain(id, f.name, f.intro, ingredientMapper.convertToDomain(f.ingredient), f.spice,
                 preProcess, process, f.cookingMethod, f.benefit,
-                f.recommendedSeason, f.region, f.specialDay, f.imageUrl)
+                f.recommendedSeason, f.region, f.specialDay, f.thumbUrl, f.imageUrl)
     }
 }
