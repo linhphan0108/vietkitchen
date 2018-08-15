@@ -12,7 +12,7 @@ import com.example.linh.vietkitchen.R
 
 fun Context.color(res: Int): Int = ContextCompat.getColor(this, res)
 fun Context.toast(message: String, length: Int = Toast.LENGTH_SHORT){
-    Toast.makeText(this, message, length).show()
+    Toast.makeText(this.applicationContext, message, length).show()
 }
 fun Fragment.toast(message: String, length: Int = Toast.LENGTH_SHORT){
     context?.toast(message, length)
