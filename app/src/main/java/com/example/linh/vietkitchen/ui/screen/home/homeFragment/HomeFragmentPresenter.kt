@@ -2,6 +2,7 @@ package com.example.linh.vietkitchen.ui.home.homeFragment
 
 import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
+import com.example.linh.vietkitchen.exception.FirebaseNoDataException
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
@@ -48,13 +49,6 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                     if (it != null && it.isEmpty()) {
                         viewContract?.onFoodsRequestFailed("Oops! something went wrong, no data found")
                     }else{
-                        if (it.last().id.equals(lastRecipeId)){
-                            isReachLastRecord = true
-                            isLoadMoreRecipe = false
-                            isFreshRecipe = false
-                            viewContract?.onLoadMoreReachEndRecord()
-                            return@subscribe
-                        }
                         lastRecipeId = it.last().id
                         if(isLoadMoreRecipe){
                             viewContract?.onLoadMoreSuccess(it)
@@ -68,12 +62,21 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
 
                 }, {
                     Timber.e(it)
-                    if(isLoadMoreRecipe){
-                        viewContract?.onLoadMoreFailed()
-                        isLoadMoreRecipe = false
-                    }else{
-                        viewContract?.onFoodsRequestFailed("Opps some things went wrong. ${it.message}")
-                        isFreshRecipe = false
+                    when {
+                        it is FirebaseNoDataException -> {
+                            isReachLastRecord = true
+                            isLoadMoreRecipe = false
+                            isFreshRecipe = false
+                            viewContract?.onLoadMoreReachEndRecord()
+                        }
+                        isLoadMoreRecipe -> {
+                            viewContract?.onLoadMoreFailed()
+                            isLoadMoreRecipe = false
+                        }
+                        else -> {
+                            viewContract?.onFoodsRequestFailed("Opps some things went wrong. ${it.message}")
+                            isFreshRecipe = false
+                        }
                     }
                 })
 

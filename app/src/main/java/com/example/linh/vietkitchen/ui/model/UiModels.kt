@@ -38,7 +38,7 @@ open class Ingredient(val notes: String?, val quantity: Int, val unit: String) :
 class Recipe(val id: String?, val name: String, val intro: String, val ingredient: Map<String, Ingredient>, val spice: String,
              val preliminaryProcessing: CharSequence, val processing: CharSequence, val cookingMethod: Map<String, Boolean>,
              val benefit: Map<String, Boolean>?, val recommendedSeason: Map<String, Boolean>, val region: String?, val specialDay: String?,
-             val imageUrl: String, var hasLiked: Boolean) : Entity(), Parcelable {
+             val thumbUrl: String, val imageUrl: String, var hasLiked: Boolean) : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),//id
             parcel.readString(),//notes
@@ -52,6 +52,7 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
             readMapStringBoolean(parcel),//recommendedSeason
             parcel.readString(),//region
             parcel.readString(),//specialDay
+            parcel.readString(),//thumbUrl
             parcel.readString(),//imageUrl
             parcel.readInt() != 0
     )
@@ -69,6 +70,7 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
         writeMapStringBoolean(recommendedSeason, parcel, flags)//recommendedSeason
         parcel.writeString(region)
         parcel.writeString(specialDay)
+        parcel.writeString(thumbUrl)
         parcel.writeString(imageUrl)
         parcel.writeInt(if (hasLiked) 1 else 0)
     }

@@ -49,6 +49,11 @@ abstract class EndlessScrollListener(
         }
     }
 
+    fun onRefresh(){
+        currentPage = 0
+        previousTotalItemCount = 0
+    }
+
     // Defines the process for actually loading more data based on page
     // Returns true if more data is being loaded; returns false if there is no more data to load.
     abstract fun onLoadMore(page: Int, totalItemsCount: Int): Boolean

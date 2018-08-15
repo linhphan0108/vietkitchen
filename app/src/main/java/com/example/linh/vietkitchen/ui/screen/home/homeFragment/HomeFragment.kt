@@ -52,6 +52,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     private var param1: String? = null
     private var param2: String? = null
+    lateinit var rcvLoadmoreListener: EndlessScrollListener
 
     //region lifecycle =============================================================================
     override fun getFragmentLayoutRes() = R.layout.fragment_home
@@ -147,7 +148,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     }
 
     override fun onLoadingMore() {
-//        recipeAdapter.startLoadMoreAnimation()
+        recipeAdapter.startLoadMoreAnimation()
     }
 
     override fun onLoadMoreSuccess(recipes: List<Recipe>) {
@@ -197,6 +198,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         swipeRefresh.setWaveColor(waveColor)
         swipeRefresh.isRefreshing = true
         swipeRefresh.setOnRefreshListener {
+            rcvLoadmoreListener.onRefresh()
             presenter.refreshFoods()
         }
     }
@@ -209,12 +211,14 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         rcvFood.itemAnimator = DefaultItemAnimator()
         rcvFood.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
         rcvFood.adapter = recipeAdapter
-        rcvFood.addOnScrollListener(object : EndlessScrollListener(3) {
+        rcvLoadmoreListener = object : EndlessScrollListener(3) {
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
-                presenter.loadMoreRecipe()
+                rcvFood.post { presenter.loadMoreRecipe() }
+                Timber.d("rcvLoadmoreListener")
                 return true
             }
-        })
+        }
+        rcvFood.addOnScrollListener(rcvLoadmoreListener)
     }
     //endregion inner classes
 }

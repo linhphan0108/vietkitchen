@@ -108,6 +108,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: DrawerNavChildItem?) {
         val category = data?.itemTitle
         onDrawerNavItemChangedListener?.onDrawerNavChanged(category)
+        drawerLayout.closeDrawer(GravityCompat.START)
     }
     //endregion callbacks
 

@@ -30,7 +30,7 @@ class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.userI
         return Recipe(domain.id, domain.name, domain.intro, ingredient,
                 domain.spice, pre, processSteps,
                 domain.cookingMethod, domain.benefit, domain.recommendedSeason,
-                domain.region, domain.specialDay, domain.imageUrl, false
+                domain.region, domain.specialDay, domain.imageUrl, domain.thumbUrl, false
         )
     }
 
