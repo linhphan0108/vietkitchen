@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.ui.screen.detailActivity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -15,25 +16,26 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.extension.capWords
 import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
-import com.example.linh.vietkitchen.extension.color
-import com.example.linh.vietkitchen.extension.toBitmap
-import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.extension.*
+import com.example.linh.vietkitchen.ui.VietKitchenApp
+import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.util.ScreenUtil
+import kotlinx.android.synthetic.main.activity_detail_content.*
 
 
 private const val BK_THUMB_IMAGE_TRANSITION_NAME = "BK_THUMB_IMAGE_TRANSITION_NAME"
 private const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
 private const val BK_RECIPE = "BK_RECIPE"
+const val BK_LIKE_STATE_JUST_CHANGED = "BK_LIKE_STATE_JUST_CHANGED"
 
 class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetailPresenter>(),
-        RecipeDetailViewContract {
+        RecipeDetailViewContract, View.OnClickListener {
     companion object {
         fun createIntent(context: Context?, thumbImageTransitionName: String, recipe: Recipe): Intent{
             val intent = Intent(context, RecipeDetailActivity::class.java)
@@ -44,18 +46,25 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
             return intent
         }
     }
+    private lateinit var userInfo: UserInfo
+    private lateinit var recipe: Recipe
     private var shouldHidePreProcessLayout = false
+    private var likeState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        userInfo = VietKitchenApp.userInfo
         intent.getBundleExtra(EXTRA_BUNDLE).let {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 appBarLayout.transitionName = it.getString(BK_THUMB_IMAGE_TRANSITION_NAME)
             }
-            val recipe = it.getParcelable<Recipe>(BK_RECIPE)
+            recipe = it.getParcelable(BK_RECIPE)
+            likeState = recipe.hasLiked
             setupToolbar(recipe.name)
             populateUI(recipe)
+            onFabStateChanged(recipe.hasLiked)
         }
+        fab.setOnClickListener(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -68,6 +77,14 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
                 super.onOptionsItemSelected(item)
             }
         }
+    }
+
+    override fun onBackPressed() {
+        if (recipe.hasLiked != likeState){
+            intent.putExtra(BK_LIKE_STATE_JUST_CHANGED, likeState)
+            setResult(Activity.RESULT_OK, intent)
+        }
+        super.onBackPressed()
     }
 
     //region MVP callbacks =========================================================================
@@ -85,12 +102,32 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
     override fun getViewContract() = this
 
     override fun getActivityLayoutRes() = R.layout.activity_detail
+
+
+    override fun onLikeChangedSuccess(state: Boolean) {
+        likeState = state
+        onFabStateChanged(state)
+    }
+
+    override fun onLikeChangedFailed() {
+    }
     //endregion MVP callbacks
 
-    //endregion animation callbacks
+    //==
+    override fun onClick(v: View) {
+        v.lookTemporary()
+        when(v.id){
+            R.id.fab -> {
+                if (likeState){
+                    confirmUnlike()
+                }else {
+                    doLikeActions()
+                }
+            }
+        }
+    }
 
     //region inner methods =========================================================================
-
     private fun setupToolbar(title: String){
         appBarLayout.layoutParams.height = ScreenUtil.screenWidth()
         setSupportActionBar(toolbar)
@@ -152,6 +189,11 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
         }
     }
 
+    private fun onFabStateChanged(state: Boolean){
+        val fabIcon = if(state) R.drawable.ic_heart_pink else R.drawable.ic_heart_grey
+        fab.setImageResource(fabIcon)
+    }
+
     private fun applyPalette(palette: Palette?) {
         val transparent = color(android.R.color.transparent)
         val primaryDark = color(R.color.colorPrimaryDark)
@@ -169,7 +211,20 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
         fab.rippleColor = lightVibrantColor
         fab.backgroundTintList = ColorStateList.valueOf(vibrantColor)
-}
+    }
+
+
+    private fun confirmUnlike(){
+        val message = getString(R.string.message_confirm_unlike, recipe.name)
+        val action = getString(R.string.label_ok)
+        showSnackBar(coordinatorLayout, message, action = action, listener = View.OnClickListener {
+            doLikeActions()
+        })
+    }
+
+    private fun doLikeActions(){
+        presenter.onLikeChanged(userInfo.uid, recipe.id!!, !likeState)
+    }
     //endregion inner methods
 }
 
