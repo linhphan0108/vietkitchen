@@ -10,6 +10,7 @@
     <string name="draw_nav_group_item_all">all</string>
     <string name="fui_progress_dialog_signing_up">Creating your shiny new account…</string>
     <string name="default_snack_bar_action">action</string>
+    <string name="label_ok">OK</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -37,5 +38,6 @@
     <string name="label_process">process:</string>
     <string name="label_pre_process">Pre process:</string>
     <string name="context_annotation"><annotation src="@drawable/https://i.imgur.com/0jQAdlZ.jpg">&#2228;</annotation></string>
+    <string name="message_confirm_unlike">make sure you want to unlike this recipe \"%s\"</string>
 
 </resources>

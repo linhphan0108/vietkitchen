@@ -44,7 +44,7 @@ abstract class BaseHomePresenter<T: BaseHomeContractView>(
                 .doOnComplete{
                     recipe.hasLiked = true
                     userInfo.likedRecipesIds!!.add(recipeId)
-                    likeOrUnLikePublisher.onNext(recipe)
+                    emitLike(recipe)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({
@@ -62,7 +62,7 @@ abstract class BaseHomePresenter<T: BaseHomeContractView>(
                 .doOnComplete {
                     recipe.hasLiked = false
                     userInfo.likedRecipesIds!!.remove(recipeId)
-                    likeOrUnLikePublisher.onNext(recipe)
+                    emitUnLike(recipe)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -70,5 +70,13 @@ abstract class BaseHomePresenter<T: BaseHomeContractView>(
                 }, {
                     Timber.e(it)
                 })
+    }
+
+    override fun emitLike(recipe: Recipe) {
+        likeOrUnLikePublisher.onNext(recipe)
+    }
+
+    override fun emitUnLike(recipe: Recipe) {
+        likeOrUnLikePublisher.onNext(recipe)
     }
 }

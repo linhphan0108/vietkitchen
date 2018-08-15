@@ -12,4 +12,6 @@ interface BaseHomeContractView : BaseViewContract{
 interface BaseHomeContractPresenter<T: BaseHomeContractView> : BasePresenterContract<T>{
     fun likeRecipe(recipe: Recipe)
     fun unLikeRecipe(recipe: Recipe)
+    fun emitLike(recipe: Recipe)
+    fun emitUnLike(recipe: Recipe)
 }

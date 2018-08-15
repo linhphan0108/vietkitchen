@@ -17,6 +17,11 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
         delegatesManager.addDelegate(ShimmerItemDelegate())
     }
 
+    fun getItemAt(position: Int): Entity? {
+        return if (position >= itemCount) null
+        else items[position]
+    }
+
     override fun setItems(items: MutableList<Entity>?) {
         super.setItems(items)
         if (items != null && items.isNotEmpty()){
@@ -43,7 +48,7 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
                 false
             }
         }
-        if (index > 0){
+        if (index >= 0){
             (items[index] as Recipe).hasLiked = true
             notifyItemChanged(index, PayLoads.LIKE_CHANGE)
         }else{

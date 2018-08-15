@@ -40,5 +40,7 @@
     <color name="translucent_scrim_bottom_center">#b6000000</color>
     <color name="textAccent">@color/colorAccent</color>
     <color name="detail_content_text_color">#fff</color>
+    <color name="fab_tint_liked_color">#E91E63</color>
+    <color name="fab_tint_unLiked_color">@color/divider</color>
 
 </resources>
