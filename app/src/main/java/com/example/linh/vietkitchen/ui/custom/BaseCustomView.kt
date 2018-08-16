@@ -5,6 +5,7 @@ import android.view.View
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
+import timber.log.Timber
 
 
 abstract class BaseCustomView : View{
@@ -29,8 +30,10 @@ abstract class BaseCustomView : View{
     protected abstract fun onConstructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width = getMeasurementSize(widthMeasureSpec, getDefaultWidthSize())
-        val height = getMeasurementSize(heightMeasureSpec, getDefaultHeightSize())
+        Timber.v("Chart onMeasure w : ${MeasureSpec.toString(widthMeasureSpec)}")
+        Timber.v("Chart onMeasure h: ${MeasureSpec.toString(heightMeasureSpec)}")
+        val width = getMeasurementSize(widthMeasureSpec, getDesiredWidthSize())
+        val height = getMeasurementSize(heightMeasureSpec, getDesiredHeightSize())
         setMeasuredDimension(width, height)
     }
 
@@ -60,6 +63,6 @@ abstract class BaseCustomView : View{
         }
     }
 
-    protected abstract fun getDefaultWidthSize() : Int
-    protected abstract fun getDefaultHeightSize() : Int
+    protected abstract fun getDesiredWidthSize() : Int
+    protected abstract fun getDesiredHeightSize() : Int
 }

@@ -90,11 +90,11 @@ class SlackLoadingView : BaseCustomView, View.OnAttachStateChangeListener {
         initView()
     }
 
-    override fun getDefaultWidthSize(): Int {
+    override fun getDesiredWidthSize(): Int {
         return (mEntireLineLength * mRatioBetweenViewSizeAndLineLength).toInt()
     }
 
-    override fun getDefaultHeightSize(): Int {
+    override fun getDesiredHeightSize(): Int {
         return (mEntireLineLength * mRatioBetweenViewSizeAndLineLength).toInt()
     }
 
