@@ -28,6 +28,10 @@
                   android:screenOrientation="portrait"/>
         <activity android:name=".ui.screen.detailActivity.RecipeDetailActivity"
                   android:screenOrientation="portrait"/>
+        <activity android:name=".admin.ui.screen.admin.AdminActivity"
+                  android:screenOrientation="portrait"/>
+
+        <service android:name=".ui.service.PutRecipeService"/>
     </application>
 
 </manifest>

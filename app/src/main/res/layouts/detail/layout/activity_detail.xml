@@ -27,7 +27,7 @@
             >
 
             <com.example.linh.vietkitchen.ui.custom.SquareImageView
-                android:id="@+id/image"
+                android:id="@+id/imgHeaderImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"

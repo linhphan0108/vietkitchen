@@ -1,10 +1,11 @@
 package com.example.linh.vietkitchen.domain.datasource
 
+import com.google.firebase.database.DataSnapshot
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
 interface UserDataSource{
     fun likeRecipe(uid: String, recipeKey: String): Completable?
     fun unLikeRecipe(uid: String, recipeKey: String): Completable?
-    fun getLikedRecipesId(uid: String): Flowable<List<String>>?
+    fun getLikedRecipesId(uid: String): Flowable<DataSnapshot>?
 }

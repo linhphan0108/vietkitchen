@@ -16,6 +16,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.signature.ObjectKey
 import java.util.concurrent.TimeUnit
 import com.bumptech.glide.load.model.GlideUrl
+import com.example.linh.vietkitchen.R
 import okhttp3.OkHttpClient
 import java.io.InputStream
 
@@ -50,5 +51,6 @@ class CustomGlideModule : AppGlideModule() {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .format(DecodeFormat.PREFER_RGB_565)
                 .skipMemoryCache(false)
+                .placeholder(R.drawable.ic_loading_gif)
     }
 }

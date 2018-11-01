@@ -40,3 +40,29 @@ fun List<String>.toString(separator: String): String{
     return if (result.isEmpty()) ""
     else result.substring(0, result.length - separator.length)
 }
+
+fun List<String>.toMapOfStringBoolean(): MutableMap<String, Boolean> {
+    val result = mutableMapOf<String, Boolean>()
+    forEach {
+        result[it] = true
+    }
+    return result
+}
+
+fun <K, V> Map<K, V>.toListOfStringOfKey(): List<K> {
+    val result = mutableListOf<K>()
+    forEach {
+        result.add(it.key)
+    }
+    return result
+}
+
+fun <K, V> Map<K, V>.toArrayString(): Array<String>{
+    val result = Array(size){""}
+    var i = 0
+    forEach {
+        result[i] = it.value.toString()
+        i++
+    }
+    return result
+}

@@ -18,5 +18,4 @@ interface HomeFragmentContractPresenter : BaseHomeContractPresenter<HomeFragment
     fun requestFoods(category: String? = null)
     fun refreshFoods(category: String? = null)
     fun loadMoreRecipe()
-    fun putARecipe()
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Viet Kitchen Admin</string>
+    <string name="label_save">save</string>
+    <string name="label_preview">preview</string>
+    <string name="hint_recipe_title">Enter title</string>
+    <string name="hint_short_intro">Short introduction</string>
+    <string name="hint_ingredients">Ingredients</string>
+    <string name="hint_spices">Spices</string>
+    <string name="hint_cooking_method">cooking method</string>
+    <string name="hint_preparation">preparation</string>
+    <string name="hint_process">process</string>
+    <string name="hint_tags">tags</string>
+    <string name="hint_season">season</string>
+    <string name="hint_special_day">special days</string>
+    <string name="hint_region">region</string>
+
+    <string name="region_vietnam">vietnam</string>
+</resources>
