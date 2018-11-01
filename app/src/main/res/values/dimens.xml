@@ -6,11 +6,12 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin_end">16dp</dimen>
     <dimen name="fab_margin_bottom">16dp</dimen>
-    <dimen name="fab_margin_bottom_home">48dp</dimen>
+    <dimen name="fab_margin_bottom_home">64dp</dimen>
     <dimen name="fab_elevation">12dp</dimen>
     <dimen name="rcv_item_decoration_top">56dp</dimen>
     <dimen name="rcv_item_decoration">8dp</dimen>
     <dimen name="app_bar_height">220dp</dimen>
+    <dimen name="dialog_Width">220dp</dimen>
 
     <dimen name="tab_bar_height">48dp</dimen>
     <dimen name="margin_16dp">16dp</dimen>

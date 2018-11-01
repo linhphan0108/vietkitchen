@@ -1,25 +1,36 @@
 package com.example.linh.vietkitchen.domain.provider
 
+import android.net.Uri
 import com.example.linh.vietkitchen.data.cloud.RecipeCloudDataSource
 import com.example.linh.vietkitchen.data.local.RecipeLocalDataSource
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
+import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.util.Constants
+import com.example.linh.vietkitchen.util.LoggerUtil
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import timber.log.Timber
 
-class RecipeProvider(sources: List<RecipeDataSource> = SOURCES) : BaseProvider<RecipeDataSource>(sources){
+class RecipeProvider(private val mapper: RecipeMapper = RecipeMapper(),
+        sources: List<RecipeDataSource> = SOURCES) : BaseProvider<RecipeDataSource>(sources){
     companion object {
         val SOURCES by lazy { listOf(RecipeLocalDataSource(), RecipeCloudDataSource()) }
     }
 
     fun requestFoods(tag: String? = null, limit: Int = Constants.PAGINATION_LENGTH, startAtId: String? = null) : Flowable<List<Recipe>> = requestToSources {
-        val result = it.getAllRecipes(tag, limit, startAtId)
-        result
+        it.getAllRecipes(tag, limit, startAtId)
+                ?.map {listDataSnapshot ->
+                    Timber.d("onFetchData data's length ${listDataSnapshot.count()}")
+                    Timber.d("latest key ${listDataSnapshot.last().key}")
+                    LoggerUtil.logThread()
+                    mapper.convertToDomain(listDataSnapshot)
+                }
     }
 
-    fun putFood(): Completable = requestToSources{
-        it.putRecipeWithDumpData()
+    fun putFood(recipe: Recipe): Flowable<String> = requestToSources{
+        it.putRecipe(mapper.toData(recipe))
+//        it.putRecipeWithDumpData()
     }
 
 //    fun requestLikedRecipes(uid: String) = requestToSources {
@@ -28,5 +39,12 @@ class RecipeProvider(sources: List<RecipeDataSource> = SOURCES) : BaseProvider<R
 
     fun requestLikedRecipes(ids: List<String>) = requestToSources {
         it.getLikedRecipes(ids)
+                ?.map {dataSnapshot ->
+                    mapper.convertToDomain(dataSnapshot)}
+                ?.toList()?.toFlowable()
+    }
+
+    fun uploadImages(multiPartFileMap: Map<String, Uri>) = requestToSources {
+        it.uploadImages(multiPartFileMap)
     }
 }

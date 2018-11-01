@@ -19,6 +19,12 @@ class UserProvider(sources: List<UserDataSource> = SOURCES) : BaseProvider<UserD
     }
 
     fun requestLikedRecipesId(uid: String) = requestToSources {
-        it.getLikedRecipesId(uid)
+        it.getLikedRecipesId(uid)?.map {dataSnapshot ->
+            val listIds = mutableListOf<String>()
+            for (child in dataSnapshot.children) {
+                child.key?.let { listIds.add(child.key!!) }
+            }
+            listIds
+        }
     }
 }

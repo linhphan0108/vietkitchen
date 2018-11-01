@@ -3,7 +3,7 @@ package com.example.linh.vietkitchen.ui.screen.home.favorite
 import com.example.linh.vietkitchen.domain.command.RequestLikedRecipesCommand
 import com.example.linh.vietkitchen.exception.FirebaseNoDataException
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomePresenter
-import com.example.linh.vietkitchen.ui.screen.home.mapper.RecipeMapper
+import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 

@@ -13,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
 import android.view.View
+import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
 import com.example.linh.vietkitchen.ui.home.homeActivity.*
@@ -50,10 +51,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         setupAppBarAndDrawerNav()
         setupBottomTabBar()
         setupViewPager()
+        setupAdminFab()
         presenter.requestCategory()
-        fab.setOnClickListener {
-            presenter.putARecipe()
-        }
+
     }
 
     override fun onBackPressed() {
@@ -173,6 +173,15 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         drawerNavExpandableRc.layoutManager = LinearLayoutManager(this)
         drawerNavExpandableRc.itemAnimator = DefaultItemAnimator()
         drawerNavExpandableRc.adapter = drawerNavAdapter
+    }
+
+    private fun setupAdminFab(){
+        fabAdmin.visibility = if(BuildConfig.IS_ADMIN) View.VISIBLE else View.GONE
+        fabAdmin.setOnClickListener {
+//            presenter.putARecipe(
+            val intent = Intent(this, Class.forName("com.example.linh.vietkitchen.admin.ui.screen.admin.AdminActivity"))
+            startActivityWithAnimation(intent)
+        }
     }
     //endregion inner methods
 }

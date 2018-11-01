@@ -22,7 +22,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     sourceSets {
         main {
             res.srcDirs = [
@@ -31,16 +30,42 @@ android {
                     'src/main/res/layouts/login',
                     'src/main/res/layouts/home',
                     'src/main/res/layouts/detail',
+                    'src/main/res/layouts/dialog',
                     'src/main/res/layouts',
-                    'src/main/res',
+                    'src/main/res'
 
             ]
         }
+
+        admin{
+            res.srcDirs = [
+                    'src/admin/res',
+                    'src/admin/res/layouts/admin'
+            ]
+        }
+    }
+
+    flavorDimensions "normal"
+    productFlavors{
+        client{
+            dimension "normal"
+            buildConfigField("boolean", "IS_ADMIN", "false")
+        }
+
+        admin{
+            applicationIdSuffix ".admin"
+            dimension "normal"
+            buildConfigField("boolean", "IS_ADMIN", "true")
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
@@ -49,15 +74,12 @@ dependencies {
     implementation 'com.android.support:palette-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:multidex:1.0.3'
-
     implementation 'com.jakewharton.timber:timber:4.7.1'
-
     //unit test libs
     testImplementation 'junit:junit:4.12'
-    testImplementation "org.mockito:mockito-core:2.12.0"
+    testImplementation 'org.mockito:mockito-core:2.12.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
     //firebase dependencies
     implementation('com.google.firebase:firebase-core:16.0.1') {
         exclude group: 'com.android.support', module: 'appcompat-v7'
@@ -73,31 +95,26 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:4.0.0'
     // Required only if Facebook login support is required
     // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
-//    implementation 'com.facebook.android:facebook-android-sdk:4.35.0'
+    //    implementation 'com.facebook.android:facebook-android-sdk:4.35.0'
     // Required only if Twitter login support is required
     // Find the latest Twitter SDK releases here: https://goo.gl/E5wZvQ
-//    implementation 'com.twitter.sdk.android:twitter-core:3.2.0'{
-//        transitive = true
-//    }
-
+    //    implementation 'com.twitter.sdk.android:twitter-core:3.2.0'{
+    //        transitive = true
+    //    }
     //rxjava
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation('io.reactivex.rxjava2:rxandroid:2.0.2') {
         exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
     }
-
     //glide
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
-    implementation "com.github.bumptech.glide:okhttp3-integration:4.7.1"
-
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.7.1'
     //leaks canary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
     // Optional, if you use support library fragments:
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
-
-
     //3th custom view libs
     implementation 'com.hannesdorfmann:adapterdelegates3:3.0.1'
     implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'

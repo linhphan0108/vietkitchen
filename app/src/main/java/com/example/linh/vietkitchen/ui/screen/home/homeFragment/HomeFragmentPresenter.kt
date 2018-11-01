@@ -1,6 +1,5 @@
 package com.example.linh.vietkitchen.ui.home.homeFragment
 
-import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
 import com.example.linh.vietkitchen.exception.FirebaseNoDataException
 import com.example.linh.vietkitchen.ui.VietKitchenApp
@@ -8,16 +7,14 @@ import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentCo
 import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomePresenter
-import com.example.linh.vietkitchen.ui.screen.home.mapper.RecipeMapper
+import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.userInfo,
                             private val recipeMapper: RecipeMapper = RecipeMapper(),
-                            private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),
-                            private val putRecipeCommand: PutRecipeCommand = PutRecipeCommand())
+                            private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand())
     : BaseHomePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
 
     private var lastRecipeId: String? = null
@@ -95,14 +92,5 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
         lastRecipeId = null
         isReachLastRecord = false
         requestFoods(category)
-    }
-
-    override fun putARecipe() {
-        compositeDisposable.add(putRecipeCommand.execute()
-                .observeOn(Schedulers.computation())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    Timber.d("a recipe was put into firebase server")
-                })
     }
 }

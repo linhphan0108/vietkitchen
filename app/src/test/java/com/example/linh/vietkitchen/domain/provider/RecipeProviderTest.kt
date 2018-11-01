@@ -55,7 +55,8 @@ class RecipeProviderTest {
         val region = "việt nam"
         val specialDay = "mùa hè"
         val imageUrl = "https://daubepgiadinh.vn/wp-content/uploads/2018/05/che-hat-sen-nhan-nhuc.jpg"
-        return Recipe(id, name, intro, ingredients, spices, preliminaryProcessing, processing, method,
-                benefit, season, region, specialDay, imageUrl)
+        val thumbUrl = imageUrl
+        return Recipe(id, name, intro, ingredients, spices, "", "", method,
+                benefit, season, region, specialDay, thumbUrl, imageUrl)
     }
 }

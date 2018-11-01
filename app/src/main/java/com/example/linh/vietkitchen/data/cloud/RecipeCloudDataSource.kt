@@ -1,17 +1,22 @@
 package com.example.linh.vietkitchen.data.cloud
 
-import com.example.linh.vietkitchen.data.cloud.mapper.RecipeMapper
+import android.net.Uri
+import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
 import com.example.linh.vietkitchen.exception.FirebaseDataException
 import com.example.linh.vietkitchen.exception.FirebaseNoDataException
+import com.example.linh.vietkitchen.extension.attractUrlFromAnnotation
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
-import com.example.linh.vietkitchen.util.LoggerUtil
+import com.google.android.gms.tasks.Continuation
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -21,11 +26,14 @@ import timber.log.Timber
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
 class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) : RecipeDataSource {
+
     private val database by lazy { FirebaseDatabase.getInstance() }
     private val dbRefRecipe by lazy { database.getReference(STORAGE_RECIPES_PATH) }
     private val dbRefUser by lazy { database.getReference(STORAGE_USER_PATH) }
+    private val storage = FirebaseStorage.getInstance()
+    private val storageRecipeRef = storage.reference.child("images/recipes/")
 
-    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<RecipeDomain>>? {
+    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<DataSnapshot>> {
         val isLoadingMore = startAtId != null
         val limitFixed = if (isLoadingMore) limit + 1 else limit
         return Flowable.create(FlowableOnSubscribe<DataSnapshot> { emitter ->
@@ -64,6 +72,7 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 }
             })
         }, BackpressureStrategy.DROP)
+                .observeOn(Schedulers.computation())
                 .doOnNext {
                     val minCount = if (isLoadingMore) 1 else 0
                     if (it.children.count() <= minCount) throw FirebaseNoDataException()
@@ -72,16 +81,10 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                     val shouldRemoveItems = if (isLoadingMore) 1 else 0
                     it.children.drop(shouldRemoveItems)
                 }
-                .map {
-                    Timber.d("onFetchData data's length ${it.count()}")
-                    Timber.d("latest key ${it.last().key}")
-                    LoggerUtil.logThread()
-                    mapper.convertToDomain(it)
-                }
 
     }
 
-    override fun getLikedRecipes(ids: List<String>): Flowable<List<com.example.linh.vietkitchen.domain.model.Recipe>>? {
+    override fun getLikedRecipes(ids: List<String>): Flowable<DataSnapshot> {
         return Flowable.fromIterable(ids)
                 .observeOn(Schedulers.computation())
                 .flatMap {key ->
@@ -104,8 +107,7 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                             }
                         })
                     }, BackpressureStrategy.DROP)
-                }.map {mapper.convertToDomain(it)}
-                .toList().toFlowable()
+                }
     }
 
 //    override fun getLikedRecipes(uid: String): Flowable<List<RecipeDomain>>? {
@@ -133,6 +135,24 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
 //
 //    }
 
+    override fun putRecipe(recipe: Recipe): Flowable<String> {
+        return Flowable.create (FlowableOnSubscribe<String> { emitter ->
+            dbRefRecipe.push().setValue(recipe){databaseError, databaseReference ->
+                if (databaseError == null){
+                    if(!emitter.isCancelled) {
+                        emitter.onNext(databaseReference.key.toString())
+                        emitter.onComplete()
+                    }
+                }else{
+                    if(!emitter.isCancelled) {
+                        emitter.onError(databaseError.toException())
+                    }
+                }
+            }
+        }, BackpressureStrategy.DROP)
+                .observeOn(Schedulers.computation())
+    }
+
     override fun putRecipeWithDumpData(): Completable? {
         return Completable.create { emitter ->
             dbRefRecipe.push().setValue(createADumpFood())
@@ -146,10 +166,52 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                             emitter.onError(it)
                         }
                     }
-        }
+        }.observeOn(Schedulers.computation())
 
 //        return RxFirebaseDatabase.setValue(dbRefRecipe, createADumpFood())
     }
+
+    override fun uploadImages(multiPartFileMap: Map<String, Uri>): Flowable<MessageUploadCommunication> {
+        return Flowable.fromIterable(multiPartFileMap.toList())
+                .concatMap {
+                    uploadImage(it)
+                }.observeOn(Schedulers.computation())
+    }
+
+    private fun uploadImage(pair: Pair<String, Uri>): Flowable<MessageUploadCommunication>? {
+        return Flowable.create(FlowableOnSubscribe<MessageUploadCommunication> {emitter ->
+            val storageRecipeImageRef = storageRecipeRef.child(pair.first)
+            storageRecipeImageRef.putFile(pair.second)
+                    .addOnProgressListener { taskSnapshot ->
+                        val progress: Int = (100 * taskSnapshot.bytesTransferred.toFloat() / taskSnapshot.totalByteCount).toInt()
+                        val message = MessageUploadCommunication(progress, pair.second.toString())
+                        emitter.onNext(message)
+                    }
+                    .continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                        if (!task.isSuccessful) {
+                            task.exception?.let {
+                                throw it
+                            }
+                        }
+                        return@Continuation storageRecipeImageRef.downloadUrl
+                    })
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val remoteUri = (task.result as Uri).toString()
+                            val message = MessageUploadCommunication(100, pair.second.toString(), remoteUri)
+                            emitter.onNext(message)
+                            emitter.onComplete()
+                            Timber.d("uploaded ${pair.second} into storage ")
+                        } else {
+                            // Handle failures
+                            Timber.e(task.exception)
+                        }
+                    }
+        }, BackpressureStrategy.DROP)
+                .observeOn(Schedulers.computation())
+    }
+
+
 
     private fun createADumpFood(): Recipe {
         val name = "canh khổ qua nhồi thịt"
@@ -160,30 +222,28 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 Pair("khoai tây", Ingredient(200, "g")),
                 Pair("bắp mỹ", Ingredient(200, "g")))
         val spices = "Muối, Mì chính(có thể thay bằng bột canh), Lá mùi tàu, hạt tiêu"
-        val preliminaryProcessing = listOf<ProcessStep>(
-                ProcessStep("Trước tiên, các bạn lấy khoảng vài thìa cà phê bột ngô hòa với một xíu nước.\n" +
+        val preparation =  "Trước tiên, các bạn lấy khoảng vài thìa cà phê bột ngô hòa với một xíu nước.\n" +
                         "Sau đó, các bạn dùng dao thật sắc và có bản to, bạn lách dao vào giữa miếng thịt để có thể tạo được thành những lát mỏng.\n" +
-                        "Tiếp theo, các bạn dùng búa nhỏ chuyên dụng để đập thịt cho mềm, bạn đập hết một mặt thì lập tiếp sang mặt kế bên. Nếu không có búa, các bạn có thể dùng đầu nhụt của dao để đập thịt cho mềm, giúp thịt ngấm gia vị dễ hơn.",
-                        "http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-1.jpg"),
-                ProcessStep("https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/canh_1.jpg ",
-                        "http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-2.jpg"),
-                ProcessStep(" Dưa leo mua về các bạn rửa sạch, đem ngâm nước muối, sau đó gọt sạch vỏ, cắt thành những khúc nhỏ có độ dày vừa phải và chiều dài bằng với bằng với chiều ngang của miếng thịt.",
-                        "http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-31.jpg")
-        )
-        val processing = listOf(
-            ProcessStep("  Trước tiên, các bạn trải miếng thịt lên một mặt phẳng, cho một miếng dưa chuột vào trong. Các bạn lấy tay quết một chút nước bột ngô vào mép miếng thịt để tạo độ kết dính và dần cuộn chặt miếng thịt lại.",
-                    "https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/canh1.jpg"),
-                ProcessStep(" Trứng gà các bạn đập sẵn ra bát rồi dùng đũa đánh nhẹ cho đều, bạn có thể cho thêm một xíu bột ngọt và tiêu rồi đánh tan.",
-                        "http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-5.jpg"),
-                ProcessStep(" Sau đó, các bạn lấy các cuộn thịt lăn đều qua bột ngô sao cho các miếng thịt đều được phủ đầy bột, sau đó nhúng vào trứng.\n" +
-                        " Tiếp đến, bạn phủ một lớp áo cuối cùng cho cuộn thịt bằng bột chiên xù và cũng tương tự như bột ngô, cuộn thịt phải được phủ đầy bột.",
-                        "http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-6.jpg"),
-                ProcessStep("Tiếp theo, các bạn bắc một cái chảo lên bếp, cho dầu ăn ngập chảo, khi dầu ăn sôi thì các bạn thả từng miếng thịt vào chiên vàng. Thịt chín các bạn vớt ra để ráo dầu. Các bạn thấm qua giấy thấm dầu một lần nữa để món ăn không còn nhiều dầu ăn. Khi chiên, các bạn nhớ lật đều các mặt để thịt chín đều và có vỏ ngoài đẹp mắt.",
-                        "http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-7.jpg"),
-                ProcessStep("Cuối cùng, các bạn trình bày món ăn ra đĩa, ăn kèm với tương ớt hoặc sốt chua ngọt.",
-                        "http://sotaynauan.com/wp-content/uploads/2016/08/thit-cuon-dua-leo-chien-xu-sp2-c83ae1.jpg"),
-                ProcessStep("Chúc các bạn thành công và ngon miệng với món ăn ngon tuyệt này nhé!")
-        )
+                        "Tiếp theo, các bạn dùng búa nhỏ chuyên dụng để đập thịt cho mềm, bạn đập hết một mặt thì lập tiếp sang mặt kế bên. Nếu không có búa, các bạn có thể dùng đầu nhụt của dao để đập thịt cho mềm, giúp thịt ngấm gia vị dễ hơn." +
+                        "<annotation src=\"http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-1.jpg\"/>" +
+                        "Tiếp theo, các bạn dùng búa nhỏ chuyên dụng để đập thịt cho mềm, bạn đập hết một mặt thì lập tiếp sang mặt kế bên. Nếu không có búa, các bạn có thể dùng đầu nhụt của dao để đập thịt cho mềm, giúp thịt ngấm gia vị dễ hơn." +
+                        "<annotation src=\"https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/canh_1.jpg\"/>" +
+                        "Dưa leo mua về các bạn rửa sạch, đem ngâm nước muối, sau đó gọt sạch vỏ, cắt thành những khúc nhỏ có độ dày vừa phải và chiều dài bằng với bằng với chiều ngang của miếng thịt." +
+                        "<annotation src=\"http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-31.jpg\"/>"
+
+        val processing = "Trước tiên, các bạn trải miếng thịt lên một mặt phẳng, cho một miếng dưa chuột vào trong. Các bạn lấy tay quết một chút nước bột ngô vào mép miếng thịt để tạo độ kết dính và dần cuộn chặt miếng thịt lại." +
+                        "<annotation src=\"https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/canh1.jpg\"/>" +
+                        "Trứng gà các bạn đập sẵn ra bát rồi dùng đũa đánh nhẹ cho đều, bạn có thể cho thêm một xíu bột ngọt và tiêu rồi đánh tan." +
+                        "<annotation src=\"http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-5.jpg\"/>" +
+                        "Sau đó, các bạn lấy các cuộn thịt lăn đều qua bột ngô sao cho các miếng thịt đều được phủ đầy bột, sau đó nhúng vào trứng.\n" +
+                        "Tiếp đến, bạn phủ một lớp áo cuối cùng cho cuộn thịt bằng bột chiên xù và cũng tương tự như bột ngô, cuộn thịt phải được phủ đầy bột." +
+                        "<annotation src=\"http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-6.jpg\"/>" +
+                        "Tiếp theo, các bạn bắc một cái chảo lên bếp, cho dầu ăn ngập chảo, khi dầu ăn sôi thì các bạn thả từng miếng thịt vào chiên vàng. Thịt chín các bạn vớt ra để ráo dầu. Các bạn thấm qua giấy thấm dầu một lần nữa để món ăn không còn nhiều dầu ăn. Khi chiên, các bạn nhớ lật đều các mặt để thịt chín đều và có vỏ ngoài đẹp mắt." +
+                        "<annotation src=\"http://sotaynauan.com/wp-content/uploads/2016/08/mon-moi-an-vat-thit-cuon-gion-tan-voi-tuong-ot-cay-hap-dan-7.jpg\"/>" +
+                        "Cuối cùng, các bạn trình bày món ăn ra đĩa, ăn kèm với tương ớt hoặc sốt chua ngọt." +
+                        "<annotation src=\"http://sotaynauan.com/wp-content/uploads/2016/08/thit-cuon-dua-leo-chien-xu-sp2-c83ae1.jpg\"/>" +
+                        "Chúc các bạn thành công và ngon miệng với món ăn ngon tuyệt này nhé!"
+
         val method = mapOf(Pair("chè", true))
         val benefit = mapOf(Pair("giải nhiệt", true))
         val season = mapOf(Pair("mùa hè", true))
@@ -195,9 +255,11 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 Pair("thịt bò xào", true),
                 Pair("bò xào", true)
         )
-        val thumbUrl = "https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/IMG_7731.JPG"
+        val thumbImageUrl = "https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/IMG_7731.JPG"
         val imageUrl = "https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/IMG_7731.JPG"
-        return Recipe( name, intro, ingredients, spices, preliminaryProcessing, processing, method,
-                benefit, season, region, specialDay, tags, thumbUrl, imageUrl)
+        return Recipe( name, intro, ingredients, spices, preparation, processing, method,
+                benefit, season, region, specialDay, tags, thumbImageUrl, imageUrl)
     }
+
+    class MessageUploadCommunication(val progress: Int = 0, val localUri: String, val remoteUri: String? = null)
 }

@@ -140,8 +140,8 @@
                 android:textColor="@color/colorAccent"
                 android:textStyle="bold"/>
 
-            <com.example.linh.vietkitchen.ui.custom.ImageSpanTextView
-                android:id="@+id/txtStepsToPreProcess"
+            <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
+                android:id="@+id/txtStepsToPreparation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/padding_8dp"
@@ -166,7 +166,7 @@
                 android:textColor="@color/colorAccent"
                 android:textStyle="bold"/>
 
-            <com.example.linh.vietkitchen.ui.custom.ImageSpanTextView
+            <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
                 android:id="@+id/txtStepsToProcess"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

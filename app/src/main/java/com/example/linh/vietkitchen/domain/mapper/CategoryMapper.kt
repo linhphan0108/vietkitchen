@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.data.cloud.mapper
+package com.example.linh.vietkitchen.domain.mapper
 
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.domain.model.CategoryItem
