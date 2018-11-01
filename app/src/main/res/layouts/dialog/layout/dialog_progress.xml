@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_16"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/dialog_rounded_corners_bg"
+    xmlns:gpb="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/txtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        gpb:layout_constraintLeft_toLeftOf="parent"
+        gpb:layout_constraintStart_toStartOf="parent"
+        gpb:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/label_loading"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/txtMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        gpb:layout_constraintTop_toBottomOf="@id/txtTitle"
+        gpb:layout_constraintStart_toEndOf="parent"
+        gpb:layout_constraintRight_toRightOf="parent"
+        android:gravity="end"
+        tools:text="content"
+        tools:textColor="@color/colorPrimary"/>
+
+    <TextView
+        android:id="@+id/txtProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        gpb:layout_constraintStart_toStartOf="parent"
+        gpb:layout_constraintTop_toBottomOf="@id/txtMessage"
+        android:maxLength="4"
+        tools:text="100%"/>
+
+    <TextView
+        android:id="@+id/txtCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        gpb:layout_constraintEnd_toEndOf="parent"
+        gpb:layout_constraintTop_toBottomOf="@id/txtMessage"
+        tools:text="3/6 files"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        gpb:layout_constraintTop_toBottomOf="@id/txtCounter"
+        android:max="100"
+        />
+    <Button
+        android:id="@+id/btnHide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        gpb:layout_constraintTop_toBottomOf="@id/progressBar"
+        gpb:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/label_hide"
+        android:textColor="@color/colorAccent"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
+
+</android.support.constraint.ConstraintLayout>

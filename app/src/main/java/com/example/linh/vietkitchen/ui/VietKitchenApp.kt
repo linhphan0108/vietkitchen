@@ -8,6 +8,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.squareup.leakcanary.LeakCanary
 import timber.log.Timber
 
+
+
 class VietKitchenApp : MultiDexApplication(){
     companion object {
         val userInfo: UserInfo by lazy {
@@ -24,7 +26,6 @@ class VietKitchenApp : MultiDexApplication(){
         super.onCreate()
 
         if(setupLeaksCanary()) return
-
         setupTimberLogger()
     }
 

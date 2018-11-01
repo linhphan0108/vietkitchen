@@ -53,7 +53,7 @@ class ProfileFragment : BaseFragment<ProfileContractView, ProfileContractPresent
     override fun onClick(v: View) {
         when(v.id){
             R.id.txtLogOut -> {
-                showSnackBar(v, R.string.message_snack_bar_logout, action = getString(R.string.label_logout),
+                showSnackBar(v.rootView, R.string.message_snack_bar_logout, action = getString(R.string.label_logout),
                         listener = View.OnClickListener {
                     presenter.logout()
                 })

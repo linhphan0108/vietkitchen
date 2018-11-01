@@ -138,7 +138,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
     }
 
     private fun populateUI(recipe: Recipe) {
-        image.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
         GlideApp.with(this)
                 .load(recipe.imageUrl)
                 .disallowHardwareConfig()
@@ -158,12 +158,12 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
                                 toast("exception thrown when generate palette")
                             }
                         }
-                        image.scaleType = ImageView.ScaleType.CENTER_CROP
+                        imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_CROP
                         return false
                     }
 
                 })
-                .into(image)
+                .into(imgHeaderImage)
 
         with(recipe) {
             val builder = StringBuilder()
@@ -175,14 +175,14 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
             txtTitle.text = name.capWords()
             txtDescription.text = intro
-            txtIngredients.text = builder.substring(0, builder.length - 1)
+            txtIngredients.text = if(builder.isNotEmpty()) builder.substring(0, builder.length - 1) else ""
             txtSpices.text = spice
 
-            if (preliminaryProcessing.isBlank()) {
+            if (preparation.isBlank()) {
                 llStepsToPreProcess.visibility = View.GONE
                 shouldHidePreProcessLayout = true
             }else{
-                txtStepsToPreProcess.setText(preliminaryProcessing, TextView.BufferType.SPANNABLE)
+                txtStepsToPreparation.setText(preparation, TextView.BufferType.SPANNABLE)
             }
 
             txtStepsToProcess.setText(processing, TextView.BufferType.SPANNABLE)

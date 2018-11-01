@@ -28,7 +28,7 @@ class UserCloudDataSource : UserDataSource{
                     }.addOnFailureListener {
                         emitter.onError(it)
                     }
-        }
+        }.observeOn(Schedulers.computation())
 
     }
 
@@ -41,11 +41,11 @@ class UserCloudDataSource : UserDataSource{
                     }.addOnFailureListener {
                         emitter.onError(it)
                     }
-        }
+        }.observeOn(Schedulers.computation())
 
     }
 
-    override fun getLikedRecipesId(uid: String): Flowable<List<String>> {
+    override fun getLikedRecipesId(uid: String): Flowable<DataSnapshot> {
         return Flowable.create(FlowableOnSubscribe<DataSnapshot> { emitter ->
             val dbRef = dbRef.child(uid).child(STORAGE_USER_LIKED_RECIPES_PATH)
             dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -59,13 +59,6 @@ class UserCloudDataSource : UserDataSource{
             })
         }, BackpressureStrategy.DROP)
                 .observeOn(Schedulers.computation())
-                .map {dataSnapshot ->
-                    val listIds = mutableListOf<String>()
-                    for (child in dataSnapshot.children) {
-                        child.key?.let { listIds.add(child.key!!) }
-                    }
-                    listIds
-                }
 
     }
 }

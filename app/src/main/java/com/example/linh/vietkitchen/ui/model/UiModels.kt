@@ -2,18 +2,19 @@ package com.example.linh.vietkitchen.ui.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.text.Spannable
 import android.text.TextUtils
 import com.example.linh.vietkitchen.domain.model.ProcessStep as DomainProcess
 
 
-open class Ingredient(val notes: String?, val quantity: Int, val unit: String) : Parcelable {
+open class Ingredient(val name: String? = null, val notes: String?, val quantity: Int, val unit: String) : Parcelable {
     constructor(parcel: Parcel) : this(
+            parcel.readString(),
             parcel.readString(),
             parcel.readInt(),
             parcel.readString())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(name)
         parcel.writeString(notes)
         parcel.writeInt(quantity)
         parcel.writeString(unit)
@@ -33,25 +34,29 @@ open class Ingredient(val notes: String?, val quantity: Int, val unit: String) :
         }
     }
 
+    override fun toString(): String {
+        return "$name $quantity$unit ($notes)"
+    }
 }
 
-class Recipe(val id: String?, val name: String, val intro: String, val ingredient: Map<String, Ingredient>, val spice: String,
-             val preliminaryProcessing: CharSequence, val processing: CharSequence, val cookingMethod: Map<String, Boolean>,
-             val benefit: Map<String, Boolean>?, val recommendedSeason: Map<String, Boolean>, val region: String?, val specialDay: String?,
-             val thumbUrl: String, val imageUrl: String, var hasLiked: Boolean) : Entity(), Parcelable {
+class Recipe(val id: String? = "", val name: String, val intro: String, val ingredient: Map<String, Ingredient>, val spice: String,
+             var preparation: CharSequence, var processing: CharSequence, val cookingMethod: List<String>,
+             val benefit: List<String>, val recommendedSeason: List<String>, val region: String?, val specialDay: String?,
+             var tags: List<String>?, var thumbUrl: String, var imageUrl: String, var hasLiked: Boolean = false) : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),//id
             parcel.readString(),//notes
             parcel.readString(),//intro
             readIngredient(parcel),//ingredient
             parcel.readString(),//spice
-            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//preliminaryProcessing
+            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//preparation
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//processing
-            readMapStringBoolean(parcel),//cookingMethod
-            readMapStringBoolean(parcel),//benefit
-            readMapStringBoolean(parcel),//recommendedSeason
+            readListString(parcel),//cookingMethod
+            readListString(parcel),//benefit
+            readListString(parcel),//recommendedSeason
             parcel.readString(),//region
             parcel.readString(),//specialDay
+            readListString(parcel),//tags
             parcel.readString(),//thumbUrl
             parcel.readString(),//imageUrl
             parcel.readInt() != 0
@@ -63,13 +68,14 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
         parcel.writeString(intro)//intro
         writeIngredient(ingredient, parcel, flags)//ingredient
         parcel.writeString(spice)////spice
-        TextUtils.writeToParcel(preliminaryProcessing, parcel, flags)//preliminaryProcessing
+        TextUtils.writeToParcel(preparation, parcel, flags)//preparation
         TextUtils.writeToParcel(processing, parcel, flags)//processing
-        writeMapStringBoolean(cookingMethod, parcel, flags)//cookingMethod
-        writeMapStringBoolean(benefit, parcel, flags)//benefit
-        writeMapStringBoolean(recommendedSeason, parcel, flags)//recommendedSeason
+        parcel.writeStringList(cookingMethod)//cookingMethod
+        parcel.writeStringList(benefit)//benefit
+        parcel.writeStringList(recommendedSeason)//recommendedSeason
         parcel.writeString(region)
         parcel.writeString(specialDay)
+        parcel.writeStringList(tags)//tags
         parcel.writeString(thumbUrl)
         parcel.writeString(imageUrl)
         parcel.writeInt(if (hasLiked) 1 else 0)
@@ -105,6 +111,12 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
                 parcel.writeString(key)
                 parcel.writeParcelable(value, flags)
             }
+        }
+
+        fun readListString(parcel: Parcel): List<String>{
+            var result: List<String> = mutableListOf()
+            parcel.readStringList(result)
+            return result
         }
 
         fun readMapStringBoolean(parcel: Parcel): MutableMap<String, Boolean> {

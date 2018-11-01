@@ -7,6 +7,7 @@
     <color name="colorPrimaryDarkStatusBar">#14000000</color>
     <color name="lightPrimaryColor">#FFCDD2</color>
     <color name="textIconColor">#FFFFFF</color>
+    <color name="textColorError">@color/colorPrimary</color>
     <!--<color notes="textPrimary">#212121</color>-->
     <color name="textPrimary">#757575</color>
     <color name="textSecondary">#9f9f9f</color>
@@ -42,5 +43,12 @@
     <color name="detail_content_text_color">#fff</color>
     <color name="fab_tint_liked_color">#E91E63</color>
     <color name="fab_tint_unLiked_color">@color/divider</color>
+
+
+    <!--TagsEditText-->
+    <color name="defaultTagsTextColor">#FFFFFF</color>
+    <dimen name="defaultTagsTextSize">16sp</dimen>
+    <dimen name="defaultTagsCloseImagePadding">10dp</dimen>
+    <dimen name="defaultTagsPadding">0dp</dimen>
 
 </resources>
