@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.data.local
 
 import android.net.Uri
-import com.example.linh.vietkitchen.data.cloud.RecipeCloudDataSource
+import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
 import com.google.firebase.database.DataSnapshot
 import com.example.linh.vietkitchen.data.cloud.Recipe as RecipeData
@@ -9,7 +9,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class RecipeLocalDataSource : RecipeDataSource {
-    override fun uploadImages(multiPartFileMap: Map<String, Uri>): Flowable<RecipeCloudDataSource.MessageUploadCommunication>? = null
+    override fun uploadImages(multiPartFileList: List<ImageUpload>): Flowable<ImageUpload>? = null
 
     override fun putRecipe(recipe: RecipeData): Flowable<String>? = null
 
