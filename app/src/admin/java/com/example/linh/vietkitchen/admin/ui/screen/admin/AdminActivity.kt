@@ -136,8 +136,8 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     override fun onGetTagsSuccess(tags: List<String>) {
         if (tags.isEmpty()) return
         val arrAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, tags)
-        edtTagIngredients.threshold = 1
-        edtTagIngredients.setAdapter(arrAdapter)
+        edtTags.threshold = 1
+        edtTags.setAdapter(arrAdapter)
 
     }
 

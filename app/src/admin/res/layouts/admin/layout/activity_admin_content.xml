@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="4"
-                android:hint="@string/hint_cooking_method" />
+                android:hint="@string/hint_benefit" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="4"
-                android:hint="@string/hint_cooking_method" />
+                android:hint="@string/hint_season" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -137,6 +137,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="4"
+                app:allowSpaceInTag="true"
                 android:hint="@string/hint_tags" />
 
         </android.support.design.widget.TextInputLayout>
