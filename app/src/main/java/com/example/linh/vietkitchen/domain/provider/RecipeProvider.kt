@@ -1,6 +1,6 @@
 package com.example.linh.vietkitchen.domain.provider
 
-import android.net.Uri
+import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.data.cloud.RecipeCloudDataSource
 import com.example.linh.vietkitchen.data.local.RecipeLocalDataSource
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
@@ -8,7 +8,6 @@ import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.LoggerUtil
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import timber.log.Timber
 
@@ -44,7 +43,7 @@ class RecipeProvider(private val mapper: RecipeMapper = RecipeMapper(),
                 ?.toList()?.toFlowable()
     }
 
-    fun uploadImages(multiPartFileMap: Map<String, Uri>) = requestToSources {
+    fun uploadImages(multiPartFileMap: List<ImageUpload>) = requestToSources {
         it.uploadImages(multiPartFileMap)
     }
 }

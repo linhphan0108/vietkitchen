@@ -14,6 +14,7 @@ import com.example.linh.vietkitchen.ui.service.PutRecipeService
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
+import android.net.Uri
 import android.os.*
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
@@ -64,14 +65,14 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
         }
     }
 
-    override fun putARecipe(recipe: Recipe) {
+    override fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>) {
         showProgressDialog()
         val newTags = recipe.tags?.filter {
             listTagsOnServer.contains(it)
         }
         if(newTags != null && newTags.isNotEmpty()) putNewTags(newTags)
 
-        doBindService(recipe)
+        doBindService(recipe, listImagesUri)
     }
 
     override fun putNewTags(tags: List<String>) {
@@ -107,7 +108,7 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
             progressDialog.show(activity?.supportFragmentManager, ProgressDialog::class.java.name)
     }
 
-    private fun doBindService(recipe: Recipe) {
+    private fun doBindService(recipe: Recipe, listImagesUri: MutableList<Uri>) {
         // Attempts to establish a connection with the service.  We use an
         // explicit class name because we want a specific service
         // implementation that we know will be running in our own process
@@ -116,6 +117,7 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
         if (context == null) return
         val intent = PutRecipeService.createIntent(context!!)
         mConnection.recipe = recipe
+        mConnection.listImagesUri = listImagesUri
         if (context?.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)!!) {
             isBounded = true
         } else {
@@ -144,7 +146,8 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
     }
 
     private val mConnection = object : ServiceConnection {
-        var recipe: Recipe? = null
+        lateinit var recipe: Recipe
+        lateinit var listImagesUri: MutableList<Uri>
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // This is called when the connection with the service has been
             // established, giving us the service object we can use to
@@ -161,13 +164,12 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
                 serviceMessenger?.send(msg)
 
                 // Give it some value as an example.
-                recipe?.let {
-                    msg = Message.obtain(null, PutRecipeService.MSG_UPLOAD_RECIPE)
-                    val bundle = Bundle()
-                    bundle.putParcelable(PutRecipeService.BK_RECIPE_TO_UPLOAD, recipe)
-                    msg.data = bundle
-                    serviceMessenger?.send(msg)
-                }
+                msg = Message.obtain(null, PutRecipeService.MSG_UPLOAD_RECIPE)
+                val bundle = Bundle()
+                bundle.putParcelable(PutRecipeService.BK_RECIPE_TO_UPLOAD, recipe)
+                bundle.putParcelableArray(PutRecipeService.BK_LIST_IMAGES_URI, listImagesUri.toTypedArray())
+                msg.data = bundle
+                serviceMessenger?.send(msg)
 //
             } catch (e: RemoteException) {
                 // In this case the service has crashed before we could even
@@ -204,9 +206,14 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
                         progressDialog.updateProgress(total, counter, progress)
                     }
                 }
-                PutRecipeService.MSG_STORING_RECIPE_TO_DB -> {
+                PutRecipeService.MSG_START_STORING_RECIPE_TO_DB -> {
                     if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_storing_recipe))
+                        progressDialog.updateMessage(getStringRes(R.string.msg_start_storing_recipe))
+                    }
+                }
+                PutRecipeService.MSG_OPTIMIZING_IMAGE -> {
+                    if (progressDialog.isVisible) {
+                        progressDialog.updateMessage(getStringRes(R.string.msg_optimizing_images))
                     }
                 }
                 PutRecipeService.MSG_STORE_RECIPE_TO_DB_SUCCESS -> {

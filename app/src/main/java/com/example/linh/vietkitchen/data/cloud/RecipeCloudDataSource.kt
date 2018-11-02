@@ -1,11 +1,11 @@
 package com.example.linh.vietkitchen.data.cloud
 
 import android.net.Uri
+import com.example.linh.vietkitchen.R.string.progress
 import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
 import com.example.linh.vietkitchen.exception.FirebaseDataException
 import com.example.linh.vietkitchen.exception.FirebaseNoDataException
-import com.example.linh.vietkitchen.extension.attractUrlFromAnnotation
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
@@ -23,6 +23,7 @@ import io.reactivex.Flowable
 import io.reactivex.FlowableOnSubscribe
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.io.File
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
 class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) : RecipeDataSource {
@@ -171,20 +172,20 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
 //        return RxFirebaseDatabase.setValue(dbRefRecipe, createADumpFood())
     }
 
-    override fun uploadImages(multiPartFileMap: Map<String, Uri>): Flowable<MessageUploadCommunication> {
-        return Flowable.fromIterable(multiPartFileMap.toList())
+    override fun uploadImages(multiPartFileList: List<ImageUpload>): Flowable<ImageUpload> {
+        return Flowable.fromIterable(multiPartFileList)
                 .concatMap {
                     uploadImage(it)
                 }.observeOn(Schedulers.computation())
     }
 
-    private fun uploadImage(pair: Pair<String, Uri>): Flowable<MessageUploadCommunication>? {
-        return Flowable.create(FlowableOnSubscribe<MessageUploadCommunication> {emitter ->
-            val storageRecipeImageRef = storageRecipeRef.child(pair.first)
-            storageRecipeImageRef.putFile(pair.second)
+    private fun uploadImage(image: ImageUpload): Flowable<ImageUpload>? {
+        return Flowable.create(FlowableOnSubscribe<ImageUpload> {emitter ->
+            val storageRecipeImageRef = storageRecipeRef.child(image.fileName)
+            storageRecipeImageRef.putFile(Uri.fromFile(File(image.optimizedPath)))
                     .addOnProgressListener { taskSnapshot ->
                         val progress: Int = (100 * taskSnapshot.bytesTransferred.toFloat() / taskSnapshot.totalByteCount).toInt()
-                        val message = MessageUploadCommunication(progress, pair.second.toString())
+                        val message = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, progress)
                         emitter.onNext(message)
                     }
                     .continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
@@ -198,10 +199,10 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val remoteUri = (task.result as Uri).toString()
-                            val message = MessageUploadCommunication(100, pair.second.toString(), remoteUri)
+                            val message = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, 100, remoteUri)
                             emitter.onNext(message)
                             emitter.onComplete()
-                            Timber.d("uploaded ${pair.second} into storage ")
+                            Timber.d("uploaded ${image.originalPath} into storage ")
                         } else {
                             // Handle failures
                             Timber.e(task.exception)
@@ -260,6 +261,4 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
         return Recipe( name, intro, ingredients, spices, preparation, processing, method,
                 benefit, season, region, specialDay, tags, thumbImageUrl, imageUrl)
     }
-
-    class MessageUploadCommunication(val progress: Int = 0, val localUri: String, val remoteUri: String? = null)
 }

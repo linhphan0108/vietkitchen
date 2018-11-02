@@ -33,3 +33,4 @@ data class Category(var groups: List<Map<String, List<Map<String, Boolean>>>>?){
 
 data class UserInfo(val favorites: Int, val schedules: Int)
 data class UserProfile(val userName: String, val name: String, val gender: Boolean, val age: Int)
+data class ImageUpload(var fileName: String, var originalPath: String, var optimizedPath: String, val progress: Int = 0, var remotePath: String? = null)
