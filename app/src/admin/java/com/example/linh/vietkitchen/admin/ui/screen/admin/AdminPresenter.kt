@@ -67,7 +67,7 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
 
     override fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>) {
         showProgressDialog()
-        val newTags = recipe.tags?.filter {
+        val newTags = recipe.tags?.filterNot {
             listTagsOnServer.contains(it)
         }
         if(newTags != null && newTags.isNotEmpty()) putNewTags(newTags)

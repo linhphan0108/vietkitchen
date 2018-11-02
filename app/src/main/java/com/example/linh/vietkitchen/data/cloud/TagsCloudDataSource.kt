@@ -41,7 +41,7 @@ class TagsCloudDataSource : TagsDataSource{
 
     override fun putTags(tags: Map<String, Boolean>) : Completable{
         return Completable.create { emitter ->
-            dbRefRecipe.setValue(true)
+            dbRefRecipe.setValue(tags)
                     .addOnCompleteListener {
                         emitter.onComplete()
                     }.addOnFailureListener {
