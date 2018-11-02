@@ -11,12 +11,15 @@ import android.os.*
 import android.support.v4.app.NotificationCompat
 import com.example.linh.vietkitchen.R
 import android.os.Messenger
+import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
 import com.example.linh.vietkitchen.domain.command.UploadImageCommand
 import com.example.linh.vietkitchen.extension.attractUrlFromAnnotation
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.util.ImageOptimizationUtil
+import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -31,6 +34,7 @@ class PutRecipeService : Service() {
     companion object {
         private const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
         const val BK_RECIPE_TO_UPLOAD = "BK_RECIPE_TO_UPLOAD"
+        const val BK_LIST_IMAGES_URI = "BK_LIST_IMAGES_URI"
         const val BK_UPLOAD_PROGRESS = "BK_UPLOAD_PROGRESS"
         const val BK_UPLOAD_COUNTER = "BK_UPLOAD_COUNTER"
         const val BK_UPLOAD_TOTAL = "BK_UPLOAD_TOTAL"
@@ -50,7 +54,8 @@ class PutRecipeService : Service() {
 
         const val MSG_UPLOAD_RECIPE = 3
         const val MSG_UPLOAD_IMAGE_PROGRESS = 4
-        const val MSG_STORING_RECIPE_TO_DB = 5
+        const val MSG_START_STORING_RECIPE_TO_DB = 5
+        const val MSG_OPTIMIZING_IMAGE = 8
         const val MSG_STORE_RECIPE_TO_DB_SUCCESS = 6
         const val MSG_STORE_RECIPE_TO_DB_FAILED = 7
         /**
@@ -88,6 +93,7 @@ class PutRecipeService : Service() {
     private lateinit var recipeMapper: RecipeMapper
     private lateinit var putRecipeCommand: PutRecipeCommand
     private lateinit var uploadImageCommand: UploadImageCommand
+    private lateinit var imageCompressionUtil: ImageOptimizationUtil
 
     private var shouldShowNotification = false
 
@@ -107,6 +113,7 @@ class PutRecipeService : Service() {
         recipeMapper = RecipeMapper()
         putRecipeCommand = PutRecipeCommand()
         uploadImageCommand = UploadImageCommand()
+        imageCompressionUtil = ImageOptimizationUtil()
     }
 
     override fun onDestroy() {
@@ -131,7 +138,8 @@ class PutRecipeService : Service() {
                 MSG_UPLOAD_RECIPE -> {
                     val bundle = msg.data
                     val recipe: Recipe = bundle.getParcelable(BK_RECIPE_TO_UPLOAD)
-                    putRecipe(recipe)
+                    val listImages: MutableList<Uri>  = (bundle.getParcelableArray(BK_LIST_IMAGES_URI) as Array<Uri>).toMutableList()
+                    putRecipe(recipe, listImages)
                 }
                 MSG_SHOW_PROGRESS_NOTIFICATION -> {
                     shouldShowNotification = true
@@ -224,48 +232,92 @@ class PutRecipeService : Service() {
         startForeground(NOTIFICATION_ID, notification)
     }
 
-    private fun putRecipe(recipe: Recipe) {
-        sendMessageToClients(MSG_STORING_RECIPE_TO_DB)
-        recipe.thumbUrl = recipe.imageUrl //todo this hard code must be revise later
-        uploadImages(recipe){
-            putRecipeCommand.recipe = recipeMapper.toDomain(recipe)
-            compositeDisposable.add(putRecipeCommand.execute()
-                    .observeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe ({
-                        sendMessageToClients(MSG_STORE_RECIPE_TO_DB_SUCCESS)
-                        if (shouldShowNotification) {
-                            updateUploadNotification("the recipe was put into remote server success")
-                        }
-                        Timber.d("a recipe was put into firebase server")
-                    }, {e ->
-                        sendMessageToClients(MSG_STORE_RECIPE_TO_DB_FAILED)
-                        Timber.e(e)
-//                        viewContract?.onPutRecipeFailed(e.message)
-                    }))
+    private fun putRecipe(recipe: Recipe, listImages: MutableList<Uri>) {
+        sendMessageToClients(MSG_START_STORING_RECIPE_TO_DB)
+        compositeDisposable.add(Flowable.just(recipe)
+                .map { extractImagePaths(it, listImages) }
+                .map { optimizeImages(it) }
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe ({ multipartFiles ->
+                    uploadImages(multipartFiles){storeRecipeToDb(recipe, it)}
+                }, { e -> Timber.e(e)}))
+    }
+
+    private fun storeRecipeToDb(recipe: Recipe, multipartFiles: List<ImageUpload>) {
+        compositeDisposable.add(Flowable.just(recipe)
+                .map {r ->
+                    multipartFiles.forEach {
+                        updateRemoteUriToRecipe(r, it.originalPath, it.remotePath!!)
+                    }
+                    recipeMapper.toDomain(r)
+                }.subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe ({ recipeUI ->
+                    putRecipeCommand.recipe = recipeUI
+                    compositeDisposable.add(putRecipeCommand.execute()
+                            .observeOn(Schedulers.computation())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe ({
+                                sendMessageToClients(MSG_STORE_RECIPE_TO_DB_SUCCESS)
+                                if (shouldShowNotification) {
+                                    updateUploadNotification("the recipe was put into remote server success")
+                                }
+                                Timber.d("a recipe was put into firebase server")
+                            }, {e ->
+                                sendMessageToClients(MSG_STORE_RECIPE_TO_DB_FAILED)
+                                Timber.e(e)
+                            }))
+                }, {
+                    Timber.e(it)
+                }))
+    }
+
+    private fun optimizeImages(extractImageUris: List<Uri>): List<ImageUpload>{
+        sendMessageToClients(MSG_OPTIMIZING_IMAGE)
+        val result = mutableListOf<ImageUpload>()
+        extractImageUris.forEachIndexed { index, uri ->
+            val optimizedPath = imageCompressionUtil.optimize(this, uri)
+            val opt = ImageUpload(optimizedPath.name, uri.toString(), optimizedPath.absolutePath)
+            result.add(opt)
+
+            //create thumb image
+            //make sure that the first added uri is the image uri
+            if(index == 0){
+                val optimizedThumbPath = imageCompressionUtil.optimizeThumbImage(this, uri)
+                val optThumb = ImageUpload(optimizedThumbPath.name, uri.toString(), optimizedThumbPath.absolutePath)
+                result.add(optThumb)
+            }
+        }
+        return result
+    }
+
+    private fun extractImagePaths(recipe: Recipe, listImages: MutableList<Uri>): List<Uri> {
+        val multiPartFiles = mutableListOf<String>()
+        with(recipe){
+            if (imageUrl.isNotBlank()) multiPartFiles.add(imageUrl)
+            preparation.attractUrlFromAnnotation()?.forEachIndexed { _, s ->
+                multiPartFiles.add(s)
+            }
+            processing.attractUrlFromAnnotation()?.forEachIndexed { _, s ->
+                multiPartFiles.add(s)
+            }
+        }
+        return listImages.filter {uri ->
+            multiPartFiles.contains(uri.toString())
         }
     }
 
-    private fun uploadImages(recipe: Recipe, completionCallback: () -> Unit) {
-        val multiPartFileMap = mutableMapOf<String, Uri>()
-        with(recipe){
-            if (imageUrl.isNotBlank()) addMultipartFileUri(multiPartFileMap, imageUrl)
-            if (thumbUrl.isNotBlank()) addMultipartFileUri(multiPartFileMap, thumbUrl)
-            preparation.attractUrlFromAnnotation()?.forEachIndexed { _, s ->
-                addMultipartFileUri(multiPartFileMap, s)
-            }
-            processing.attractUrlFromAnnotation()?.forEachIndexed { _, s ->
-                addMultipartFileUri(multiPartFileMap, s)
-            }
-        }
-        val totalFiles = multiPartFileMap.size
+    private fun uploadImages(multipartFiles: List<ImageUpload>, completionCallback: (multipartFiles: List<ImageUpload>) -> Unit) {
+        val result = mutableListOf<ImageUpload>()
+        val totalFiles = multipartFiles.size
         var counter = 1
-        uploadImageCommand.multiPartFileMap = multiPartFileMap
+        uploadImageCommand.multiPartFileMap = multipartFiles
         compositeDisposable.add(uploadImageCommand.execute()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({message ->
-                    if (message.progress == 100 && !message.remoteUri.isNullOrBlank()) {
-                        updateRemoteUriToRecipe(recipe, message.localUri, message.remoteUri!!)
+                    if (message.progress == 100 && !message.remotePath.isNullOrBlank()) {
+                        result.add(message)
                         counter++
                     }else{
                         val bundle = Bundle()
@@ -277,26 +329,26 @@ class PutRecipeService : Service() {
                             updateProgressNotification(totalFiles, counter, message.progress)
                         }
                         Timber.d("****************************")
-                        Timber.d("uploading ${message.localUri}")
+                        Timber.d("uploading ${message.originalPath}")
                         Timber.d("uploading ${message.progress}")
                         Timber.d("****************************")
                     }
                 }, {
                     Timber.e(it)
                 }, {
-                    completionCallback()
-                    toast("upload images go into onComplete()")
-                    Timber.d("upload images go into onComplete()")
+                    completionCallback(result)
+                    toast("upload multipartFiles go into onComplete()")
+                    Timber.d("upload multipartFiles go into onComplete()")
                 }))
     }
 
-    private fun addMultipartFileUri(multiPartFileMap: MutableMap<String, Uri>, uri: String){
+    private fun addMultipartFileUri(multiPartFileMap: MutableMap<String, String>, path: String){
         val timeStamp = System.currentTimeMillis().toString()
-        val arr = uri.split(".")
+        val arr = path.split(".")
         var ex = arr[arr.size-1]
         ex = if (ex.startsWith(".")) ex else ".$ex"
         val fileName = "$timeStamp-${multiPartFileMap.size}$ex"
-        multiPartFileMap[fileName] = Uri.parse(uri)
+        multiPartFileMap[fileName] = path
     }
 
     private fun updateRemoteUriToRecipe(recipe: Recipe, sLocalUri: String, sDownloadUri: String) {

@@ -54,7 +54,8 @@
     <!--progress dialog-->
     <string name="uploading_image">uploading images</string>
     <string name="store_recipe">store recipe</string>
-    <string name="msg_storing_recipe">almost done, storing the recipe!</string>
+    <string name="msg_start_storing_recipe">prepare for storing the recipe!</string>
+    <string name="msg_optimizing_images">optimizing images to upload</string>
     <string name="msg_store_recipe_success">the recipe has been stored successfully!</string>
     <string name="msg_store_recipe_failed">Opps, Something was wrong when storing the recipe, please try later!</string>
     <string name="progress">%d%%</string>

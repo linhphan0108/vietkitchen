@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
+import android.net.Uri
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import com.example.linh.vietkitchen.ui.mvpBase.BaseViewContract
@@ -17,6 +18,6 @@ interface AdminContractView : BaseViewContract{
 interface AdminContractPresenter: BasePresenterContract<AdminContractView>{
     fun preview(recipe: Recipe)
     fun getTags()
-    fun putARecipe(recipe: Recipe)
+    fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>)
     fun putNewTags(tags: List<String>)
 }

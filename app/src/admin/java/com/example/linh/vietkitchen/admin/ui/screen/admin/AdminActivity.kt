@@ -43,6 +43,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     }
 
     private var imageUrl: Uri? = null
+    private lateinit var listImagesUri: MutableList<Uri>
     var ingredients: MutableMap<String, Ingredient> = mutableMapOf()
 
     //#region life circle ==================================================================================
@@ -53,6 +54,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         iBtnUpdateImage.setOnClickListener(this)
         iBtnPreparationBrowser.setOnClickListener(this)
         iBtnProcessBrowser.setOnClickListener(this)
+        listImagesUri = mutableListOf()
         presenter.getTags()
     }
 
@@ -63,6 +65,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
                         onRequestHeaderImage(data.data)
+                        listImagesUri.add(data.data)
                         Timber.v("REQUEST_IMAGE $imageUrl")
                     }
                 }
@@ -71,6 +74,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
                         onRequestPreparationImage(data.data)
+                        listImagesUri.add(data.data)
                         Timber.v("REQUEST_IMAGE $imageUrl")
                     }
                 }
@@ -79,6 +83,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
                         onRequestProcessImage(data.data)
+                        listImagesUri.add(data.data)
                         Timber.v("REQUEST_IMAGE $imageUrl")
                     }
                 }
@@ -212,7 +217,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     }
 
     private fun onSaveAction(){
-        presenter.putARecipe(combineRecipe())
+        presenter.putARecipe(combineRecipe(), listImagesUri)
     }
 
     private fun onPreviewAction(){
@@ -237,6 +242,20 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         return Recipe("", title, shortIntro, ingredients, spices, preparation, process,
                 method, benefit, season, region, specialDay, tags, thumbUrl, imageUrl, false)
     }
+
+//    private fun openGallery() {
+//        if (Build.VERSION.SDK_INT < 19) {
+//            val intent = Intent()
+//            intent.type = "image/*"
+//            intent.action = Intent.ACTION_GET_CONTENT
+//            startActivityForResult(Intent.createChooser(intent, resources.getString(R.string.select_picture)), GALLERY_INTENT_CALLED)
+//        } else {
+//            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+//            intent.addCategory(Intent.CATEGORY_OPENABLE)
+//            intent.type = "image/*"
+//            startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED)
+//        }
+//    }
 
     private fun requestImage(requestCode: Int){
         val intent = Intent(if(SDKUtil.atLeastKitKat())Intent.ACTION_OPEN_DOCUMENT
@@ -266,5 +285,6 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                 .load(uri)
                 .into(imgHeaderImage)
     }
+
     //#endregion inner methods
 }
