@@ -11,4 +11,7 @@
 /build
 /captures
 .externalNativeBuild
+
 app/google-services.json
+app/src/admin/google-services.json
+app/viet-kitchen-catergory-export.json

@@ -1,3 +1,3 @@
 package com.example.linh.vietkitchen.ui.model
 
-class DrawerNavChildItem(val itemTitle: String) : Entity()
+class DrawerNavChildItem(val itemTitle: String, val path: String, val numberItems: Int) : Entity()

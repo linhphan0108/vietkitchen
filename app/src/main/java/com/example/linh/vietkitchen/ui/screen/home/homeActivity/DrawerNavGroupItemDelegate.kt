@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Entity
+import com.example.linh.vietkitchen.ui.screen.home.homeActivity.DrawerNavGroupViewHolder
+import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnGroupItemClickListener
 import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
 
 class DrawerNavGroupItemDelegate(private val listener: OnGroupItemClickListener? = null): AbsListItemAdapterDelegate<DrawerNavGroupItem,

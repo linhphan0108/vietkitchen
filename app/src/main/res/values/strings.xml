@@ -16,6 +16,9 @@
     <string name="label_cancel">@android:string/cancel</string>
     <string name="label_hide">hide</string>
 
+    <!--drawer navigation-->
+    <string name="drawer_nav_item_title">%s (%d)</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_temp">Temp</string>
