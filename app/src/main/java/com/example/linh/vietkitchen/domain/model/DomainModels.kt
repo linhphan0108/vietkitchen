@@ -10,5 +10,5 @@ class Recipe(val id: String?, val name: String, val intro: String, val ingredien
              val benefit: Map<String, Boolean>?, val recommendedSeason: Map<String, Boolean>, val region: String?, val specialDay: String?,
              val tags: Map<String, Boolean>, val thumbUrl: String, val imageUrl: String) : Entity()
 
-data class CategoryItem(val itemTitle: String)
-data class CategoryGroup(val headerTile: String, val itemsList: List<CategoryItem>? = null)
+data class CategoryChild(val itemTitle: String, val path: String, val numberItems: Int)
+data class CategoryGroup(val headerTile: String, val path: String, val numberItems: Int, val itemsList: List<CategoryChild>? = null)

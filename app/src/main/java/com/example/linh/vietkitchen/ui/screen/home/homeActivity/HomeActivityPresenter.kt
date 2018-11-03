@@ -1,10 +1,12 @@
-package com.example.linh.vietkitchen.ui.home.homeActivity
+package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.os.Looper
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestCategoryCommand
-import com.example.linh.vietkitchen.ui.home.mapper.CategoryMapper
+import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivityContractPresenter
+import com.example.linh.vietkitchen.ui.home.homeActivity.HomeActivityContractView
+import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,11 +19,12 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
     : BasePresenter<HomeActivityContractView>() , HomeActivityContractPresenter {
     override fun requestCategory() {
         compositeDisposable.add(requestCategoryCommand.execute()
-                .map {
+                .map {listCategories ->
                     Timber.e("on map: ${Looper.myLooper() == Looper.getMainLooper()}")
-                    val categories = categoryMapper.convertToUI(it).toMutableList()
-                    val groupItemTitleAll = context?.getString(R.string.draw_nav_group_item_all)
-                    categories.add(0, DrawerNavGroupItem(groupItemTitleAll!!))
+                    val categories = categoryMapper.convertToUI(listCategories).toMutableList()
+                    val groupItemTitleAll = context?.getString(R.string.draw_nav_group_item_all) ?: ""
+                    val totalItems = categories.sumBy { it.numberItems }
+                    categories.add(0, DrawerNavGroupItem(groupItemTitleAll, "", totalItems))
                     categories
                 }
                 .observeOn(AndroidSchedulers.mainThread())

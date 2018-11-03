@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.ui.home.mapper
+package com.example.linh.vietkitchen.ui.mapper
 
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
@@ -10,12 +10,12 @@ class CategoryMapper {
             var navChildren: List<DrawerNavChildItem>?  = null
             if (it.itemsList != null && it.itemsList.isNotEmpty()){
                 navChildren = it.itemsList.map {
-                    DrawerNavChildItem(it.itemTitle)
+                    DrawerNavChildItem(it.itemTitle, it.path, it.numberItems)
                 }
 
             }
             val groupTitle = it.headerTile
-            DrawerNavGroupItem(groupTitle, navChildren)
+            DrawerNavGroupItem(groupTitle, it.path, it.numberItems, navChildren)
         }
     }
 }
