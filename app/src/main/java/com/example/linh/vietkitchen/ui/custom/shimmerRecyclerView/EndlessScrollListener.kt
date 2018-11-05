@@ -18,7 +18,7 @@ abstract class EndlessScrollListener(
     // True if we are still waiting for the last set of data to load.
     private var loading = true
 
-    override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         // If the total item count is zero and the previous isn't, assume the
         // list is invalidated and should be reset back to initial state
         val totalItemCount = recyclerView?.adapter?.itemCount ?: 0
