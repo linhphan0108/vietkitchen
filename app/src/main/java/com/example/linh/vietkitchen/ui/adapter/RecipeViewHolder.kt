@@ -1,10 +1,18 @@
 package com.example.linh.vietkitchen.ui.adapter
 
+import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ImageView
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.example.linh.vietkitchen.R.id.imgHeaderImage
 import com.example.linh.vietkitchen.extension.lookTemporary
 import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.util.GlideUtil
 import com.like.LikeButton
 import com.like.OnLikeListener
 import kotlinx.android.synthetic.main.item_recipe.view.*
@@ -23,9 +31,20 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
             }
         }else {
             with(recipe) {
-                GlideApp.with(itemView.context)
-                        .load(recipe.thumbUrl)
+                itemView.imgFoodThumb.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                GlideUtil.widthLoadingHolder(itemView.context, recipe.thumbUrl)
+                        .listener(object: RequestListener<Drawable?> {
+                            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                                return false
+                            }
+
+                            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                                itemView.imgFoodThumb.scaleType = ImageView.ScaleType.CENTER_CROP
+                                return false
+                            }
+                        })
                         .into(itemView.imgFoodThumb)
+
                 itemView.txtFoodName.text = name
                 itemView.txtShortIntro.text = intro
                 itemView.btnFavorite.isLiked = hasLiked

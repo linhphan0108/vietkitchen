@@ -40,7 +40,7 @@
             app:layout_constraintEnd_toStartOf="@id/verticalGuideline"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
-            android:scaleType="centerCrop"
+            android:scaleType="centerInside"
             tools:src="@tools:sample/avatars"/>
 
         <TextView

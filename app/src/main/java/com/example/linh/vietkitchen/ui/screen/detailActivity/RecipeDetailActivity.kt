@@ -16,7 +16,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
 import android.view.MenuItem
@@ -25,6 +24,7 @@ import android.widget.TextView
 import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.model.UserInfo
+import com.example.linh.vietkitchen.util.GlideUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_detail_content.*
 
@@ -139,10 +139,8 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
     private fun populateUI(recipe: Recipe) {
         imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        GlideApp.with(this)
-                .load(recipe.imageUrl)
+        GlideUtil.widthLoadingHolder(this, recipe.imageUrl)
                 .disallowHardwareConfig()
-                .placeholder(R.drawable.ic_loading_gif)
                 .override(ScreenUtil.screenWidth())
                 .listener(object : RequestListener<Drawable?>{
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
@@ -164,6 +162,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
                 })
                 .into(imgHeaderImage)
+
 
         with(recipe) {
             val builder = StringBuilder()
