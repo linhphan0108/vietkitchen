@@ -1,6 +1,5 @@
 package com.example.linh.vietkitchen.ui.dialog
 
-import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -16,7 +15,7 @@ import kotlinx.android.synthetic.main.dialog_progress.*
 class ProgressDialog : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        dialog.window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return inflater.inflate(R.layout.dialog_progress, container)
     }
 
@@ -35,6 +34,10 @@ class ProgressDialog : DialogFragment() {
         params.width = width
         params.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.window!!.attributes = params as android.view.WindowManager.LayoutParams
+
+        txtProgress.visibility = View.GONE
+        txtCounter.visibility = View.GONE
+        progressBar.visibility = View.GONE
     }
 
     fun updateProgress(totalFiles: Int, counter: Int, progress: Int){

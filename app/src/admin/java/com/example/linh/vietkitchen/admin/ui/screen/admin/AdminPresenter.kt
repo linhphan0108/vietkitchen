@@ -76,7 +76,7 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
             val charPreparation = preparation.generateAnnotationSpan()
             val charProcess = processing.generateAnnotationSpan()
             val data = Recipe(id, name, intro, ingredient, spice, charPreparation, charProcess,
-                    categories, tags,thumbUrl, imageUrl, false)
+                    notes, categories, tags,thumbUrl, imageUrl, false)
             val intent = RecipeDetailActivity.createIntent(context, "", data)
             context?.startActivity(intent)
         }

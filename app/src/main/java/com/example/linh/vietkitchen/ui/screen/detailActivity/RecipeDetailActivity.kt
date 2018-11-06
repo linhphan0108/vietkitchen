@@ -186,6 +186,11 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
             }
 
             txtStepsToProcess.setText(processing, TextView.BufferType.SPANNABLE)
+
+            notes?.let {
+                llNotes.visibility = View.VISIBLE
+                txtNotes.text = notes
+            }
         }
     }
 

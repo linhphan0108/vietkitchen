@@ -281,7 +281,8 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
 
         val preparation = edtPreparation.text.trim()
         val process = edtProcess.text.trim()
-        return Recipe("", title, shortIntro, ingredients, spices, preparation, process,
+        val notes = edtNotes.text.toString().trim()
+        return Recipe("", title, shortIntro, ingredients, spices, preparation, process, notes,
                 categories, tags, thumbUrl, imageUrl, false)
     }
 

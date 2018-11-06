@@ -5,6 +5,7 @@
     <string name="label_preview">preview</string>
     <string name="hint_recipe_title">Enter title</string>
     <string name="hint_short_intro">Short introduction</string>
+    <string name="hint_notes">Notes</string>
     <string name="hint_ingredients">Ingredients</string>
     <string name="hint_spices">Spices</string>
     <string name="hint_cooking_method">cooking method</string>
