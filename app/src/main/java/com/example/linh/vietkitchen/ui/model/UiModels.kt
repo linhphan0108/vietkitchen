@@ -6,7 +6,7 @@ import android.text.TextUtils
 import com.example.linh.vietkitchen.domain.model.ProcessStep as DomainProcess
 
 
-open class Ingredient(val name: String? = null, val notes: String?, val quantity: Int, val unit: String) : Parcelable {
+class Ingredient(val name: String? = null, val notes: String?, val quantity: Int, val unit: String) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),
@@ -40,9 +40,9 @@ open class Ingredient(val name: String? = null, val notes: String?, val quantity
 }
 
 class Recipe(val id: String? = "", val name: String, val intro: String, val ingredient: Map<String, Ingredient>, val spice: String,
-             var preparation: CharSequence, var processing: CharSequence, val cookingMethod: List<String>,
-             val benefit: List<String>, val recommendedSeason: List<String>, val region: String?, val specialDay: String?,
-             var tags: List<String>?, var thumbUrl: String, var imageUrl: String, var hasLiked: Boolean = false) : Entity(), Parcelable {
+             var preparation: CharSequence, var processing: CharSequence, val categories: List<String>,
+             var tags: List<String>?, var thumbUrl: String, var imageUrl: String,
+             var hasLiked: Boolean = false) : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),//id
             parcel.readString(),//notes
@@ -51,11 +51,7 @@ class Recipe(val id: String? = "", val name: String, val intro: String, val ingr
             parcel.readString(),//spice
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//preparation
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//processing
-            readListString(parcel),//cookingMethod
-            readListString(parcel),//benefit
-            readListString(parcel),//recommendedSeason
-            parcel.readString(),//region
-            parcel.readString(),//specialDay
+            readListString(parcel),//categories
             readListString(parcel),//tags
             parcel.readString(),//thumbUrl
             parcel.readString(),//imageUrl
@@ -70,11 +66,7 @@ class Recipe(val id: String? = "", val name: String, val intro: String, val ingr
         parcel.writeString(spice)////spice
         TextUtils.writeToParcel(preparation, parcel, flags)//preparation
         TextUtils.writeToParcel(processing, parcel, flags)//processing
-        parcel.writeStringList(cookingMethod)//cookingMethod
-        parcel.writeStringList(benefit)//benefit
-        parcel.writeStringList(recommendedSeason)//recommendedSeason
-        parcel.writeString(region)
-        parcel.writeString(specialDay)
+        parcel.writeStringList(tags)//categories
         parcel.writeStringList(tags)//tags
         parcel.writeString(thumbUrl)
         parcel.writeString(imageUrl)
@@ -189,5 +181,5 @@ data class ProcessStep(val step: String = "", val imageUrl: String = "") : Parce
     }
 
 }
-data class CategoryItem(val itemTitle: String)
-data class CategoryGroup(val headerTile: String, val itemsList: List<CategoryItem>? = null)
+//data class CategoryItem(val itemTitle: String)
+//data class CategoryGroup(val headerTile: String, val itemsList: List<CategoryItem>? = null)

@@ -9,6 +9,7 @@
     tools:context=".admin.ui.screen.admin.AdminActivity"
     >
     <LinearLayout
+        android:id="@+id/llContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_16"
@@ -63,11 +64,8 @@
                 android:id="@+id/iBtnAddIngredient"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp"
-                android:padding="4dp"
                 android:layout_gravity="top|end"
-                android:src="@drawable/ic_menu_camera"
+                android:src="@android:drawable/ic_input_add"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
         </FrameLayout>
 
@@ -82,105 +80,6 @@
                 android:inputType="text"
                 android:maxLines="4"
                 android:hint="@string/hint_spices" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.example.linh.vietkitchen.ui.custom.TagsEditText
-                android:id="@+id/edtMethod"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="4"
-                android:hint="@string/hint_cooking_method" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.example.linh.vietkitchen.ui.custom.TagsEditText
-                android:id="@+id/edtBenefit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="4"
-                android:hint="@string/hint_benefit" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.example.linh.vietkitchen.ui.custom.TagsEditText
-                android:id="@+id/edtSeason"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="4"
-                android:hint="@string/hint_season" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.example.linh.vietkitchen.ui.custom.TagsEditText
-                android:id="@+id/edtTags"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="4"
-                app:allowSpaceInTag="true"
-                android:hint="@string/hint_tags" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/edtSpecialDay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="4"
-                android:hint="@string/hint_special_day" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="4"
-                android:hint="@string/hint_season" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/edtRegion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="4"
-                android:hint="@string/hint_region"
-                android:text="@string/region_vietnam"/>
 
         </android.support.design.widget.TextInputLayout>
 
@@ -240,5 +139,20 @@
                 android:src="@drawable/ic_menu_camera"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
         </FrameLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.example.linh.vietkitchen.ui.custom.TagsEditText
+                android:id="@+id/edtTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="4"
+                app:allowSpaceInTag="true"
+                android:hint="@string/hint_tags" />
+
+        </android.support.design.widget.TextInputLayout>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

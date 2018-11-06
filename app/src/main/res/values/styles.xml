@@ -4,6 +4,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="chipIconTint">@color/colorAccent</item>-->
         <item name="android:colorBackground">@android:color/white</item>
         <item name="android:textColor">@color/textPrimary</item>
         <item name="android:textColorSecondary">@color/textSecondary</item>
@@ -23,6 +24,11 @@
     <style name="DialogAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_up</item>
         <item name="android:windowExitAnimation">@anim/slide_out_down</item>
+    </style>
+
+    <style name="Widget.MyApp.MyButton" parent="Theme.MaterialComponents.Light.Bridge">
+        <item name="backgroundTint">@android:color/white</item>
+        <item name="android:background">@android:color/white</item>
     </style>
 
 </resources>

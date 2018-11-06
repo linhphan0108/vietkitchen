@@ -190,7 +190,7 @@ class AnimatedExpandableListView : ExpandableListView {
      *
      * For animating the collapse of a group is a bit more difficult since we
      * can't call collapseGroup from the start as it would just ignore the
-     * child items, giving up no chance to do any sort of animation. Instead
+     * child navItems, giving up no chance to do any sort of animation. Instead
      * what we have to do is play the animation first and call collapseGroup
      * after the animation is done.
      *

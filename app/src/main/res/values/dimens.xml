@@ -10,6 +10,7 @@
     <dimen name="fab_elevation">12dp</dimen>
     <dimen name="rcv_item_decoration_top">56dp</dimen>
     <dimen name="rcv_item_decoration">8dp</dimen>
+    <dimen name="rcv_item_decoration_1dp">1dp</dimen>
     <dimen name="app_bar_height">220dp</dimen>
     <dimen name="dialog_Width">220dp</dimen>
 
@@ -18,6 +19,7 @@
     <dimen name="margin_8dp">8dp</dimen>
     <dimen name="padding_16">16dp</dimen>
     <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="padding_24dp">24dp</dimen>
     <dimen name="margin_drawer_nav_group_item">12dp</dimen>
     <dimen name="margin_drawer_nav_rv_padding_bottom">26dp</dimen>
     <dimen name="drawer_nav_group_height">56dp</dimen>

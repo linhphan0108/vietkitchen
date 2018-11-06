@@ -256,9 +256,10 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 Pair("thịt bò xào", true),
                 Pair("bò xào", true)
         )
+        val categories = mapOf<String, Boolean>()
         val thumbImageUrl = "https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/IMG_7731.JPG"
         val imageUrl = "https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/IMG_7731.JPG"
-        return Recipe( name, intro, ingredients, spices, preparation, processing, method,
-                benefit, season, region, specialDay, tags, thumbImageUrl, imageUrl)
+        return Recipe( name, intro, ingredients, spices, preparation, processing, categories,
+                tags, thumbImageUrl, imageUrl)
     }
 }

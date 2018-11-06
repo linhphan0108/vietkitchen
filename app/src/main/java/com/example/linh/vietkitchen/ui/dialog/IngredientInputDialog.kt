@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.capWords
 import com.example.linh.vietkitchen.ui.model.Ingredient
-import kotlinx.android.synthetic.main.dialog_input_ingredient.*
+import kotlinx.android.synthetic.admin.dialog_input_ingredient.*
 
 class IngredientInputDialog : BottomSheetDialogFragment() {
 

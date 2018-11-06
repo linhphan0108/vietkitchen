@@ -20,21 +20,23 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
+import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
+import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 
 
-class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
-                     private val putTagsCommand: PutTagsCommand = PutTagsCommand(),
+class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand(),
                      private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand())
     : BasePresenter<AdminContractView>(), AdminContractPresenter {
 
     private lateinit var listTagsOnServer: List<String>
+    private lateinit var categories: List<DrawerNavGroupItem>
 
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.
     private var isBounded: Boolean = false
     // To invoke the bound service, first make sure that this value
     // is not null.
-    private var boundService: PutRecipeService? = null
+//    private var boundService: PutRecipeService? = null
     /** Messenger for communicating with service.  */
     var serviceMessenger: Messenger? = null
     /**
@@ -54,12 +56,27 @@ class AdminPresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
         doUnbindService()
     }
 
+    //==============================================================================================
+    override fun setCategoriesList(categories: List<DrawerNavGroupItem>) {
+        this.categories = categories
+    }
+
+    override fun openCategoryDialogChecker() {
+        val dialog = CategoryChecker.newInstance(categories)
+        dialog.callback = object: CategoryChecker.OnDismissCallback {
+            override fun onDismiss(listCatsChecked: MutableList<DrawerNavChildItem>) {
+
+            }
+        }
+        dialog.show(activity!!.supportFragmentManager, CategoryChecker::class.java.name)
+    }
+
     override fun preview(recipe: Recipe) {
         with(recipe){
             val charPreparation = preparation.generateAnnotationSpan()
             val charProcess = processing.generateAnnotationSpan()
             val data = Recipe(id, name, intro, ingredient, spice, charPreparation, charProcess,
-                    cookingMethod, benefit, recommendedSeason, region, specialDay, tags,thumbUrl, imageUrl, false)
+                    categories, tags,thumbUrl, imageUrl, false)
             val intent = RecipeDetailActivity.createIntent(context, "", data)
             context?.startActivity(intent)
         }

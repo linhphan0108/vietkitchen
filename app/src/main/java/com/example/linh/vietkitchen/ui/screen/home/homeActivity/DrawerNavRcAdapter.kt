@@ -1,14 +1,13 @@
-package com.example.linh.vietkitchen.ui.home.homeActivity
+package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
+import com.example.linh.vietkitchen.ui.home.homeActivity.DrawerNavChildItemDelegate
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavHeader
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnGroupItemClickListener
-import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnItemClickListener
 import com.hannesdorfmann.adapterdelegates3.ListDelegationAdapter
 import timber.log.Timber
 

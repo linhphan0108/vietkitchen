@@ -22,6 +22,7 @@ import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
+import com.example.linh.vietkitchen.util.Constants
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.activity_home.*
@@ -43,6 +44,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
     internal var likeOrUnLikePublisher: Subject<Recipe> = PublishSubject.create()
+    lateinit var navItems: List<DrawerNavGroupItem>
 
     //region lifecycle =============================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +86,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
 
     override fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
         drawerNavAdapter.updateItemThenNotify(items)
+        navItems = items
     }
 
     override fun onRequestCategoriesFailed(message: String) {
@@ -180,6 +183,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         fabAdmin.setOnClickListener {
 //            presenter.putARecipe(
             val intent = Intent(this, Class.forName("com.example.linh.vietkitchen.admin.ui.screen.admin.AdminActivity"))
+            val bundle = Bundle()
+            bundle.putParcelableArrayList(Constants.BK_CATEGORIES, ArrayList(navItems))
+            intent.putExtras(bundle)
             startActivityWithAnimation(intent)
         }
     }

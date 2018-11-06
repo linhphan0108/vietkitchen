@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.chip.Chip
+import android.support.design.chip.ChipGroup
+import android.support.v4.content.ContextCompat
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,12 +22,17 @@ import kotlinx.android.synthetic.admin.activity_admin.*
 import kotlinx.android.synthetic.admin.activity_admin_content.*
 import timber.log.Timber
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.example.linh.vietkitchen.extension.showSnackBar
 import com.example.linh.vietkitchen.extension.toArrayString
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.ui.dialog.IngredientInputDialog
+import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
+import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.util.Constants
 
 
 private const val REQUEST_IMAGE = 98
@@ -45,16 +54,21 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     private var imageUrl: Uri? = null
     private lateinit var listImagesUri: MutableList<Uri>
     var ingredients: MutableMap<String, Ingredient> = mutableMapOf()
+    private lateinit var listCatsChecked: MutableList<DrawerNavChildItem>
 
     //#region life circle ==================================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val categories = intent.extras.getParcelableArrayList<DrawerNavGroupItem>(Constants.BK_CATEGORIES).toList()
+        presenter.setCategoriesList(categories)
         setupToolbar()
         setupTagsEditText()
+        setupCategoryChip(categories)
         iBtnUpdateImage.setOnClickListener(this)
         iBtnPreparationBrowser.setOnClickListener(this)
         iBtnProcessBrowser.setOnClickListener(this)
         listImagesUri = mutableListOf()
+        listCatsChecked = mutableListOf()
         presenter.getTags()
     }
 
@@ -186,6 +200,35 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         collapsingToolbarLayout.title = title
     }
 
+    private fun setupCategoryChip(categories: List<DrawerNavGroupItem>) {
+        categories.forEach {groupItem ->
+            if (groupItem.itemsList.isNullOrEmpty()) return@forEach
+            val llChipGroup = LayoutInflater.from(this).inflate(R.layout.chip_category, llContent, false) as LinearLayout
+            val txtTitle = llChipGroup.getChildAt(0) as TextView
+            val chipGroup = llChipGroup.getChildAt(1) as ChipGroup
+            txtTitle.text = groupItem.headerTile
+            groupItem.itemsList.forEach {childItem ->
+                val chip = Chip(this)
+                chip.text = childItem.itemTitle
+//                chip.chipIcon = ContextCompat.getDrawable(requireContext(), baseline_person_black_18)
+                chip.isCheckable = true
+                chip.setOnCheckedChangeListener { _, checked ->
+                    if (checked){
+                        if (!listCatsChecked.contains(childItem)) {
+                            listCatsChecked.add(childItem)
+                        }
+                    }else {
+                        if (listCatsChecked.contains(childItem)) {
+                            listCatsChecked.remove(childItem)
+                        }
+                    }
+                }
+                chipGroup.addView(chip as View)
+            }
+            llContent.addView(llChipGroup)
+        }
+    }
+
     private fun setupTagsEditText(){
         edtTagIngredients.setTagsWithSpacesEnabled(true)
 //        edtTagIngredients.setAdapter(ArrayAdapter<String>(this,
@@ -230,17 +273,16 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         val title = edtRecipeTitle.text.toString().trim().capWords()
         val shortIntro = edtShortIntro.text.toString().trim().capitalize()
         val spices = edtSpices.text.toString().trim().capitalize()
-        val method = edtMethod.tags
-        val benefit = edtBenefit.tags
-        val season = edtSeason.tags
-        val region = edtRegion.text.toString().trim()
-        val specialDay = edtSpecialDay.text.toString().trim()
         val tags = edtTags.tags
+
+        val categories = listCatsChecked.map {childItem ->
+            childItem.itemTitle
+        }
 
         val preparation = edtPreparation.text.trim()
         val process = edtProcess.text.trim()
         return Recipe("", title, shortIntro, ingredients, spices, preparation, process,
-                method, benefit, season, region, specialDay, tags, thumbUrl, imageUrl, false)
+                categories, tags, thumbUrl, imageUrl, false)
     }
 
 //    private fun openGallery() {
