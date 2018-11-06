@@ -118,7 +118,7 @@ abstract class AnimatedExpandableListAdapter : BaseExpandableListAdapter() {
                 // is called, the ExpandableListView tries to keep the
                 // list position the same by saving the first visible item
                 // and jumping back to that item after the views have been
-                // refreshed. Now the problem is, if a group has 2 items
+                // refreshed. Now the problem is, if a group has 2 navItems
                 // and the first visible item is the 2nd child of the group
                 // and this group is collapsed, then the dummy view will be
                 // used for the group. But now the group only has 1 item

@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.ui.home.homeActivity
+package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

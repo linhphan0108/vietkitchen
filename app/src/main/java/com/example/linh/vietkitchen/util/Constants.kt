@@ -8,5 +8,7 @@ object Constants {
     const val STORAGE_USER_LIKED_RECIPES_PATH = "likedRecipes"
     const val STORAGE_USER_PATH = "users"
 
+    const val BK_CATEGORIES = "CATEGORIES"
+
     const val PAGINATION_LENGTH = 10
 }

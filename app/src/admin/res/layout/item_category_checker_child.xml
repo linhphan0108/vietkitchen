@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/margin_8dp"
+    android:paddingBottom="@dimen/margin_8dp"
+    android:paddingStart="@dimen/padding_24dp"
+    android:paddingLeft="@dimen/padding_24dp"
+    android:paddingEnd="@dimen/padding_24dp"
+    android:paddingRight="@dimen/padding_24dp"
+    android:background="?attr/selectableItemBackground">
+
+    <CheckedTextView
+        android:id="@+id/cTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textSecondary"
+        android:checkMark="@android:drawable/checkbox_off_background"
+        android:textSize="18sp"
+        android:checked="false"/>
+
+</android.support.constraint.ConstraintLayout>

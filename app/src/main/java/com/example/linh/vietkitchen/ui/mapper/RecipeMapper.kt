@@ -28,9 +28,7 @@ class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.userI
             }
             val mapTags = tags?.toMapOfStringBoolean() ?: mapOf<String, Boolean>()
             return RecipeDomain("", name, intro, ingredientDomainMap, spice, preparation.toString()
-                    , processing.toString(), cookingMethod.toMapOfStringBoolean(),
-                    benefit.toMapOfStringBoolean(), recommendedSeason.toMapOfStringBoolean(),
-                    region, specialDay, mapTags, thumbUrl, imageUrl)
+                    , processing.toString(), categories, mapTags, thumbUrl, imageUrl)
         }
     }
 
@@ -44,10 +42,8 @@ class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.userI
 
         val pre = domain.preparation.generateAnnotationSpan()
         val processSteps = domain.processing.generateAnnotationSpan()
-        val benefit = domain.benefit?.toListOfStringOfKey() ?: listOf()
         return Recipe(domain.id, domain.name, domain.intro, ingredient,
-                domain.spice, pre, processSteps,domain.cookingMethod.toListOfStringOfKey(), benefit,
-                domain.recommendedSeason.toListOfStringOfKey(), domain.region, domain.specialDay,
+                domain.spice, pre, processSteps, domain.categories,
                 domain.tags.toListOfStringOfKey(), domain.thumbUrl, domain.imageUrl,false
         )
     }

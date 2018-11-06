@@ -28,6 +28,10 @@
         <item>#B05ABA94</item>
     </array>
 
+    <color name="item_group_background">#e6e1e1</color>
+    <color name="item_child_background">#ffffff</color>
+    <color name="recycler_background">@color/divider</color>
+
     <!--shimmer loading effect-->
     <color name="shimmer_background">#dddddd</color>
     <color name="demo_light_transparent">#16000000</color>
@@ -50,5 +54,6 @@
     <dimen name="defaultTagsTextSize">16sp</dimen>
     <dimen name="defaultTagsCloseImagePadding">10dp</dimen>
     <dimen name="defaultTagsPadding">0dp</dimen>
+
 
 </resources>

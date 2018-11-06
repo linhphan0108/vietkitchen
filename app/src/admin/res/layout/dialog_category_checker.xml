@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rcvCategoryChecker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/recycler_background"
+        tools:listitem="@layout/item_drawer_sample_switcher"
+        />
+
+</android.support.constraint.ConstraintLayout>
