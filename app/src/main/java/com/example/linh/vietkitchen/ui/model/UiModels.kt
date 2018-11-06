@@ -11,7 +11,7 @@ class Ingredient(val name: String? = null, val notes: String?, val quantity: Int
             parcel.readString(),
             parcel.readString(),
             parcel.readInt(),
-            parcel.readString())
+            parcel.readString()!!)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)
@@ -39,22 +39,23 @@ class Ingredient(val name: String? = null, val notes: String?, val quantity: Int
     }
 }
 
-class Recipe(val id: String? = "", val name: String, val intro: String, val ingredient: Map<String, Ingredient>, val spice: String,
-             var preparation: CharSequence, var processing: CharSequence, val categories: List<String>,
+class Recipe(val id: String? = "", val name: String, val intro: String?, val ingredient: Map<String, Ingredient>, val spice: String,
+             var preparation: CharSequence, var processing: CharSequence, val notes: String?, val categories: List<String>,
              var tags: List<String>?, var thumbUrl: String, var imageUrl: String,
              var hasLiked: Boolean = false) : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),//id
-            parcel.readString(),//notes
+            parcel.readString()!!,//name
             parcel.readString(),//intro
             readIngredient(parcel),//ingredient
-            parcel.readString(),//spice
+            parcel.readString()!!,//spice
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//preparation
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//processing
+            parcel.readString(),//notes
             readListString(parcel),//categories
             readListString(parcel),//tags
-            parcel.readString(),//thumbUrl
-            parcel.readString(),//imageUrl
+            parcel.readString()!!,//thumbUrl
+            parcel.readString()!!,//imageUrl
             parcel.readInt() != 0
     )
 
@@ -66,6 +67,7 @@ class Recipe(val id: String? = "", val name: String, val intro: String, val ingr
         parcel.writeString(spice)////spice
         TextUtils.writeToParcel(preparation, parcel, flags)//preparation
         TextUtils.writeToParcel(processing, parcel, flags)//processing
+        parcel.writeString(notes)
         parcel.writeStringList(tags)//categories
         parcel.writeStringList(tags)//tags
         parcel.writeString(thumbUrl)
@@ -158,8 +160,8 @@ class Recipe(val id: String? = "", val name: String, val intro: String, val ingr
 
 data class ProcessStep(val step: String = "", val imageUrl: String = "") : Parcelable{
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
-            parcel.readString())
+            parcel.readString()!!,
+            parcel.readString()!!)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(step)

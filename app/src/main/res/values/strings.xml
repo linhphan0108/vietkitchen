@@ -41,6 +41,7 @@
     <string name="demo_desc">Blah Blah Blah Blah Blah Blah Blah!!!!!!</string>
     <string name="recipe_picture_content_description">recipe picture</string>
     <string name="label_spices">spices:</string>
+    <string name="label_notes">Notes</string>
     <string name="label_ingredients">ingredients:</string>
     <string name="label_process">process:</string>
     <string name="label_pre_process">Pre process:</string>

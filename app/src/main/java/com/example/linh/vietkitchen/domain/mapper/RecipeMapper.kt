@@ -29,7 +29,8 @@ class RecipeMapper(private val ingredientMapper: IngredientMapper = IngredientMa
 //            ProcessStep(it.step, it.imageUrl)
 //        }
         return RecipeDomain(id, f.name, f.intro, ingredientMapper.convertToDomain(f.ingredient), f.spice,
-                f.preparation, f.processing, f.categories.toListOfStringOfKey(), f.tags, f.thumbUrl, f.imageUrl)
+                f.preparation, f.processing, f.notes, f.categories.toListOfStringOfKey(),
+                f.tags, f.thumbUrl, f.imageUrl)
     }
 
     fun toData(domain: RecipeDomain): Recipe {
@@ -40,7 +41,7 @@ class RecipeMapper(private val ingredientMapper: IngredientMapper = IngredientMa
                 }
             }
 
-            return Recipe(name, intro, ingredientDataMap, spice, preparation, processing,
+            return Recipe(name, intro, ingredientDataMap, spice, preparation, processing, notes,
                     categories.toMapOfStringBoolean(), tags, thumbUrl, imageUrl)
         }
     }

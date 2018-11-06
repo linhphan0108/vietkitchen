@@ -144,6 +144,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <EditText
+                android:id="@+id/edtNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textMultiLine"
+                android:maxLines="4"
+                android:hint="@string/hint_notes" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <com.example.linh.vietkitchen.ui.custom.TagsEditText
                 android:id="@+id/edtTags"
                 android:layout_width="match_parent"
