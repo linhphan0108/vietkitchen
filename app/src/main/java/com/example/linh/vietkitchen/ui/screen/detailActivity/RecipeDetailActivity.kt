@@ -138,6 +138,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
     }
 
     private fun populateUI(recipe: Recipe) {
+        val scaleType = imgHeaderImage.scaleType
         imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
         GlideUtil.widthLoadingHolder(this, recipe.imageUrl)
                 .disallowHardwareConfig()
@@ -156,7 +157,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
                                 toast("exception thrown when generate palette")
                             }
                         }
-                        imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_CROP
+                        imgHeaderImage.scaleType = scaleType
                         return false
                     }
 

@@ -31,6 +31,7 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
             }
         }else {
             with(recipe) {
+                val scaleType = itemView.imgFoodThumb.scaleType
                 itemView.imgFoodThumb.scaleType = ImageView.ScaleType.CENTER_INSIDE
                 GlideUtil.widthLoadingHolder(itemView.context, recipe.thumbUrl)
                         .listener(object: RequestListener<Drawable?> {
@@ -39,7 +40,7 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
                             }
 
                             override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                                itemView.imgFoodThumb.scaleType = ImageView.ScaleType.CENTER_CROP
+                                itemView.imgFoodThumb.scaleType = scaleType
                                 return false
                             }
                         })
