@@ -6,7 +6,6 @@
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".admin.ui.screen.admin.AdminActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -14,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
-        android:fitsSystemWindows="true"
         >
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarLayout"
@@ -22,7 +20,6 @@
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="@android:color/transparent"
-            android:fitsSystemWindows="true"
             >
             <com.example.linh.vietkitchen.ui.custom.SquareImageView
                 android:id="@+id/imgHeaderImage"
@@ -32,7 +29,6 @@
                 app:layout_collapseMode="parallax"
                 android:src="@drawable/img_drawer_nav_header"
                 android:background="@android:color/white"
-                android:fitsSystemWindows="true"
                 />
 
             <ImageButton
@@ -48,6 +44,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:layout_marginTop="@dimen/margin_24dp"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:layout_collapseMode="pin"
                 tools:title="canh xương hầm khoai tây"
