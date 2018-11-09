@@ -8,13 +8,10 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.example.linh.vietkitchen.R.id.imgHeaderImage
 import com.example.linh.vietkitchen.extension.lookTemporary
-import com.example.linh.vietkitchen.ui.GlideApp
+import com.example.linh.vietkitchen.ui.custom.likeButton.AndroidLikeButton
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.GlideUtil
-import com.like.LikeButton
-import com.like.OnLikeListener
 import kotlinx.android.synthetic.main.item_recipe.view.*
 
 class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : RecyclerView.ViewHolder(itemView) {
@@ -25,7 +22,7 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
                 if(it is PayLoads) {
                     when (it) {
                         PayLoads.LIKE_CHANGE ->
-                            itemView.btnFavorite.isLiked = recipe.hasLiked
+                            itemView.btnFavorite.setCurrentlyLiked(recipe.hasLiked)
                     }
                 }
             }
@@ -48,7 +45,7 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
 
                 itemView.txtFoodName.text = name
                 itemView.txtShortIntro.text = intro
-                itemView.btnFavorite.isLiked = hasLiked
+                itemView.btnFavorite.setCurrentlyLiked(hasLiked)
             }
 
             bindListeners(recipe)
@@ -59,17 +56,16 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
         itemView.setOnClickListener {
             listener?.onItemClick(itemView.imgFoodThumb, layoutPosition, adapterPosition, recipe)
         }
-        itemView.btnFavorite.setOnLikeListener(object : OnLikeListener {
-            override fun liked(p0: LikeButton?) {
-                itemView.btnFavorite.lookTemporary()
-                listener?.onLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
-            }
-
-            override fun unLiked(p0: LikeButton?) {
+        itemView.btnFavorite.setOnLikeEventListener(object: AndroidLikeButton.OnLikeEventListener {
+            override fun onUnlikeClicked(androidLikeButton: AndroidLikeButton?) {
                 itemView.btnFavorite.lookTemporary()
                 listener?.onUnLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
             }
 
+            override fun onLikeClicked(androidLikeButton: AndroidLikeButton?) {
+                itemView.btnFavorite.lookTemporary()
+                listener?.onLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
+            }
         })
     }
 }
