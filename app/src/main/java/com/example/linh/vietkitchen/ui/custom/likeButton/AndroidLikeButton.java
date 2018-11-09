@@ -284,7 +284,12 @@ public class AndroidLikeButton extends FrameLayout implements View.OnClickListen
         star.getLayoutParams().height = height;
         androidCircleView.setWidthAndHeight(width, height);
         androidDotView.setWidthAndHeight(width, height);
-        requestLayout();
+        post(new Runnable() {
+            @Override
+            public void run() {
+                requestLayout();
+            }
+        });
     }
 
     public void setLikeIcon(int resId) {
