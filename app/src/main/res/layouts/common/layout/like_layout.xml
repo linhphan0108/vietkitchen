@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content">
+
+    <com.example.linh.vietkitchen.ui.custom.likeButton.AndroidDotView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:id="@+id/dotView"
+        />
+
+  <com.example.linh.vietkitchen.ui.custom.likeButton.AndroidCircleView
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_gravity="center"
+      android:id="@+id/circleView"
+      />
+
+    <ImageView
+        android:id="@+id/starImg"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:scaleType="centerInside"
+        tools:src="@drawable/heart_on"
+        />
+
+</merge>
