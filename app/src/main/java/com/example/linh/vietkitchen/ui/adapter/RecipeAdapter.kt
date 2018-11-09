@@ -28,7 +28,7 @@ class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
                 false
             }
         }
-        if (index > 0){
+        if (index > -1){
             (items[index] as Recipe).hasLiked = true
             notifyItemChanged(index, PayLoads.LIKE_CHANGE)
         }else{
@@ -46,7 +46,7 @@ class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
                 false
             }
         }
-        if (index >= 0){
+        if (index > -1){
             if (shouldRemove){
                 items.removeAt(index)
                 notifyItemRemoved(index)

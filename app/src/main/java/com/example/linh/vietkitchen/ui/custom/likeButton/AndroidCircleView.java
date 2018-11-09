@@ -152,7 +152,15 @@ public class AndroidCircleView extends View {
            this.height = height*2;
            valueInit(width*2);
            changeDimensiion = true;
-           requestLayout();
+            getLayoutParams().width = this.width;
+            getLayoutParams().height = this.height;
+            setLayoutParams(getLayoutParams());
+//            post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    requestLayout();
+//                }
+//            });
    }
 
    /* This method is used to enable and disable the circle  */

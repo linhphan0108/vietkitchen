@@ -198,7 +198,15 @@ public class AndroidDotView extends View {
              maxOuterDotsRadius = width;
              maxDotSize = getDotSize(centerX)+5;
              changeDimension = true;
-             requestLayout();
+             getLayoutParams().width = this.width;
+             getLayoutParams().height = this.height;
+             setLayoutParams(getLayoutParams());
+//             post(new Runnable() {
+//                 @Override
+//                 public void run() {
+//                     requestLayout();
+//                 }
+//             });
          }
    }
 
