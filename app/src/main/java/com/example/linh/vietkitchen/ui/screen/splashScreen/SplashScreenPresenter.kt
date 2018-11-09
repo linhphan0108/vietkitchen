@@ -5,20 +5,29 @@ import android.content.Intent
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.command.RequestRecipesIdCommand
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
-import com.example.linh.vietkitchen.ui.screen.splashScreenonActivityResult.SplashScreenContractPresenter
-import com.example.linh.vietkitchen.ui.screen.splashScreenonActivityResult.SplashScreenContractView
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.internal.operators.flowable.FlowableEmpty
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesIdCommand = RequestRecipesIdCommand())
     : BasePresenter<SplashScreenContractView>(), SplashScreenContractPresenter {
     companion object {
         private const val RC_SIGN_IN = 123
+        private const val TIME_WAITING_IN_SPLASH_SCREEN = 7000//in millisecond
+    }
+
+    private var timeStartedSplashScreen: Long = 0
+
+    override fun attachView(view: SplashScreenContractView) {
+        super.attachView(view)
+        timeStartedSplashScreen = System.currentTimeMillis()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
@@ -61,6 +70,22 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
             viewContract?.onHasLoggedIn()
         }else {
             silentLogin()
+        }
+    }
+
+    override fun gotoNextScreen(){
+        val currentTime = System.currentTimeMillis()
+        val duration = currentTime - timeStartedSplashScreen
+        if (duration >= TIME_WAITING_IN_SPLASH_SCREEN){
+            viewContract?.gotoHomeScreen()
+        }else{
+            val delayTime = TIME_WAITING_IN_SPLASH_SCREEN - duration
+            compositeDisposable.add(FlowableEmpty.just(true)
+                    .delay(delayTime, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        viewContract?.gotoHomeScreen()
+                    })
         }
     }
 
@@ -113,12 +138,12 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
 
     override fun requestLikedRecipesId(uid: String) {
         requestRecipesIdCommand.uid = uid
-        requestRecipesIdCommand.execute()
+        compositeDisposable.add(requestRecipesIdCommand.execute()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({ recipesId ->
                     viewContract?.onRequestLikedRecipesIdSuccess(recipesId)
                 }, {
                     viewContract?.onRequestLikedRecipesIdFailed()
-                })
+                }))
     }
 }
