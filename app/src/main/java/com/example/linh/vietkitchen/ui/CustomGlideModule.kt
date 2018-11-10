@@ -16,7 +16,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.signature.ObjectKey
 import java.util.concurrent.TimeUnit
 import com.bumptech.glide.load.model.GlideUrl
-import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.util.ScreenUtil
 import okhttp3.OkHttpClient
 import java.io.InputStream
 
@@ -44,13 +44,13 @@ class CustomGlideModule : AppGlideModule() {
         return RequestOptions()
                 .signature(ObjectKey(
                         System.currentTimeMillis() / (24 * 60 * 60 * 1000)))
-                .override(200, 200)
+                .override(ScreenUtil.dp2px(400))
                 .centerCrop()
                 .encodeFormat(Bitmap.CompressFormat.PNG)
                 .encodeQuality(100)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .format(DecodeFormat.PREFER_RGB_565)
                 .skipMemoryCache(false)
-                .placeholder(R.drawable.ic_loading_gif)
+
     }
 }

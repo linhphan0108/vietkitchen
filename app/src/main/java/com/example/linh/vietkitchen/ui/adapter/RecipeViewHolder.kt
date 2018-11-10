@@ -1,12 +1,17 @@
 package com.example.linh.vietkitchen.ui.adapter
 
+import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ImageView
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.extension.lookTemporary
-import com.example.linh.vietkitchen.ui.GlideApp
+import com.example.linh.vietkitchen.ui.custom.likeButton.AndroidLikeButton
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.like.LikeButton
-import com.like.OnLikeListener
+import com.example.linh.vietkitchen.util.GlideUtil
 import kotlinx.android.synthetic.main.item_recipe.view.*
 
 class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : RecyclerView.ViewHolder(itemView) {
@@ -17,18 +22,30 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
                 if(it is PayLoads) {
                     when (it) {
                         PayLoads.LIKE_CHANGE ->
-                            itemView.btnFavorite.isLiked = recipe.hasLiked
+                            itemView.btnFavorite.setCurrentlyLiked(recipe.hasLiked)
                     }
                 }
             }
         }else {
             with(recipe) {
-                GlideApp.with(itemView.context)
-                        .load(recipe.thumbUrl)
+                val scaleType = itemView.imgFoodThumb.scaleType
+                itemView.imgFoodThumb.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                GlideUtil.widthLoadingHolder(itemView.context, recipe.thumbUrl)
+                        .listener(object: RequestListener<Drawable?> {
+                            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                                return false
+                            }
+
+                            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                                itemView.imgFoodThumb.scaleType = scaleType
+                                return false
+                            }
+                        })
                         .into(itemView.imgFoodThumb)
+
                 itemView.txtFoodName.text = name
                 itemView.txtShortIntro.text = intro
-                itemView.btnFavorite.isLiked = hasLiked
+                itemView.btnFavorite.setCurrentlyLiked(hasLiked)
             }
 
             bindListeners(recipe)
@@ -39,17 +56,16 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
         itemView.setOnClickListener {
             listener?.onItemClick(itemView.imgFoodThumb, layoutPosition, adapterPosition, recipe)
         }
-        itemView.btnFavorite.setOnLikeListener(object : OnLikeListener {
-            override fun liked(p0: LikeButton?) {
-                itemView.btnFavorite.lookTemporary()
-                listener?.onLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
-            }
-
-            override fun unLiked(p0: LikeButton?) {
+        itemView.btnFavorite.setOnLikeEventListener(object: AndroidLikeButton.OnLikeEventListener {
+            override fun onUnlikeClicked(androidLikeButton: AndroidLikeButton?) {
                 itemView.btnFavorite.lookTemporary()
                 listener?.onUnLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
             }
 
+            override fun onLikeClicked(androidLikeButton: AndroidLikeButton?) {
+                itemView.btnFavorite.lookTemporary()
+                listener?.onLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
+            }
         })
     }
 }

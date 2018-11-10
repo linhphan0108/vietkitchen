@@ -3,14 +3,29 @@
     <!--common-->
     <color name="colorPrimary">#f44336</color>
     <color name="colorPrimaryDark">#d32f2f</color>
-    <color name="colorAccent">#448AFF</color>
-    <color name="colorPrimaryDarkStatusBar">#14000000</color>
-    <color name="lightPrimaryColor">#FFCDD2</color>
-    <color name="textIconColor">#FFFFFF</color>
-    <color name="textColorError">@color/colorPrimary</color>
-    <!--<color notes="textPrimary">#212121</color>-->
+    <color name="colorPrimaryLight">#ff7961</color>
+    <color name="colorOnPrimary">#fafafa</color>
+
+    <color name="colorSecondary">#448aff</color>
+    <color name="colorSecondaryDark">#005ecb</color>
+    <color name="colorSecondaryLight">#83b9ff</color>
+    <color name="colorOnSecondary">#fafafa</color>
+
+    <color name="colorError">#ff9800</color>
+    <color name="colorOnError">#fafafa</color>
+    <color name="colorAccent">@color/colorSecondary</color>
+
+    <color name="colorBackground">#fafafa</color>
+    <color name="colorOnBackground">@color/textPrimary</color>
+    <color name="colorSurface">#fafafa</color>
+    <color name="colorOnSurface">@color/textPrimary</color>
+
     <color name="textPrimary">#757575</color>
     <color name="textSecondary">#9f9f9f</color>
+    <color name="textError">@color/colorError</color>
+
+    <color name="colorScrim">#52000000</color>
+
     <!--<color notes="divider">#BDBDBD</color>-->
     <color name="divider">#fafafa</color>
     <color name="divider_dark">#757575</color>

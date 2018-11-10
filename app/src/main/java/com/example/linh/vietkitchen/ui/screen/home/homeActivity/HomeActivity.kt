@@ -1,9 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -42,9 +40,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
 
     private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
-    var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
+    internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
     internal var likeOrUnLikePublisher: Subject<Recipe> = PublishSubject.create()
-    lateinit var navItems: List<DrawerNavGroupItem>
+    private lateinit var navItems: List<DrawerNavGroupItem>
 
     //region lifecycle =============================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -160,7 +158,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     private fun setupAppBarAndDrawerNav(){
         setSupportActionBar(toolbar)
 
@@ -179,7 +176,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     }
 
     private fun setupAdminFab(){
-        fabAdmin.visibility = if(BuildConfig.IS_ADMIN) View.VISIBLE else View.GONE
+        if(BuildConfig.IS_ADMIN) fabAdmin.show() else fabAdmin.hide()
         fabAdmin.setOnClickListener {
 //            presenter.putARecipe(
             val intent = Intent(this, Class.forName("com.example.linh.vietkitchen.admin.ui.screen.admin.AdminActivity"))
