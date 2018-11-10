@@ -51,9 +51,13 @@
         <item name="android:windowExitAnimation">@anim/slide_out_down</item>
     </style>
 
-    <style name="Widget.MyApp.MyButton" parent="Theme.MaterialComponents.Light.Bridge">
-        <item name="backgroundTint">@android:color/white</item>
-        <item name="android:background">@android:color/white</item>
+    <style name="AppTheme.Base.Button.White" parent="Widget.MaterialComponents.Button.TextButton">
+        <!--<item name="android:textColor">@color/colorAccent</item>-->
     </style>
+
+    <style name="CancelButtonLightTheme" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="colorAccent">@color/colorError</item>
+    </style>
+
 
 </resources>
