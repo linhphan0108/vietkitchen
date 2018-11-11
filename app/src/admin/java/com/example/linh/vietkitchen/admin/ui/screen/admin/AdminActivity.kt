@@ -202,6 +202,8 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
             txtTitle.text = groupItem.headerTile
             groupItem.itemsList.forEach {childItem ->
                 val chip = Chip(this)
+                chip.setChipBackgroundColorResource(R.color.bg_chip_states)
+                chip.setTextAppearance(R.style.ChipTextStyle_Selected)
                 chip.text = childItem.itemTitle
 //                chip.chipIcon = ContextCompat.getDrawable(requireContext(), baseline_person_black_18)
                 chip.isCheckable = true
