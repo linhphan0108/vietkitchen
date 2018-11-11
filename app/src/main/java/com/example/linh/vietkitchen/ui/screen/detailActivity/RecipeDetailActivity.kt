@@ -151,8 +151,8 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                         if (resource != null){
                             try {
-                            Palette.from(resource.toBitmap()).generate {
-                                applyPalette(it)
+                            Palette.from(resource.toBitmap()).generate { palette ->
+                                palette?.also {applyPalette(it)}
                             }}catch (e: Exception){
                                 toast("exception thrown when generate palette")
                             }
@@ -166,7 +166,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
 
         with(recipe) {
-            txtTitle.text = name.capWords()
+//            txtTitle.text = name.capWords()
             txtDescription.text = intro
             txtIngredients.text = ingredient
             txtSpices.text = spice
@@ -193,14 +193,23 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
     }
 
     private fun applyPalette(palette: Palette?) {
-        val transparent = color(android.R.color.transparent)
-        val primaryDark = color(R.color.colorPrimaryDark)
-        val primary = color(R.color.colorPrimary)
-        val mutedPrimary = palette?.getMutedColor(primary) ?: primary
-        val mutedPrimaryDark = palette?.getDarkMutedColor(primaryDark) ?: primaryDark
+//        val transparent = color(android.R.color.transparent)
+        var mutedPrimaryDark = color(R.color.colorPrimaryDark)
+        var mutedPrimary = color(R.color.colorPrimary)
+        var expandedTitleTextColor = color(R.color.textAccent)
+        var collapsedTitleTextColor = color(R.color.colorOnPrimary)
+        if(palette != null) {
+            val mutedSwatch = palette.mutedSwatch
+            mutedPrimary = mutedSwatch?.rgb ?: mutedPrimary
+            collapsedTitleTextColor = mutedSwatch?.titleTextColor ?: collapsedTitleTextColor
+            expandedTitleTextColor = mutedSwatch?.titleTextColor ?: expandedTitleTextColor
+            mutedPrimaryDark = palette.getDarkMutedColor(mutedPrimaryDark)
+        }
+
         collapsingToolbarLayout.setContentScrimColor(mutedPrimary)
         collapsingToolbarLayout.setStatusBarScrimColor(mutedPrimaryDark)
-        collapsingToolbarLayout.setExpandedTitleColor(transparent)
+        collapsingToolbarLayout.setCollapsedTitleTextColor(collapsedTitleTextColor)
+        collapsingToolbarLayout.setExpandedTitleColor(expandedTitleTextColor)
     }
 
     private fun updateBackground(fab: FloatingActionButton, palette: Palette) {
