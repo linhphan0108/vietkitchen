@@ -134,7 +134,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
         collapsingToolbarLayout.title = title
-        applyPalette(null)
+        applyPalette(null, collapsingToolbarLayout)
     }
 
     private fun populateUI(recipe: Recipe) {
@@ -152,7 +152,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
                         if (resource != null){
                             try {
                             Palette.from(resource.toBitmap()).generate { palette ->
-                                palette?.also {applyPalette(it)}
+                                palette?.also {applyPalette(it, collapsingToolbarLayout)}
                             }}catch (e: Exception){
                                 toast("exception thrown when generate palette")
                             }
@@ -192,25 +192,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
         fab.setImageResource(fabIcon)
     }
 
-    private fun applyPalette(palette: Palette?) {
-//        val transparent = color(android.R.color.transparent)
-        var mutedPrimaryDark = color(R.color.colorPrimaryDark)
-        var mutedPrimary = color(R.color.colorPrimary)
-        var expandedTitleTextColor = color(R.color.textAccent)
-        var collapsedTitleTextColor = color(R.color.colorOnPrimary)
-        if(palette != null) {
-            val mutedSwatch = palette.mutedSwatch
-            mutedPrimary = mutedSwatch?.rgb ?: mutedPrimary
-            collapsedTitleTextColor = mutedSwatch?.titleTextColor ?: collapsedTitleTextColor
-            expandedTitleTextColor = mutedSwatch?.titleTextColor ?: expandedTitleTextColor
-            mutedPrimaryDark = palette.getDarkMutedColor(mutedPrimaryDark)
-        }
 
-        collapsingToolbarLayout.setContentScrimColor(mutedPrimary)
-        collapsingToolbarLayout.setStatusBarScrimColor(mutedPrimaryDark)
-        collapsingToolbarLayout.setCollapsedTitleTextColor(collapsedTitleTextColor)
-        collapsingToolbarLayout.setExpandedTitleColor(expandedTitleTextColor)
-    }
 
     private fun updateBackground(fab: FloatingActionButton, palette: Palette) {
         val lightVibrantColor = palette.getLightVibrantColor(color(android.R.color.white))

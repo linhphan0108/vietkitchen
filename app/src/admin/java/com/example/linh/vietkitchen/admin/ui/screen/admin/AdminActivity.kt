@@ -2,10 +2,12 @@ package com.example.linh.vietkitchen.admin.ui.screen.admin
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.chip.Chip
 import android.support.design.chip.ChipGroup
+import android.support.v7.graphics.Palette
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -19,15 +21,21 @@ import kotlinx.android.synthetic.admin.activity_admin.*
 import kotlinx.android.synthetic.admin.activity_admin_content.*
 import timber.log.Timber
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.extension.showSnackBar
+import com.example.linh.vietkitchen.extension.toBitmap
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.Constants
+import com.example.linh.vietkitchen.util.GlideUtil
 
 
 private const val REQUEST_IMAGE = 98
@@ -46,7 +54,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         }
     }
 
-    private var imageUrl: Uri? = null
+    private var imageUri: Uri? = null
     private lateinit var listImagesUri: MutableList<Uri>
     private lateinit var listCatsChecked: MutableList<DrawerNavChildItem>
 
@@ -73,7 +81,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                     if (data != null) {
                         onRequestHeaderImage(data.data)
                         listImagesUri.add(data.data)
-                        Timber.v("REQUEST_IMAGE $imageUrl")
+                        Timber.v("REQUEST_IMAGE $imageUri")
                     }
                 }
             }
@@ -82,7 +90,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                     if (data != null) {
                         onRequestPreparationImage(data.data)
                         listImagesUri.add(data.data)
-                        Timber.v("REQUEST_IMAGE $imageUrl")
+                        Timber.v("REQUEST_IMAGE $imageUri")
                     }
                 }
             }
@@ -91,7 +99,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                     if (data != null) {
                         onRequestProcessImage(data.data)
                         listImagesUri.add(data.data)
-                        Timber.v("REQUEST_IMAGE $imageUrl")
+                        Timber.v("REQUEST_IMAGE $imageUri")
                     }
                 }
             }
@@ -263,7 +271,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     }
 
     private fun combineRecipe(): Recipe {
-        val imageUrl = if(imageUrl.toString().isBlank())"" else imageUrl.toString()
+        val imageUrl = if(imageUri.toString().isBlank())"" else imageUri.toString()
         val thumbUrl = imageUrl
         val title = edtRecipeTitle.text.toString().trim().capWords()
         val shortIntro = edtShortIntro.text.toString().trim().capitalize()
@@ -319,9 +327,28 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     }
 
     private fun onRequestHeaderImage(uri: Uri){
-        imageUrl = uri
-        GlideApp.with(this)
-                .load(uri)
+        imageUri = uri
+        val scaleType = imgHeaderImage.scaleType
+        imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        GlideUtil.widthLoadingHolder(this, uri)
+                .listener(object: RequestListener<Drawable?> {
+                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                        if (resource != null){
+                            try {
+                                Palette.from(resource.toBitmap()).generate { palette ->
+                                    palette?.also {applyPalette(it, collapsingToolbarLayout)}
+                                }}catch (e: Exception){
+                                toast("exception thrown when generate palette")
+                            }
+                        }
+                        imgHeaderImage.scaleType = scaleType
+                        return false
+                    }
+                })
                 .into(imgHeaderImage)
     }
 
