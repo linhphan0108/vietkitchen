@@ -6,15 +6,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.chip.Chip
 import android.support.design.chip.ChipGroup
-import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.capWords
-import com.example.linh.vietkitchen.ui.custom.TagsEditText
-import com.example.linh.vietkitchen.ui.model.Ingredient
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.util.SDKUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
@@ -25,10 +22,8 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.linh.vietkitchen.extension.showSnackBar
-import com.example.linh.vietkitchen.extension.toArrayString
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.GlideApp
-import com.example.linh.vietkitchen.ui.dialog.IngredientInputDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
@@ -53,7 +48,6 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
 
     private var imageUrl: Uri? = null
     private lateinit var listImagesUri: MutableList<Uri>
-    var ingredients: MutableMap<String, Ingredient> = mutableMapOf()
     private lateinit var listCatsChecked: MutableList<DrawerNavChildItem>
 
     //#region life circle ==================================================================================
@@ -62,7 +56,6 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         val categories = intent.extras.getParcelableArrayList<DrawerNavGroupItem>(Constants.BK_CATEGORIES).toList()
         presenter.setCategoriesList(categories)
         setupToolbar()
-        setupTagsEditText()
         setupCategoryChip(categories)
         iBtnUpdateImage.setOnClickListener(this)
         iBtnPreparationBrowser.setOnClickListener(this)
@@ -229,35 +222,35 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         }
     }
 
-    private fun setupTagsEditText(){
-        edtTagIngredients.setTagsWithSpacesEnabled(true)
-//        edtTagIngredients.setAdapter(ArrayAdapter<String>(this,
-//                android.R.layout.simple_dropdown_item_1line, arrayOfNulls(0)))
-//        edtTagIngredients.threshold = 1
-        iBtnAddIngredient.setOnClickListener {
-            val dialog = IngredientInputDialog()
-            dialog.listener = object : IngredientInputDialog.OnResultListeners{
-                override fun onResult(ingredient: Ingredient) {
-                    ingredients[ingredient.name!!] = ingredient
-                    edtTagIngredients.setTags(ingredients.toArrayString())
-                }
-
-            }
-            dialog.show(supportFragmentManager, IngredientInputDialog::class.java.simpleName)
-        }
-
-        edtTagIngredients.setTagsListener(object : TagsEditText.TagsEditListener{
-            override fun onTagsChanged(tags: Collection<String>) {
-                ingredients = ingredients.filterValues {
-                    tags.contains(it.toString())
-                }.toMutableMap()
-            }
-
-            override fun onEditingFinished() {
-            }
-
-        })
-    }
+//    private fun setupTagsEditText(){
+//        edtTagIngredients.setTagsWithSpacesEnabled(true)
+////        edtTagIngredients.setAdapter(ArrayAdapter<String>(this,
+////                android.R.layout.simple_dropdown_item_1line, arrayOfNulls(0)))
+////        edtTagIngredients.threshold = 1
+//        iBtnAddIngredient.setOnClickListener {
+//            val dialog = IngredientInputDialog()
+//            dialog.listener = object : IngredientInputDialog.OnResultListeners{
+//                override fun onResult(ingredient: Ingredient) {
+//                    ingredients[ingredient.name!!] = ingredient
+//                    edtTagIngredients.setTags(ingredients.toArrayString())
+//                }
+//
+//            }
+//            dialog.show(supportFragmentManager, IngredientInputDialog::class.java.simpleName)
+//        }
+//
+//        edtTagIngredients.setTagsListener(object : TagsEditText.TagsEditListener{
+//            override fun onTagsChanged(tags: Collection<String>) {
+//                ingredients = ingredients.filterValues {
+//                    tags.contains(it.toString())
+//                }.toMutableMap()
+//            }
+//
+//            override fun onEditingFinished() {
+//            }
+//
+//        })
+//    }
 
     private fun onSaveAction(){
         presenter.putARecipe(combineRecipe(), listImagesUri)
@@ -272,6 +265,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         val thumbUrl = imageUrl
         val title = edtRecipeTitle.text.toString().trim().capWords()
         val shortIntro = edtShortIntro.text.toString().trim().capitalize()
+        val ingredients = edtIngredients.text.toString().trim().capitalize()
         val spices = edtSpices.text.toString().trim().capitalize()
         val tags = edtTags.tags
 

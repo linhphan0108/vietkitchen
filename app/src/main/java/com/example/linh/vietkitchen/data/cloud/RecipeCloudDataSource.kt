@@ -1,7 +1,6 @@
 package com.example.linh.vietkitchen.data.cloud
 
 import android.net.Uri
-import com.example.linh.vietkitchen.R.string.progress
 import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
 import com.example.linh.vietkitchen.exception.FirebaseDataException
@@ -217,11 +216,7 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
     private fun createADumpFood(): Recipe {
         val name = "canh khổ qua nhồi thịt"
         val intro = "Chè hạt sen nhãn nhục không chỉ có vị thơm mát, ngọt dịu của hạt sen hòa quyện với nhãn nhục, mà còn là món ăn bổ dưỡng cho cơ thể. Như bạn cũng biết nhãn nhục ăn quá nhiều sẽ bị nóng nhưng có một cách để ăn nhãn nhục không lo bị nóng đó là chúng ta đem kết hợp nhãn nhục với hạt sen. "
-        val ingredients = mapOf(
-                Pair("sườn già", Ingredient(200, "g")),
-                Pair("cà rốt", Ingredient(200, "g")),
-                Pair("khoai tây", Ingredient(200, "g")),
-                Pair("bắp mỹ", Ingredient(200, "g")))
+        val ingredients = ""
         val spices = "Muối, Mì chính(có thể thay bằng bột canh), Lá mùi tàu, hạt tiêu"
         val preparation =  "Trước tiên, các bạn lấy khoảng vài thìa cà phê bột ngô hòa với một xíu nước.\n" +
                         "Sau đó, các bạn dùng dao thật sắc và có bản to, bạn lách dao vào giữa miếng thịt để có thể tạo được thành những lát mỏng.\n" +

@@ -1,13 +1,12 @@
 package com.example.linh.vietkitchen.domain.mapper
 
-import com.example.linh.vietkitchen.data.cloud.Ingredient
 import com.example.linh.vietkitchen.data.cloud.Recipe
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.google.firebase.database.DataSnapshot
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
-class RecipeMapper(private val ingredientMapper: IngredientMapper = IngredientMapper()) {
+class RecipeMapper() {
 
     fun convertToDomain(children: Iterable<DataSnapshot>): List<RecipeDomain> {
         return if (children.none()){
@@ -28,20 +27,14 @@ class RecipeMapper(private val ingredientMapper: IngredientMapper = IngredientMa
 //        val process = f.processing.map {
 //            ProcessStep(it.step, it.imageUrl)
 //        }
-        return RecipeDomain(id, f.name, f.intro, ingredientMapper.convertToDomain(f.ingredient), f.spice,
+        return RecipeDomain(id, f.name, f.intro, f.ingredient, f.spice,
                 f.preparation, f.processing, f.notes, f.categories.toListOfStringOfKey(),
                 f.tags, f.thumbUrl, f.imageUrl)
     }
 
     fun toData(domain: RecipeDomain): Recipe {
         with(domain){
-            val ingredientDataMap = ingredient.mapValues {
-                with(it.value){
-                    Ingredient(quantity, unit, notes)
-                }
-            }
-
-            return Recipe(name, intro, ingredientDataMap, spice, preparation, processing, notes,
+            return Recipe(name, intro, ingredient, spice, preparation, processing, notes,
                     categories.toMapOfStringBoolean(), tags, thumbUrl, imageUrl)
         }
     }

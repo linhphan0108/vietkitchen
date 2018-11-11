@@ -166,16 +166,9 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
 
         with(recipe) {
-            val builder = StringBuilder()
-            for ((key, value) in ingredient){
-                builder.append(key)
-                if (value.notes.isNullOrBlank()) builder.append("${value.notes}\n")
-                builder.append("${value.quantity}${value.unit}\n")
-            }
-
             txtTitle.text = name.capWords()
             txtDescription.text = intro
-            txtIngredients.text = if(builder.isNotEmpty()) builder.substring(0, builder.length - 1) else ""
+            txtIngredients.text = ingredient
             txtSpices.text = spice
 
             if (preparation.isBlank()) {
