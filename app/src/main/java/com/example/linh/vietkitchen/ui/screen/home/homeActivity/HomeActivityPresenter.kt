@@ -22,9 +22,9 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
                 .map {listCategories ->
                     Timber.e("on map: ${Looper.myLooper() == Looper.getMainLooper()}")
                     val categories = categoryMapper.convertToUI(listCategories).toMutableList()
-                    val groupItemTitleAll = context?.getString(R.string.draw_nav_group_item_all) ?: ""
-                    val totalItems = categories.sumBy { it.numberItems }
-                    categories.add(0, DrawerNavGroupItem(groupItemTitleAll, "", totalItems))
+//                    val groupItemTitleAll = context?.getString(R.string.draw_nav_group_item_all) ?: ""
+//                    val totalItems = categories.sumBy { it.numberItems }
+//                    categories.add(0, DrawerNavGroupItem(groupItemTitleAll, "", totalItems))
                     categories
                 }
                 .observeOn(AndroidSchedulers.mainThread())

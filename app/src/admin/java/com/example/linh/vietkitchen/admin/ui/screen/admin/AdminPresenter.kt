@@ -1,12 +1,10 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
-import com.example.linh.vietkitchen.domain.command.PutTagsCommand
 import com.example.linh.vietkitchen.domain.command.RequestTagsCommand
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
-import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import com.example.linh.vietkitchen.extension.generateAnnotationSpan
@@ -18,14 +16,12 @@ import android.net.Uri
 import android.os.*
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
-import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 
 
-class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand(),
-                     private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand())
+class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand())
     : BasePresenter<AdminContractView>(), AdminContractPresenter {
 
     private lateinit var listTagsOnServer: List<String>
@@ -54,6 +50,8 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
     override fun detachView() {
         super.detachView()
         doUnbindService()
+        if (progressDialog.isVisible)
+            progressDialog.dismiss()
     }
 
     //==============================================================================================
@@ -87,21 +85,18 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
         val newTags = recipe.tags?.filterNot {
             listTagsOnServer.contains(it)
         }
-        if(newTags != null && newTags.isNotEmpty()) putNewTags(newTags)
 
-        doBindService(recipe, listImagesUri)
-    }
+        recipe.categories.forEach {checkedCat ->
+            categories.forEach { groupCat ->
+                groupCat.itemsList?.forEach { childCat ->
+                    if (checkedCat == childCat.itemTitle) childCat.numberItems++
+                }
+            }
+        }
+        //increase the all item
+        categories.first().numberItems++
 
-    override fun putNewTags(tags: List<String>) {
-        putTagsCommand.tags = tags.toMapOfStringBoolean()
-        compositeDisposable.add(putTagsCommand.execute()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({
-                    Timber.d("just put ${tags.size} tags successfully")
-                }, {
-                    Timber.e(it)
-                })
-        )
+        doBindService(recipe, listImagesUri, newTags, categories)
     }
 
 
@@ -125,7 +120,7 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
             progressDialog.show(activity?.supportFragmentManager, ProgressDialog::class.java.name)
     }
 
-    private fun doBindService(recipe: Recipe, listImagesUri: MutableList<Uri>) {
+    private fun doBindService(recipe: Recipe, listImagesUri: MutableList<Uri>, newTags: List<String>?, newDrawerNav: List<DrawerNavGroupItem>) {
         // Attempts to establish a connection with the service.  We use an
         // explicit class name because we want a specific service
         // implementation that we know will be running in our own process
@@ -135,6 +130,8 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
         val intent = PutRecipeService.createIntent(context!!)
         mConnection.recipe = recipe
         mConnection.listImagesUri = listImagesUri
+        mConnection.newTags = newTags
+        mConnection.newDrawerNav = newDrawerNav
         if (context?.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)!!) {
             isBounded = true
         } else {
@@ -165,6 +162,8 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
     private val mConnection = object : ServiceConnection {
         lateinit var recipe: Recipe
         lateinit var listImagesUri: MutableList<Uri>
+        var newTags: List<String>? = null
+        lateinit var newDrawerNav: List<DrawerNavGroupItem>
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // This is called when the connection with the service has been
             // established, giving us the service object we can use to
@@ -184,7 +183,12 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
                 msg = Message.obtain(null, PutRecipeService.MSG_UPLOAD_RECIPE)
                 val bundle = Bundle()
                 bundle.putParcelable(PutRecipeService.BK_RECIPE_TO_UPLOAD, recipe)
-                bundle.putParcelableArray(PutRecipeService.BK_LIST_IMAGES_URI, listImagesUri.toTypedArray())
+                bundle.putParcelableArrayList(PutRecipeService.BK_LIST_IMAGES_URI, ArrayList(listImagesUri))
+                newTags?.also {
+                    bundle.putStringArrayList(PutRecipeService.BK_LIST_NEW_TAGS, ArrayList(it))
+                }
+                bundle.putParcelableArrayList(PutRecipeService.BK_NEW_CATEGORIES, ArrayList(newDrawerNav))
+
                 msg.data = bundle
                 serviceMessenger?.send(msg)
 //
@@ -228,7 +232,7 @@ class AdminPresenter(private val putTagsCommand: PutTagsCommand = PutTagsCommand
                         progressDialog.updateMessage(getStringRes(R.string.msg_start_storing_recipe))
                     }
                 }
-                PutRecipeService.MSG_OPTIMIZING_IMAGE -> {
+                PutRecipeService.MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING -> {
                     if (progressDialog.isVisible) {
                         progressDialog.updateMessage(getStringRes(R.string.msg_optimizing_images))
                     }

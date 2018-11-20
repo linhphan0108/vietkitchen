@@ -22,5 +22,4 @@ interface AdminContractPresenter: BasePresenterContract<AdminContractView>{
     fun preview(recipe: Recipe)
     fun getTags()
     fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>)
-    fun putNewTags(tags: List<String>)
 }

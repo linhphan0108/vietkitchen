@@ -5,6 +5,7 @@ import com.example.linh.vietkitchen.data.local.CategoryLocalDs
 import com.example.linh.vietkitchen.domain.datasource.CategoryDataSource
 import com.example.linh.vietkitchen.domain.mapper.CategoryMapper
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import timber.log.Timber
 
@@ -21,5 +22,9 @@ class CategoryProvider(private val mapper: CategoryMapper = CategoryMapper(),
             Timber.d("category's data's length ${dataSnapshot.children.count()}")
             mapper.convertToDomain(dataSnapshot)
         }
+    }
+
+    fun updateCategories(cats: List<CategoryGroup>) : Completable = requestToSources {
+        it.updateCategories(mapper.convertToData(cats))
     }
 }

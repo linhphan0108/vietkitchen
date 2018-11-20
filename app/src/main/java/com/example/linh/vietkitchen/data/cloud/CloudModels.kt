@@ -26,7 +26,7 @@ data class Recipe(var id: String?=null, val name: String, val intro: String?, va
             mapOf<String, Boolean>(), "", "")
 }
 
-data class Category(var groups: List<Map<String, List<Map<String, Boolean>>>>?){
+data class Category(var groups: List<Map<String, Any>>?){
     constructor(): this(null)
 }
 

@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.*
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.capWords
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
@@ -20,10 +21,6 @@ import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.admin.activity_admin.*
 import kotlinx.android.synthetic.admin.activity_admin_content.*
 import timber.log.Timber
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -263,15 +260,54 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
 //    }
 
     private fun onSaveAction(){
-        presenter.putARecipe(combineRecipe(), listImagesUri)
+        if(invalidateRecipe())
+            presenter.putARecipe(combineRecipe(), listImagesUri)
     }
 
     private fun onPreviewAction(){
         presenter.preview(combineRecipe())
     }
 
+    /**
+     * @return true if the input data is valid otherwise return false
+     */
+    private fun invalidateRecipe(): Boolean{
+
+        if(imageUri.toString().isBlank()){
+            toast(getString(R.string.error_msg_thumb_image_null))
+            return false
+        }
+
+        if(edtRecipeTitle.text.isNullOrBlank()){
+            edtRecipeTitle.error = getString(R.string.error_msg_title_empty)
+            return false
+        }
+
+        if(edtIngredients.text.isNullOrBlank()){
+            edtIngredients.error = getString(R.string.error_msg_ingredient_empty)
+            return false
+        }
+
+        if(edtTags.tags.isNullOrEmpty()){
+            edtTags.error = getString(R.string.error_msg_tags_empty)
+            return false
+        }
+
+        if(listCatsChecked.isNullOrEmpty()){
+            toast(getString(R.string.error_msg_categories_un_selected))
+            return false
+        }
+
+        if (edtProcess.text.isNullOrBlank()){
+            edtProcess.error = getString(R.string.error_msg_process_step_empty)
+            return false
+        }
+
+        return true
+    }
+
     private fun combineRecipe(): Recipe {
-        val imageUrl = if(imageUri.toString().isBlank())"" else imageUri.toString()
+        val imageUrl = imageUri.toString()
         val thumbUrl = imageUrl
         val title = edtRecipeTitle.text.toString().trim().capWords()
         val shortIntro = edtShortIntro.text.toString().trim().capitalize()
@@ -287,7 +323,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         val process = edtProcess.text.trim()
         val notes = edtNotes.text.toString().trim()
         return Recipe("", title, shortIntro, ingredients, spices, preparation, process, notes,
-                categories, tags, thumbUrl, imageUrl, false)
+                categories, tags, thumbUrl, imageUrl)
     }
 
 //    private fun openGallery() {
