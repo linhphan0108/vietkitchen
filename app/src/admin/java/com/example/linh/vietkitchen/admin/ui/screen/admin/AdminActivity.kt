@@ -2,37 +2,37 @@ package com.example.linh.vietkitchen.admin.ui.screen.admin
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.chip.Chip
 import android.support.design.chip.ChipGroup
-import android.support.v4.content.ContextCompat
+import android.support.v7.graphics.Palette
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.*
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.capWords
-import com.example.linh.vietkitchen.ui.custom.TagsEditText
-import com.example.linh.vietkitchen.ui.model.Ingredient
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.util.SDKUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.admin.activity_admin.*
 import kotlinx.android.synthetic.admin.activity_admin_content.*
 import timber.log.Timber
-import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.TextView
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.extension.showSnackBar
-import com.example.linh.vietkitchen.extension.toArrayString
+import com.example.linh.vietkitchen.extension.toBitmap
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.GlideApp
-import com.example.linh.vietkitchen.ui.dialog.IngredientInputDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.Constants
+import com.example.linh.vietkitchen.util.GlideUtil
 
 
 private const val REQUEST_IMAGE = 98
@@ -51,9 +51,8 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         }
     }
 
-    private var imageUrl: Uri? = null
+    private var imageUri: Uri? = null
     private lateinit var listImagesUri: MutableList<Uri>
-    var ingredients: MutableMap<String, Ingredient> = mutableMapOf()
     private lateinit var listCatsChecked: MutableList<DrawerNavChildItem>
 
     //#region life circle ==================================================================================
@@ -62,7 +61,6 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         val categories = intent.extras.getParcelableArrayList<DrawerNavGroupItem>(Constants.BK_CATEGORIES).toList()
         presenter.setCategoriesList(categories)
         setupToolbar()
-        setupTagsEditText()
         setupCategoryChip(categories)
         iBtnUpdateImage.setOnClickListener(this)
         iBtnPreparationBrowser.setOnClickListener(this)
@@ -80,7 +78,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                     if (data != null) {
                         onRequestHeaderImage(data.data)
                         listImagesUri.add(data.data)
-                        Timber.v("REQUEST_IMAGE $imageUrl")
+                        Timber.v("REQUEST_IMAGE $imageUri")
                     }
                 }
             }
@@ -89,7 +87,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                     if (data != null) {
                         onRequestPreparationImage(data.data)
                         listImagesUri.add(data.data)
-                        Timber.v("REQUEST_IMAGE $imageUrl")
+                        Timber.v("REQUEST_IMAGE $imageUri")
                     }
                 }
             }
@@ -98,7 +96,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                     if (data != null) {
                         onRequestProcessImage(data.data)
                         listImagesUri.add(data.data)
-                        Timber.v("REQUEST_IMAGE $imageUrl")
+                        Timber.v("REQUEST_IMAGE $imageUri")
                     }
                 }
             }
@@ -209,6 +207,8 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
             txtTitle.text = groupItem.headerTile
             groupItem.itemsList.forEach {childItem ->
                 val chip = Chip(this)
+                chip.setChipBackgroundColorResource(R.color.bg_chip_states)
+                chip.setTextAppearance(R.style.ChipTextStyle_Selected)
                 chip.text = childItem.itemTitle
 //                chip.chipIcon = ContextCompat.getDrawable(requireContext(), baseline_person_black_18)
                 chip.isCheckable = true
@@ -229,49 +229,89 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         }
     }
 
-    private fun setupTagsEditText(){
-        edtTagIngredients.setTagsWithSpacesEnabled(true)
-//        edtTagIngredients.setAdapter(ArrayAdapter<String>(this,
-//                android.R.layout.simple_dropdown_item_1line, arrayOfNulls(0)))
-//        edtTagIngredients.threshold = 1
-        iBtnAddIngredient.setOnClickListener {
-            val dialog = IngredientInputDialog()
-            dialog.listener = object : IngredientInputDialog.OnResultListeners{
-                override fun onResult(ingredient: Ingredient) {
-                    ingredients[ingredient.name!!] = ingredient
-                    edtTagIngredients.setTags(ingredients.toArrayString())
-                }
-
-            }
-            dialog.show(supportFragmentManager, IngredientInputDialog::class.java.simpleName)
-        }
-
-        edtTagIngredients.setTagsListener(object : TagsEditText.TagsEditListener{
-            override fun onTagsChanged(tags: Collection<String>) {
-                ingredients = ingredients.filterValues {
-                    tags.contains(it.toString())
-                }.toMutableMap()
-            }
-
-            override fun onEditingFinished() {
-            }
-
-        })
-    }
+//    private fun setupTagsEditText(){
+//        edtTagIngredients.setTagsWithSpacesEnabled(true)
+////        edtTagIngredients.setAdapter(ArrayAdapter<String>(this,
+////                android.R.layout.simple_dropdown_item_1line, arrayOfNulls(0)))
+////        edtTagIngredients.threshold = 1
+//        iBtnAddIngredient.setOnClickListener {
+//            val dialog = IngredientInputDialog()
+//            dialog.listener = object : IngredientInputDialog.OnResultListeners{
+//                override fun onResult(ingredient: Ingredient) {
+//                    ingredients[ingredient.name!!] = ingredient
+//                    edtTagIngredients.setTags(ingredients.toArrayString())
+//                }
+//
+//            }
+//            dialog.show(supportFragmentManager, IngredientInputDialog::class.java.simpleName)
+//        }
+//
+//        edtTagIngredients.setTagsListener(object : TagsEditText.TagsEditListener{
+//            override fun onTagsChanged(tags: Collection<String>) {
+//                ingredients = ingredients.filterValues {
+//                    tags.contains(it.toString())
+//                }.toMutableMap()
+//            }
+//
+//            override fun onEditingFinished() {
+//            }
+//
+//        })
+//    }
 
     private fun onSaveAction(){
-        presenter.putARecipe(combineRecipe(), listImagesUri)
+        if(invalidateRecipe())
+            presenter.putARecipe(combineRecipe(), listImagesUri)
     }
 
     private fun onPreviewAction(){
         presenter.preview(combineRecipe())
     }
 
+    /**
+     * @return true if the input data is valid otherwise return false
+     */
+    private fun invalidateRecipe(): Boolean{
+
+        if(imageUri.toString().isBlank()){
+            toast(getString(R.string.error_msg_thumb_image_null))
+            return false
+        }
+
+        if(edtRecipeTitle.text.isNullOrBlank()){
+            edtRecipeTitle.error = getString(R.string.error_msg_title_empty)
+            return false
+        }
+
+        if(edtIngredients.text.isNullOrBlank()){
+            edtIngredients.error = getString(R.string.error_msg_ingredient_empty)
+            return false
+        }
+
+        if(edtTags.tags.isNullOrEmpty()){
+            edtTags.error = getString(R.string.error_msg_tags_empty)
+            return false
+        }
+
+        if(listCatsChecked.isNullOrEmpty()){
+            toast(getString(R.string.error_msg_categories_un_selected))
+            return false
+        }
+
+        if (edtProcess.text.isNullOrBlank()){
+            edtProcess.error = getString(R.string.error_msg_process_step_empty)
+            return false
+        }
+
+        return true
+    }
+
     private fun combineRecipe(): Recipe {
-        val imageUrl = if(imageUrl.toString().isBlank())"" else imageUrl.toString()
+        val imageUrl = imageUri.toString()
         val thumbUrl = imageUrl
         val title = edtRecipeTitle.text.toString().trim().capWords()
         val shortIntro = edtShortIntro.text.toString().trim().capitalize()
+        val ingredients = edtIngredients.text.toString().trim().capitalize()
         val spices = edtSpices.text.toString().trim().capitalize()
         val tags = edtTags.tags
 
@@ -283,7 +323,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
         val process = edtProcess.text.trim()
         val notes = edtNotes.text.toString().trim()
         return Recipe("", title, shortIntro, ingredients, spices, preparation, process, notes,
-                categories, tags, thumbUrl, imageUrl, false)
+                categories, tags, thumbUrl, imageUrl)
     }
 
 //    private fun openGallery() {
@@ -323,9 +363,28 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     }
 
     private fun onRequestHeaderImage(uri: Uri){
-        imageUrl = uri
-        GlideApp.with(this)
-                .load(uri)
+        imageUri = uri
+        val scaleType = imgHeaderImage.scaleType
+        imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        GlideUtil.widthLoadingHolder(this, uri)
+                .listener(object: RequestListener<Drawable?> {
+                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                        if (resource != null){
+                            try {
+                                Palette.from(resource.toBitmap()).generate { palette ->
+                                    palette?.also {applyPalette(it, collapsingToolbarLayout)}
+                                }}catch (e: Exception){
+                                toast("exception thrown when generate palette")
+                            }
+                        }
+                        imgHeaderImage.scaleType = scaleType
+                        return false
+                    }
+                })
                 .into(imgHeaderImage)
     }
 

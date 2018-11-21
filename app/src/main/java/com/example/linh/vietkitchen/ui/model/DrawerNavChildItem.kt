@@ -3,11 +3,11 @@ package com.example.linh.vietkitchen.ui.model
 import android.os.Parcel
 import android.os.Parcelable
 
-class DrawerNavChildItem(val itemTitle: String, val path: String, val numberItems: Int)
+class DrawerNavChildItem(val itemTitle: String, val path: String, var numberItems: Int)
     : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
-            parcel.readString(),
+            parcel.readString()!!,
+            parcel.readString()!!,
             parcel.readInt())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

@@ -5,12 +5,12 @@ import android.os.Parcelable
 import com.example.linh.vietkitchen.extension.readListParcelableObjects
 import com.example.linh.vietkitchen.extension.writeListParcelableObjects
 
-class DrawerNavGroupItem(val headerTile: String, val path: String, val numberItems: Int, val itemsList: List<DrawerNavChildItem>? = null,
+class DrawerNavGroupItem(val headerTile: String, val path: String, var numberItems: Int, val itemsList: List<DrawerNavChildItem>? = null,
                          var isChildrenVisible: Boolean = false)
     : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
-            parcel.readString(),
+            parcel.readString()!!,
+            parcel.readString()!!,
             parcel.readInt(),
             parcel.readListParcelableObjects(DrawerNavChildItem::class.java),
             parcel.readByte() != 0.toByte())

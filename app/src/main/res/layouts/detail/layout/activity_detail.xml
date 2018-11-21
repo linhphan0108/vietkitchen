@@ -18,9 +18,10 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="@android:color/transparent"
+            app:expandedTitleTextAppearance="@style/CollapsingToolbarLayout.TextTitle"
             >
 
             <com.example.linh.vietkitchen.ui.custom.SquareImageView

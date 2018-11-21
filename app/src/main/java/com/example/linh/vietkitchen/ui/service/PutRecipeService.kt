@@ -13,15 +13,21 @@ import com.example.linh.vietkitchen.R
 import android.os.Messenger
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
+import com.example.linh.vietkitchen.domain.command.PutTagsCommand
+import com.example.linh.vietkitchen.domain.command.UpdateCategoriesCommand
 import com.example.linh.vietkitchen.domain.command.UploadImageCommand
 import com.example.linh.vietkitchen.extension.attractUrlFromAnnotation
-import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
+import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
+import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.ImageOptimizationUtil
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
 
@@ -35,6 +41,8 @@ class PutRecipeService : Service() {
         private const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
         const val BK_RECIPE_TO_UPLOAD = "BK_RECIPE_TO_UPLOAD"
         const val BK_LIST_IMAGES_URI = "BK_LIST_IMAGES_URI"
+        const val BK_LIST_NEW_TAGS = "BK_LIST_NEW_TAGS"
+        const val BK_NEW_CATEGORIES = "BK_NEW_CATEGORIES"
         const val BK_UPLOAD_PROGRESS = "BK_UPLOAD_PROGRESS"
         const val BK_UPLOAD_COUNTER = "BK_UPLOAD_COUNTER"
         const val BK_UPLOAD_TOTAL = "BK_UPLOAD_TOTAL"
@@ -55,9 +63,14 @@ class PutRecipeService : Service() {
         const val MSG_UPLOAD_RECIPE = 3
         const val MSG_UPLOAD_IMAGE_PROGRESS = 4
         const val MSG_START_STORING_RECIPE_TO_DB = 5
-        const val MSG_OPTIMIZING_IMAGE = 8
+        const val MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING = 8
         const val MSG_STORE_RECIPE_TO_DB_SUCCESS = 6
         const val MSG_STORE_RECIPE_TO_DB_FAILED = 7
+        const val MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT = 8
+        const val MSG_START_UPLOADING_IMAGES = 9
+        const val MSG_UPDATE_NEW_CATEGORIES = 10
+        const val MSG_PUT_NEW_TAGS = 11
+        const val MSG_STORE_RECIPE_TOTALLY_FINISHED = 99
         /**
          * command to show progress notification
          */
@@ -91,9 +104,12 @@ class PutRecipeService : Service() {
     private lateinit var compositeDisposable: CompositeDisposable
 
     private lateinit var recipeMapper: RecipeMapper
+    private lateinit var categoryMapper: CategoryMapper
     private lateinit var putRecipeCommand: PutRecipeCommand
     private lateinit var uploadImageCommand: UploadImageCommand
     private lateinit var imageCompressionUtil: ImageOptimizationUtil
+    private lateinit var putTagsCommand: PutTagsCommand
+    private lateinit var updateCategoriesCommand: UpdateCategoriesCommand
 
     private var shouldShowNotification = false
 
@@ -111,8 +127,11 @@ class PutRecipeService : Service() {
         nn = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         compositeDisposable = CompositeDisposable()
         recipeMapper = RecipeMapper()
+        categoryMapper = CategoryMapper()
         putRecipeCommand = PutRecipeCommand()
         uploadImageCommand = UploadImageCommand()
+        putTagsCommand = PutTagsCommand()
+        updateCategoriesCommand = UpdateCategoriesCommand()
         imageCompressionUtil = ImageOptimizationUtil()
     }
 
@@ -137,9 +156,11 @@ class PutRecipeService : Service() {
                 MSG_UNREGISTER_CLIENT -> clients.remove(msg.replyTo)
                 MSG_UPLOAD_RECIPE -> {
                     val bundle = msg.data
-                    val recipe: Recipe = bundle.getParcelable(BK_RECIPE_TO_UPLOAD)
-                    val listImages: MutableList<Uri>  = (bundle.getParcelableArray(BK_LIST_IMAGES_URI) as Array<Uri>).toMutableList()
-                    putRecipe(recipe, listImages)
+                    val recipe: Recipe = bundle.getParcelable(BK_RECIPE_TO_UPLOAD)!!
+                    val listImages: List<Uri>  = bundle.getParcelableArrayList(BK_LIST_IMAGES_URI)!!
+                    val listNewTags: List<String>? = bundle.getStringArrayList(BK_LIST_NEW_TAGS)
+                    val drawerNav: List<DrawerNavGroupItem> = bundle.getParcelableArrayList(BK_NEW_CATEGORIES)!!
+                    putRecipe(recipe, listImages, drawerNav, listNewTags)
                 }
                 MSG_SHOW_PROGRESS_NOTIFICATION -> {
                     shouldShowNotification = true
@@ -232,49 +253,73 @@ class PutRecipeService : Service() {
         startForeground(NOTIFICATION_ID, notification)
     }
 
-    private fun putRecipe(recipe: Recipe, listImages: MutableList<Uri>) {
+    private fun putRecipe(recipe: Recipe, listImages: List<Uri>, drawerNav: List<DrawerNavGroupItem>, listNewTags: List<String>?) {
         sendMessageToClients(MSG_START_STORING_RECIPE_TO_DB)
         compositeDisposable.add(Flowable.just(recipe)
                 .map { extractImagePaths(it, listImages) }
                 .map { optimizeImages(it) }
+                .flatMap {
+                    uploadImages(it)
+                }.flatMap {multipartFiles ->
+                    storeRecipeToDb(recipe, multipartFiles)
+                }
+                .flatMapCompletable {
+                    Completable.mergeArray(updateCategories(drawerNav), putNewTags(listNewTags))
+                }
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({ multipartFiles ->
-                    uploadImages(multipartFiles){storeRecipeToDb(recipe, it)}
-                }, { e -> Timber.e(e)}))
+                .subscribe ({
+                    sendMessageToClients(MSG_STORE_RECIPE_TOTALLY_FINISHED)
+                }, {e ->
+                    sendMessageToClients(MSG_STORE_RECIPE_TO_DB_FAILED)
+                    Timber.e(e)
+                }))
     }
 
-    private fun storeRecipeToDb(recipe: Recipe, multipartFiles: List<ImageUpload>) {
-        compositeDisposable.add(Flowable.just(recipe)
+    private fun storeRecipeToDb(recipe: Recipe, multipartFiles: List<ImageUpload>): Flowable<String> {
+        Timber.d("store the recipe into remote db")
+        return Flowable.just(recipe)
                 .map {r ->
                     multipartFiles.forEach {
                         updateRemoteUriToRecipe(r, it.originalPath, it.remotePath!!)
                     }
                     recipeMapper.toDomain(r)
-                }.subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({ recipeUI ->
+                }.flatMap {recipeUI ->
                     putRecipeCommand.recipe = recipeUI
-                    compositeDisposable.add(putRecipeCommand.execute()
-                            .observeOn(Schedulers.computation())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe ({
+                    putRecipeCommand.execute()
+                            .doOnComplete {
                                 sendMessageToClients(MSG_STORE_RECIPE_TO_DB_SUCCESS)
                                 if (shouldShowNotification) {
                                     updateUploadNotification("the recipe was put into remote server success")
                                 }
                                 Timber.d("a recipe was put into firebase server")
-                            }, {e ->
-                                sendMessageToClients(MSG_STORE_RECIPE_TO_DB_FAILED)
-                                Timber.e(e)
-                            }))
-                }, {
+                            }
+                }
+    }
+
+    private fun putNewTags(tags: List<String>?): Completable {
+        if(tags.isNullOrEmpty()) return Completable.complete()
+        Timber.d("put new tags into db")
+        sendMessageToClients(MSG_PUT_NEW_TAGS)
+        putTagsCommand.tags = tags.toMapOfStringBoolean()
+        return putTagsCommand.execute()
+                .doOnComplete {
+                    Timber.d("just put ${tags.size} tags successfully")
+                }.doOnError {
                     Timber.e(it)
-                }))
+                }
+    }
+
+    private fun updateCategories(drawerNav: List<DrawerNavGroupItem>): Completable{
+        Timber.d("update categories")
+        sendMessageToClients(MSG_UPDATE_NEW_CATEGORIES)
+        updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(drawerNav)
+        return updateCategoriesCommand.execute()
     }
 
     private fun optimizeImages(extractImageUris: List<Uri>): List<ImageUpload>{
-        sendMessageToClients(MSG_OPTIMIZING_IMAGE)
+        Timber.d("optimizing images before uploading")
+        sendMessageToClients(MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING)
         val result = mutableListOf<ImageUpload>()
         extractImageUris.forEachIndexed { index, uri ->
             val optimizedPath = imageCompressionUtil.optimize(this, uri)
@@ -292,7 +337,9 @@ class PutRecipeService : Service() {
         return result
     }
 
-    private fun extractImagePaths(recipe: Recipe, listImages: MutableList<Uri>): List<Uri> {
+    private fun extractImagePaths(recipe: Recipe, listImages: List<Uri>): List<Uri> {
+        Timber.d("extract Image path from the recipe's content")
+        sendMessageToClients(MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT)
         val multiPartFiles = mutableListOf<String>()
         with(recipe){
             if (imageUrl.isNotBlank()) multiPartFiles.add(imageUrl)
@@ -308,38 +355,35 @@ class PutRecipeService : Service() {
         }
     }
 
-    private fun uploadImages(multipartFiles: List<ImageUpload>, completionCallback: (multipartFiles: List<ImageUpload>) -> Unit) {
+    private fun uploadImages(multipartFiles: List<ImageUpload>): Flowable<List<ImageUpload>> {
+        Timber.d("start uploading images")
+        sendMessageToClients(MSG_START_UPLOADING_IMAGES)
         val result = mutableListOf<ImageUpload>()
         val totalFiles = multipartFiles.size
         var counter = 1
         uploadImageCommand.multiPartFileMap = multipartFiles
-        compositeDisposable.add(uploadImageCommand.execute()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({message ->
-                    if (message.progress == 100 && !message.remotePath.isNullOrBlank()) {
-                        result.add(message)
-                        counter++
-                    }else{
-                        val bundle = Bundle()
-                        bundle.putInt(BK_UPLOAD_PROGRESS, message.progress)
-                        bundle.putInt(BK_UPLOAD_COUNTER, counter)
-                        bundle.putInt(BK_UPLOAD_TOTAL, totalFiles)
-                        sendMessageToClients(MSG_UPLOAD_IMAGE_PROGRESS, bundle)
-                        if (shouldShowNotification) {
-                            updateProgressNotification(totalFiles, counter, message.progress)
-                        }
-                        Timber.d("****************************")
-                        Timber.d("uploading ${message.originalPath}")
-                        Timber.d("uploading ${message.progress}")
-                        Timber.d("****************************")
+        return uploadImageCommand.execute()
+                .doOnNext {message ->
+                    val bundle = Bundle()
+                    bundle.putInt(BK_UPLOAD_PROGRESS, message.progress)
+                    bundle.putInt(BK_UPLOAD_COUNTER, counter)
+                    bundle.putInt(BK_UPLOAD_TOTAL, totalFiles)
+                    sendMessageToClients(MSG_UPLOAD_IMAGE_PROGRESS, bundle)
+                    if (shouldShowNotification) {
+                        updateProgressNotification(totalFiles, counter, message.progress)
                     }
-                }, {
-                    Timber.e(it)
-                }, {
-                    completionCallback(result)
-                    toast("upload multipartFiles go into onComplete()")
-                    Timber.d("upload multipartFiles go into onComplete()")
-                }))
+                    Timber.d("****************************")
+                    Timber.d("uploading ${message.originalPath}")
+                    Timber.d("uploading ${message.progress}")
+                    Timber.d("****************************")
+                }.filter {message -> message.progress == 100 && !message.remotePath.isNullOrBlank()}
+                .doOnNext {message ->
+                    result.add(message)
+                    counter++
+                }
+                .doOnComplete {
+                    Timber.d("upload multipartFiles go into doOnComplete()")
+                }.toList().toFlowable()
     }
 
     private fun addMultipartFileUri(multiPartFileMap: MutableMap<String, String>, path: String){

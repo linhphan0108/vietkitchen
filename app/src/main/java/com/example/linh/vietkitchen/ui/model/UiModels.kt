@@ -39,7 +39,7 @@ class Ingredient(val name: String? = null, val notes: String?, val quantity: Int
     }
 }
 
-class Recipe(val id: String? = "", val name: String, val intro: String?, val ingredient: Map<String, Ingredient>, val spice: String,
+class Recipe(val id: String? = "", val name: String, val intro: String?, val ingredient: String, val spice: String,
              var preparation: CharSequence, var processing: CharSequence, val notes: String?, val categories: List<String>,
              var tags: List<String>?, var thumbUrl: String, var imageUrl: String,
              var hasLiked: Boolean = false) : Entity(), Parcelable {
@@ -47,7 +47,7 @@ class Recipe(val id: String? = "", val name: String, val intro: String?, val ing
             parcel.readString(),//id
             parcel.readString()!!,//name
             parcel.readString(),//intro
-            readIngredient(parcel),//ingredient
+            parcel.readString()!!,//ingredient
             parcel.readString()!!,//spice
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//preparation
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//processing
@@ -63,7 +63,7 @@ class Recipe(val id: String? = "", val name: String, val intro: String?, val ing
         parcel.writeString(id)//id
         parcel.writeString(name)//notes
         parcel.writeString(intro)//intro
-        writeIngredient(ingredient, parcel, flags)//ingredient
+        parcel.writeString(ingredient)//ingredient
         parcel.writeString(spice)////spice
         TextUtils.writeToParcel(preparation, parcel, flags)//preparation
         TextUtils.writeToParcel(processing, parcel, flags)//processing

@@ -14,6 +14,7 @@
     <color name="colorError">#ff9800</color>
     <color name="colorOnError">#fafafa</color>
     <color name="colorAccent">@color/colorSecondary</color>
+    <color name="colorOnAccent">#fafafa</color>
 
     <color name="colorBackground">#fafafa</color>
     <color name="colorOnBackground">@color/textPrimary</color>
@@ -25,6 +26,15 @@
     <color name="textError">@color/colorError</color>
 
     <color name="colorScrim">#52000000</color>
+    <color name="colorTranslucentStatus">#29000000</color>
+
+    <color name="chip_bg_default">#efefef</color>
+    <color name="chip_bg_selected">@color/colorAccent</color>
+    <color name="chip_text_default">@color/textPrimary</color>
+    <color name="chip_text_selected">@color/colorOnAccent</color>
+
+    <color name="action_bar">#912722</color>
+    <color name="status_bar">#b83222</color>
 
     <!--<color notes="divider">#BDBDBD</color>-->
     <color name="divider">#fafafa</color>

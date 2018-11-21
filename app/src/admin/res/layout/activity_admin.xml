@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="@android:color/transparent"
+            app:contentScrim="@color/colorPrimary"
             >
             <com.example.linh.vietkitchen.ui.custom.SquareImageView
                 android:id="@+id/imgHeaderImage"
