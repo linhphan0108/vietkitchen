@@ -16,7 +16,8 @@ import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarFragment
 import com.example.linh.vietkitchen.ui.screen.detailActivity.BK_LIKE_STATE_JUST_CHANGED
 import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
-import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
+
+
 
 private const val REQUEST_DETAIL_RECIPE = 2
 abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPresenter<V>> : ToolbarFragment<V, P>(),

@@ -1,6 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
 import android.content.Context
+import android.graphics.Canvas
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -20,6 +21,10 @@ import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
 import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.support.v7.widget.RecyclerView
+import com.example.linh.vietkitchen.ui.adapter.SwipeController
+import com.example.linh.vietkitchen.ui.adapter.SwipeControllerActions
 
 
 private const val ARG_PARAM1 = "param1"
@@ -208,7 +213,6 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     private fun setupRecyclerView() {
 //        recyclerView.itemAnimator = DefaultItemAnimator()
         rcvRecipes.layoutManager = LinearLayoutManager(context)
-        rcvRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
         rcvRecipes.adapter = recipeAdapter
         rcvLoadMoreListener = object : EndlessScrollListener(3) {
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
@@ -218,6 +222,21 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
             }
         }
         rcvRecipes.addOnScrollListener(rcvLoadMoreListener)
+        val swipeController = SwipeController(object : SwipeControllerActions {
+            override fun onLeftClicked(position: Int) {
+            }
+
+            override fun onRightClicked(position: Int) {
+            }
+        })
+        val itemTouchHelper = ItemTouchHelper(swipeController)
+        itemTouchHelper.attachToRecyclerView(rcvRecipes)
+        //        rcvRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
+        rcvRecipes.addItemDecoration(object : RecyclerView.ItemDecoration() {
+            override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+                swipeController.onDraw(c)
+            }
+        })
     }
     //endregion inner classes
 }
