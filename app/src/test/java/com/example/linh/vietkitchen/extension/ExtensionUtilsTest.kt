@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.extension
 
+import com.example.linh.vietkitchen.util.toDateString
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.text.DateFormat

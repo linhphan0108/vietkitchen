@@ -43,6 +43,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({
+                    viewContract?.hideProgress()
                     if (it != null && it.isEmpty()) {
                         viewContract?.onFoodsRequestFailed("Oops! something went wrong, no data found")
                     }else{
@@ -55,9 +56,9 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                             isFreshRecipe = false
                         }
                     }
-                    viewContract?.hideProgress()
 
                 }, {
+                    viewContract?.hideProgress()
                     Timber.e(it)
                     when {
                         it is FirebaseNoDataException -> {
@@ -75,6 +76,9 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                             isFreshRecipe = false
                         }
                     }
+                }, {
+                    viewContract?.hideProgress()
+                    Timber.d("on fetching recipes completed")
                 })
 
     }
