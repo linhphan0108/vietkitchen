@@ -5,6 +5,7 @@ import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
 import com.example.linh.vietkitchen.exception.FirebaseDataException
 import com.example.linh.vietkitchen.exception.FirebaseNoDataException
+import com.example.linh.vietkitchen.util.Constants.STARAGE_RECIPES_CHILD_CATEGORIES
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
@@ -23,6 +24,7 @@ import io.reactivex.FlowableOnSubscribe
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.io.File
+import java.util.*
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
 class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) : RecipeDataSource {
@@ -46,11 +48,11 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 }
             } else {
                 if (isLoadingMore) {
-                    dbRefRecipe.orderByChild(STORAGE_RECIPES_CHILD_TAGS_PATH + tag)
+                    dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
                             .equalTo(true)
                             .startAt(startAtId)
                 } else {
-                    dbRefRecipe.orderByChild(STORAGE_RECIPES_CHILD_TAGS_PATH + tag)
+                    dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
                             .equalTo(true)
                 }
             }.limitToFirst(limitFixed)

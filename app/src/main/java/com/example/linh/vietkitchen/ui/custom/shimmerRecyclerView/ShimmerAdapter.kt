@@ -6,9 +6,12 @@ import com.example.linh.vietkitchen.ui.model.Entity
 import com.hannesdorfmann.adapterdelegates3.ListDelegationAdapter
 import timber.log.Timber
 
+private const val DEFAULT_NUMBER_OF_SHIMMER_ITEMS = 5
+
 open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
     private var isLoadingMore: Boolean = false
     var isShimmerAnimationReFresh: Boolean = false
+    private var shimmerItemsCount = DEFAULT_NUMBER_OF_SHIMMER_ITEMS
 
     init {
         delegatesManager.addDelegate(ShimmerItemDelegate())
@@ -36,10 +39,11 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
 
     }
 
-    fun startShimmerAnimation(numberShimmerItem: Int = 6) {
+    fun startShimmerAnimation(numberShimmerItem: Int = shimmerItemsCount) {
         isShimmerAnimationReFresh = true
+        shimmerItemsCount = numberShimmerItem
         val shimmerItems = mutableListOf<ShimmerItem>()
-        for (i in 1..numberShimmerItem){
+        for (i in 1..shimmerItemsCount){
             shimmerItems.add(ShimmerItem())
         }
         setItems(shimmerItems.toMutableList())
@@ -47,8 +51,16 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
     }
 
     fun stopShimmerAnimation(){
-        setItems(mutableListOf())
-        notifyDataSetChanged()
+        if (itemCount < shimmerItemsCount) return
+        var counter = 0
+        for (i in 0 until shimmerItemsCount){
+            if (items[counter] is ShimmerItem) {
+                items.removeAt(counter)
+                notifyItemRemoved(counter)
+            }else{
+                counter++
+            }
+        }
     }
 
     fun startLoadMoreAnimation(){

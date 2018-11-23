@@ -140,7 +140,6 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     override fun onFoodsRequestFailed(msg: String) {
         toast(msg)
-        recipeAdapter.stopShimmerAnimation()
     }
 
     override fun onRefreshRecipe() {
@@ -179,6 +178,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     }
 
     override fun hideProgress() {
+        recipeAdapter.stopShimmerAnimation()
     }
     //endregion MVP callbacks
 
