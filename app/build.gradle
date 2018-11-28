@@ -25,15 +25,14 @@ android {
     sourceSets {
         main {
             res.srcDirs = [
+                    'src/main/res',
+                    'src/main/res/layouts',
                     'src/main/res/layouts/common',
                     'src/main/res/layouts/splashScreen',
                     'src/main/res/layouts/login',
                     'src/main/res/layouts/home',
                     'src/main/res/layouts/detail',
-                    'src/main/res/layouts/dialog',
-                    'src/main/res/layouts',
-                    'src/main/res'
-
+                    'src/main/res/layouts/dialog'
             ]
         }
 
@@ -112,6 +111,9 @@ dependencies {
     implementation('io.reactivex.rxjava2:rxandroid:2.0.2') {
         exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
     }
+
+    implementation 'org.greenrobot:eventbus:3.1.1'
+
     //glide
     implementation ('com.github.bumptech.glide:glide:4.7.1'){
         exclude group: 'com.android.support', module: 'support-fragment'

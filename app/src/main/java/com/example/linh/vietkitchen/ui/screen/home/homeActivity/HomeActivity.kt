@@ -26,6 +26,7 @@ import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
 import kotlinx.android.synthetic.main.activity_home_content.*
+import org.greenrobot.eventbus.EventBus
 
 
 class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContractPresenter>(),
@@ -85,6 +86,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     override fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
         drawerNavAdapter.updateItemThenNotify(items)
         navItems = items
+        EventBus.getDefault().post(items)
     }
 
     override fun onRequestCategoriesFailed(message: String) {

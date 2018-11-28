@@ -8,6 +8,7 @@ import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.LoggerUtil
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import timber.log.Timber
 
@@ -45,5 +46,13 @@ class RecipeProvider(private val mapper: RecipeMapper = RecipeMapper(),
 
     fun uploadImages(multiPartFileMap: List<ImageUpload>) = requestToSources {
         it.uploadImages(multiPartFileMap)
+    }
+
+    fun deleteImages(fileUrls: List<String>) = requestToSources {
+        it.deleteImages(fileUrls)
+    }
+
+    fun deleteRecipe(recipe: Recipe): Completable = requestToSources {
+        it.deleteRecipe(mapper.toData(recipe))
     }
 }

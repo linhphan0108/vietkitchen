@@ -1,17 +1,24 @@
 package com.example.linh.vietkitchen.data.local
 
-import android.net.Uri
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
 import com.google.firebase.database.DataSnapshot
-import com.example.linh.vietkitchen.data.cloud.Recipe as RecipeData
+import com.example.linh.vietkitchen.data.cloud.Recipe
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class RecipeLocalDataSource : RecipeDataSource {
+    override fun deleteImages(fileUrls: List<String>): Flowable<Boolean>? {
+        return null
+    }
+
+    override fun deleteRecipe(recipe: Recipe): Completable? {
+        return null
+    }
+
     override fun uploadImages(multiPartFileList: List<ImageUpload>): Flowable<ImageUpload>? = null
 
-    override fun putRecipe(recipe: RecipeData): Flowable<String>? = null
+    override fun putRecipe(recipe: Recipe): Flowable<String>? = null
 
     override fun getLikedRecipes(ids: List<String>): Flowable<DataSnapshot>? = null
 

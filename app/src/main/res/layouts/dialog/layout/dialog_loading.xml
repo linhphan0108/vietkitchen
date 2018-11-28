@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_rounded_corners_bg"
+    android:padding="@dimen/padding_16">
+
+    <com.example.linh.vietkitchen.ui.custom.SlackLoadingView
+        android:id="@+id/slackLoadingView"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/txtMessage"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/txtMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginLeft="@dimen/margin_8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/slackLoadingView"
+        app:layout_constraintEnd_toStartOf="@+id/txtDotLoader"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toEndOf="@+id/slackLoadingView"
+        tools:text="@string/label_delete"
+        />
+
+    <com.bhargavms.dotloader.DotLoader
+        android:id="@+id/txtDotLoader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginLeft="@dimen/margin_8dp"
+        app:color_array="@array/dot_colors"
+        app:dot_radius="3dp"
+        app:layout_constraintBottom_toBottomOf="@+id/txtMessage"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/txtMessage"
+        app:number_of_dots="3"
+        />
+</android.support.constraint.ConstraintLayout>

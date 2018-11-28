@@ -137,6 +137,22 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
 //
 //    }
 
+    override fun deleteRecipe(recipe: Recipe): Completable {
+        return Completable.create { emitter ->
+            dbRefRecipe.child(recipe.id!!).removeValue()
+                    .addOnSuccessListener {
+                        if(!emitter.isDisposed) {
+                            emitter.onComplete()
+                        }
+                    }
+                    .addOnFailureListener {
+                        if(!emitter.isDisposed) {
+                            emitter.onError(it)
+                        }
+                    }
+        }.observeOn(Schedulers.computation())
+    }
+
     override fun putRecipe(recipe: Recipe): Flowable<String> {
         return Flowable.create (FlowableOnSubscribe<String> { emitter ->
             dbRefRecipe.push().setValue(recipe){databaseError, databaseReference ->
@@ -180,6 +196,8 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 }.observeOn(Schedulers.computation())
     }
 
+
+
     private fun uploadImage(image: ImageUpload): Flowable<ImageUpload>? {
         return Flowable.create(FlowableOnSubscribe<ImageUpload> {emitter ->
             val storageRecipeImageRef = storageRecipeRef.child(image.fileName)
@@ -213,7 +231,30 @@ class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) :
                 .observeOn(Schedulers.computation())
     }
 
+    override fun deleteImages(fileUrls: List<String>): Flowable<Boolean> {
+        return Flowable.fromIterable(fileUrls)
+                .concatMap {
+                    deleteImage(it)
+                }
+                .observeOn(Schedulers.computation())
+    }
 
+    private fun deleteImage(url: String): Flowable<Boolean>{
+        return Flowable.create(FlowableOnSubscribe<Boolean> { emitter ->
+            storage.getReferenceFromUrl(url)
+                    .delete()
+                    .addOnSuccessListener {
+                        emitter.onNext(true)
+                        emitter.onComplete()
+                        Timber.d("deleted file successfully at $url")
+                    }.addOnFailureListener {
+                        emitter.onNext(false)
+                        emitter.onComplete()
+                        Timber.d("deleted failed successfully at $url")
+                    }
+        }, BackpressureStrategy.DROP)
+                .observeOn(Schedulers.computation())
+    }
 
     private fun createADumpFood(): Recipe {
         val name = "canh khổ qua nhồi thịt"

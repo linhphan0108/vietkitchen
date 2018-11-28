@@ -10,39 +10,35 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
+import com.example.linh.vietkitchen.ui.dialog.BottomSheetOptions
+import com.example.linh.vietkitchen.ui.dialog.LoadingDialog
+import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnDrawerNavItemChangedListener
-import com.example.linh.vietkitchen.ui.home.homeFragment.HomeFragmentPresenter
-import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractPresenter
-import com.example.linh.vietkitchen.ui.home.homeFragmentonRefresh.HomeFragmentContractView
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
+import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 
 class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(),
         HomeFragmentContractView, OnDrawerNavItemChangedListener {
+
     companion object {
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
          * @return A new instance of fragment HomeFragment.
          */
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(navItems: List<DrawerNavGroupItem>) =
                 HomeFragment().apply {
                     arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
+                        putParcelableArrayList(Constants.BK_CATEGORIES, ArrayList(navItems))
                     }
                 }
 
@@ -50,9 +46,9 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         fun newInstance() = HomeFragment()
     }
 
-    private var param1: String? = null
-    private var param2: String? = null
     lateinit var rcvLoadMoreListener: EndlessScrollListener
+    private var bottomSheetOptions: BottomSheetOptions? = null
+    private var loadingDialog: LoadingDialog? = null
 
     //region lifecycle =============================================================================
     override fun getFragmentLayoutRes() = R.layout.fragment_home
@@ -60,8 +56,6 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
         }
         Timber.e("on create")
     }
@@ -124,7 +118,9 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     //endregion lifecycle
 
     //region MVP callbacks =========================================================================
-    override fun initPresenter() = HomeFragmentPresenter()
+    override fun initPresenter(): HomeFragmentContractPresenter {
+        return HomeFragmentPresenter()
+    }
 
     override val viewContext: Context?
         get() = context
@@ -143,7 +139,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     }
 
     override fun onRefreshRecipe() {
-        recipeAdapter.startShimmerAnimation()
+        showShimmer()
     }
 
     override fun onLoadingMore() {
@@ -173,18 +169,53 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         recipeAdapter.onUnLike(recipe)
     }
 
-    override fun showProgress() {
+    override fun onDeleteRecipeSuccess(adapterPosition: Int) {
+        recipeAdapter.removeItem(adapterPosition)
+        toast("recipe deleted successfully")
+    }
+
+    override fun onDeleteRecipeFailed(msg: String) {
+        toast(msg)
+    }
+
+    override fun showShimmer() {
         recipeAdapter.startShimmerAnimation()
     }
 
-    override fun hideProgress() {
+    override fun hideShimmer() {
         recipeAdapter.stopShimmerAnimation()
+    }
+
+    override fun showProgress() {
+        if (loadingDialog == null) {
+            loadingDialog = LoadingDialog.newInstance("delete")
+        }
+        loadingDialog!!.show(childFragmentManager, LoadingDialog::class.java.name)
+    }
+
+    override fun hideProgress() {
+        loadingDialog?.let { loadingDialog ->
+            if(loadingDialog.isVisible) loadingDialog.dismiss()
+        }
     }
     //endregion MVP callbacks
 
     //region callbacks =============================================================================
     override fun onDrawerNavChanged(category: String?) {
         presenter.refreshFoods(category)
+    }
+
+    override fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean {
+        if (bottomSheetOptions == null){
+            bottomSheetOptions = BottomSheetOptions()
+            bottomSheetOptions!!.listeners = object: BottomSheetOptions.BottomSheetOptionsListeners {
+                override fun onDelete() {
+                    presenter.deleteRecipe(data, adapterPosition)
+                }
+            }
+        }
+        bottomSheetOptions!!.show(childFragmentManager, BottomSheetOptions::class.java.name)
+        return true
     }
     //endregion callbacks
 

@@ -39,6 +39,11 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
 
     }
 
+    fun removeItem(position: Int){
+        items.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
     fun startShimmerAnimation(numberShimmerItem: Int = shimmerItemsCount) {
         isShimmerAnimationReFresh = true
         shimmerItemsCount = numberShimmerItem

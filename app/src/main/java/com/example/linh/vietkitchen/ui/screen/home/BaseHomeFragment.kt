@@ -71,6 +71,9 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
         presenter.unLikeRecipe(data)
     }
 
+    override fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean {
+        return false
+    }
     //region inner methods =========================================================================
     protected open fun setupAdapter() {
         recipeAdapter = RecipeAdapter(listener = this)

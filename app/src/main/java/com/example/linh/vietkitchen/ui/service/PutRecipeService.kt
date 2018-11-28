@@ -255,7 +255,7 @@ class PutRecipeService : Service() {
 
     private fun putRecipe(recipe: Recipe, listImages: List<Uri>, drawerNav: List<DrawerNavGroupItem>, listNewTags: List<String>?) {
         sendMessageToClients(MSG_START_STORING_RECIPE_TO_DB)
-        compositeDisposable.add(Flowable.just(recipe)
+        compositeDisposable.add(Flowable.fromCallable {recipe}
                 .map { extractImagePaths(it, listImages) }
                 .map { optimizeImages(it) }
                 .flatMap {
