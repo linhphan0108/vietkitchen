@@ -58,7 +58,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     //#region life circle ==================================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val categories = intent.extras.getParcelableArrayList<DrawerNavGroupItem>(Constants.BK_CATEGORIES).toList()
+        val categories = intent.extras!!.getParcelableArrayList<DrawerNavGroupItem>(Constants.BK_CATEGORIES)!!.toList()
         presenter.setCategoriesList(categories)
         setupToolbar()
         setupCategoryChip(categories)
@@ -205,7 +205,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
             val txtTitle = llChipGroup.getChildAt(0) as TextView
             val chipGroup = llChipGroup.getChildAt(1) as ChipGroup
             txtTitle.text = groupItem.headerTile
-            groupItem.itemsList.forEach {childItem ->
+            groupItem.itemsList?.forEach {childItem ->
                 val chip = Chip(this)
                 chip.setChipBackgroundColorResource(R.color.bg_chip_states)
                 chip.setTextAppearance(R.style.ChipTextStyle_Selected)

@@ -22,7 +22,7 @@ class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.userI
     fun  toDomain(recipe: Recipe): RecipeDomain{
         with(recipe) {
             val mapTags = tags?.toMapOfStringBoolean() ?: mapOf<String, Boolean>()
-            return RecipeDomain("", name, intro, ingredient, spice, preparation.toString()
+            return RecipeDomain(id, name, intro, ingredient, spice, preparation.toString()
                     , processing.toString(), notes, categories, mapTags, thumbUrl, imageUrl)
         }
     }

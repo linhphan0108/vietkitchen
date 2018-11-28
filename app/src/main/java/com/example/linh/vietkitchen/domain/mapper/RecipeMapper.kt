@@ -34,7 +34,7 @@ class RecipeMapper() {
 
     fun toData(domain: RecipeDomain): Recipe {
         with(domain){
-            return Recipe(name, intro, ingredient, spice, preparation, processing, notes,
+            return Recipe(id, name, intro, ingredient, spice, preparation, processing, notes,
                     categories.toMapOfStringBoolean(), tags, thumbUrl, imageUrl)
         }
     }

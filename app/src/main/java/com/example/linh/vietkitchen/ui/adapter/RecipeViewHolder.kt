@@ -8,11 +8,13 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.extension.lookTemporary
 import com.example.linh.vietkitchen.ui.custom.likeButton.AndroidLikeButton
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.GlideUtil
 import kotlinx.android.synthetic.main.item_recipe.view.*
+import timber.log.Timber
 
 class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : RecyclerView.ViewHolder(itemView) {
 
@@ -56,6 +58,12 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
         itemView.setOnClickListener {
             listener?.onItemClick(itemView.imgFoodThumb, layoutPosition, adapterPosition, recipe)
         }
+        if(BuildConfig.IS_ADMIN) {
+            itemView.setOnLongClickListener {
+                listener?.onItemLongClick(itemView.imgFoodThumb, layoutPosition, adapterPosition, recipe)
+                        ?: false
+            }
+        }
         itemView.btnFavorite.setOnLikeEventListener(object: AndroidLikeButton.OnLikeEventListener {
             override fun onUnlikeClicked(androidLikeButton: AndroidLikeButton?) {
                 itemView.btnFavorite.lookTemporary()
@@ -76,6 +84,7 @@ enum class PayLoads{
 
 interface OnItemClickListener{
     fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe)
+    fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean
     fun onLike(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe)
     fun onUnLike(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe)
 }
