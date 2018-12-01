@@ -364,28 +364,23 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
 
     private fun onRequestHeaderImage(uri: Uri){
         imageUri = uri
-        val scaleType = imgHeaderImage.scaleType
-        imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        GlideUtil.widthLoadingHolder(this, uri)
-                .listener(object: RequestListener<Drawable?> {
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
-                        return false
-                    }
+        GlideUtil.widthLoadingHolder(this, imgHeaderImage, uri, object: RequestListener<Drawable?> {
+            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                return false
+            }
 
-                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                        if (resource != null){
-                            try {
-                                Palette.from(resource.toBitmap()).generate { palette ->
-                                    palette?.also {applyPalette(it, collapsingToolbarLayout)}
-                                }}catch (e: Exception){
-                                toast("exception thrown when generate palette")
-                            }
-                        }
-                        imgHeaderImage.scaleType = scaleType
-                        return false
+            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                if (resource != null){
+                    try {
+                        Palette.from(resource.toBitmap()).generate { palette ->
+                            palette?.also {applyPalette(it, collapsingToolbarLayout)}
+                        }}catch (e: Exception){
+                        toast("exception thrown when generate palette")
                     }
-                })
-                .into(imgHeaderImage)
+                }
+                return false
+            }
+        })
     }
 
     //#endregion inner methods
