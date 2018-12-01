@@ -19,7 +19,6 @@ import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
 import android.view.MenuItem
-import android.widget.ImageView
 import android.widget.TextView
 import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.ui.VietKitchenApp
@@ -48,7 +47,6 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
     }
     private lateinit var userInfo: UserInfo
     private lateinit var recipe: Recipe
-    private var shouldHidePreProcessLayout = false
     private var likeState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -138,30 +136,25 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
     }
 
     private fun populateUI(recipe: Recipe) {
-        val scaleType = imgHeaderImage.scaleType
-        imgHeaderImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        GlideUtil.widthLoadingHolder(this, recipe.imageUrl)
-                .disallowHardwareConfig()
+        GlideUtil.widthLoadingHolder(this, imgHeaderImage, recipe.imageUrl, object : RequestListener<Drawable?>{
+            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
+                return false
+            }
+
+            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                if (resource != null){
+                    try {
+                        Palette.from(resource.toBitmap()).generate { palette ->
+                            palette?.also {applyPalette(it, collapsingToolbarLayout)}
+                        }}catch (e: Exception){
+                        toast("exception thrown when generate palette")
+                    }
+                }
+                return false
+            }
+
+        }).disallowHardwareConfig()
                 .override(ScreenUtil.screenWidth())
-                .listener(object : RequestListener<Drawable?>{
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
-                        return false
-                    }
-
-                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                        if (resource != null){
-                            try {
-                            Palette.from(resource.toBitmap()).generate { palette ->
-                                palette?.also {applyPalette(it, collapsingToolbarLayout)}
-                            }}catch (e: Exception){
-                                toast("exception thrown when generate palette")
-                            }
-                        }
-                        imgHeaderImage.scaleType = scaleType
-                        return false
-                    }
-
-                })
                 .into(imgHeaderImage)
 
 
@@ -173,14 +166,15 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
             if (preparation.isBlank()) {
                 llStepsToPreProcess.visibility = View.GONE
-                shouldHidePreProcessLayout = true
             }else{
                 txtStepsToPreparation.setText(preparation, TextView.BufferType.SPANNABLE)
             }
 
             txtStepsToProcess.setText(processing, TextView.BufferType.SPANNABLE)
 
-            notes?.let {
+            if(notes.isNullOrBlank()) {
+                llNotes.visibility = View.GONE
+            }else{
                 llNotes.visibility = View.VISIBLE
                 txtNotes.text = notes
             }
