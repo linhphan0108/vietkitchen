@@ -20,8 +20,10 @@ import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
 import android.view.MenuItem
 import android.widget.TextView
+import com.example.linh.vietkitchen.R.id.*
 import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.ui.VietKitchenApp
+import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.util.GlideUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
@@ -53,10 +55,10 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
         super.onCreate(savedInstanceState)
         userInfo = VietKitchenApp.userInfo
         intent.getBundleExtra(EXTRA_BUNDLE).let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                appBarLayout.transitionName = it.getString(BK_THUMB_IMAGE_TRANSITION_NAME)
-            }
-            recipe = it.getParcelable(BK_RECIPE)
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                appBarLayout.transitionName = it.getString(BK_THUMB_IMAGE_TRANSITION_NAME)
+//            }
+            recipe = it.getParcelable(BK_RECIPE)!!
             likeState = recipe.hasLiked
             setupToolbar(recipe.name)
             populateUI(recipe)
@@ -85,7 +87,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
         super.onBackPressed()
     }
 
-    //region MVP callbacks =========================================================================
+    //region MVP callbacks =========r================================================================
     override val viewContext: Context?
         get() = this
 
@@ -153,8 +155,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
                 return false
             }
 
-        }).disallowHardwareConfig()
-                .override(ScreenUtil.screenWidth())
+        }).override(ScreenUtil.getMaxWidthImage())
                 .into(imgHeaderImage)
 
 
