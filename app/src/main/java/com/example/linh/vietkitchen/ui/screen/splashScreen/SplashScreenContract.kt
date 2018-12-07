@@ -8,7 +8,7 @@ interface SplashScreenContractView : BaseViewContract{
     fun onHasLoggedIn()
     fun onHasNotLoggedIn()
     fun onRequestLikedRecipesIdSuccess(recipesId: List<String>)
-    fun onRequestLikedRecipesIdFailed()
+    fun onRequestLikedRecipesIdFailed(message: String?)
     fun gotoHomeScreen()
 }
 

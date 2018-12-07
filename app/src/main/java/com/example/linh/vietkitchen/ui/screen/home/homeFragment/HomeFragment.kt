@@ -129,6 +129,9 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         return this
     }
 
+    override fun onNoInternetException() {
+    }
+
     override fun onFoodsRequestSuccess(recipes: List<Recipe>) {
         recipeAdapter.updateItemThenNotify(recipes.toMutableList())
         swipeRefresh.isRefreshing = false

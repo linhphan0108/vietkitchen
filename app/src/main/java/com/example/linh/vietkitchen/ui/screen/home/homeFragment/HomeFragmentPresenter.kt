@@ -63,7 +63,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
         }
         requestRecipeCommand.category = category
         requestRecipeCommand.startAtId = lastRecipeId
-        requestRecipeDisposable = requestRecipeCommand.execute()
+        requestRecipeDisposable = requestRecipeCommand.executeOnTheInternet(context!!)
                 .map {
                     recipeMapper.convertToUi(it)
                 }

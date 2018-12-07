@@ -145,6 +145,10 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
 
     override fun getActivityLayoutRes() = R.layout.activity_admin
 
+    override fun onNoInternetException() {
+
+    }
+
     override fun onGetTagsSuccess(tags: List<String>) {
         if (tags.isEmpty()) return
         val arrAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, tags)
