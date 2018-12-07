@@ -1,91 +1,130 @@
 package com.example.linh.vietkitchen.ui.custom.imageSpanWidget
 
+import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.widget.TextView
 import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.ctx
 import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.util.ScreenUtil
+import pl.droidsonroids.gif.GifDrawable
+import timber.log.Timber
+import java.lang.ref.WeakReference
 
-private const val IMAGE_LOADING_WIDTH:Int = 64
-private const val IMAGE_LOADING_HEIGHT:Int = 64
+private val IMAGE_LOADING_WIDTH:Int = ScreenUtil.dp2px(16)
+private val IMAGE_LOADING_HEIGHT:Int = IMAGE_LOADING_WIDTH
 
-class BitmapDrawablePlaceHolder(val textView: TextView,
-                                private val w: Int,
-                                private val h: Int) : BitmapDrawable(), Drawable.Callback {
-    private var left: Int = ((ScreenUtil.screenWidth() - w) * .5).toInt()
-    private val top: Int = 0
-    private val right = left + w
-    private val bottom = top + h
-    var gdLoading: GifDrawable? = null
-    val context = textView.ctx
-    init {
-//        val resource = textView.ctx.resources
-        GlideApp.with(context)
-                .asGif()
-                .load(R.drawable.ic_loading_gif)
-                .format(DecodeFormat.PREFER_ARGB_8888)
-                .into(object : SimpleTarget<GifDrawable>(){
-                    override fun onResourceReady(resource: GifDrawable, transition: Transition<in GifDrawable>?) {
-                        val top = h/2 - IMAGE_LOADING_HEIGHT /2
-                        val left = w/2 - IMAGE_LOADING_WIDTH /2
-                        val right = left + IMAGE_LOADING_WIDTH
-                        val bottom = top + IMAGE_LOADING_HEIGHT
-                        gdLoading = resource
-                        gdLoading!!.setBounds(left, top, right, bottom)
-                        textView.invalidate()
-                    }
+class BitmapDrawablePlaceHolder : BitmapDrawable, Drawable.Callback {
+    private lateinit var placeHolderBounds: Rect
+    private var gdLoading: GifDrawable? = null
+    private var drawable: BitmapDrawable? = null
+    lateinit var target: SimpleTarget<Bitmap>
+    private lateinit var contextRef: WeakReference<Context>
+    private lateinit var textViewRef: WeakReference<TextView>
 
-                })
-        setBounds(left, top, right, bottom)
+    constructor(textView: TextView, w: Int, h: Int){
+        this.textViewRef = WeakReference(textView)
+        this.contextRef = WeakReference(textView.ctx)
+        val left = 0
+        val top = 0
+        val right = left + w
+        val bottom = top + h
+        placeHolderBounds = Rect(left, top, right, bottom)
+        bounds = placeHolderBounds
+        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565)
+        target = object: SimpleTarget<Bitmap>(){
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                Timber.d("SimpleTarget image's width = ${resource.width}")
+                Timber.d("SimpleTarget image's height = ${resource.height}")
+                placeHolderBounds.bottom = (placeHolderBounds.width().toFloat() * resource.height / resource.width).toInt()
+                drawable = BitmapDrawable(contextRef.get()?.resources, resource)
+                drawable?.bounds = placeHolderBounds
+                bounds = placeHolderBounds
+                if (gdLoading != null && gdLoading!!.isRunning){
+                    Timber.d("stop gif loading")
+                    gdLoading!!.stop()
+                    gdLoading!!.callback = null
+                    gdLoading!!.recycle()
+                }
+                textViewRef.get()?.postInvalidate()
+            }
+        }
+        BitmapDrawablePlaceHolder(textView.resources, bitmap)
+        loadLoadingGif(textView.ctx)
     }
 
-    var drawable: BitmapDrawable? = null
-        set(value) {
-            field = value
-            value?.setBounds(0, 0, right, bottom)
-        }
+    constructor(res: Resources, bitmap: Bitmap): super(res, bitmap)
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
         if (drawable != null) {
-            drawable!!.draw(canvas)
-            if (gdLoading != null && gdLoading!!.isRunning){
-                gdLoading!!.stop()
-            }
-        }else
-            if (gdLoading != null){
-                gdLoading!!.draw(canvas)
-                if (!gdLoading!!.isRunning) {
-                    gdLoading!!.callback = this@BitmapDrawablePlaceHolder
-                    gdLoading!!.start()
-                }
-            }
-    }
-
-    val target = object: SimpleTarget<Bitmap>(w, h){
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-            drawable = BitmapDrawable(textView.ctx.resources, resource)
+            Timber.d("draw drawable")
+            drawable?.draw(canvas)
+        }else {
+            Timber.d("draw loading-gif")
+            gdLoading?.draw(canvas)
         }
     }
 
     override fun unscheduleDrawable(who: Drawable?, what: Runnable?) {
-        gdLoading?.recycle()
-        textView.removeCallbacks(what)
+        Timber.d("unscheduleDrawable")
+        textViewRef.get()?.removeCallbacks(what)
     }
 
     override fun invalidateDrawable(who: Drawable?) {
-        textView.invalidate()
+        Timber.d("gif invalidateDrawable")
+        textViewRef.get()?.postInvalidate()
     }
 
     override fun scheduleDrawable(who: Drawable?, what: Runnable?, `when`: Long) {
-        textView.postDelayed(what, `when`)
+        textViewRef.get()?.postDelayed(what, `when`)
+    }
+
+    private fun loadLoadingGif(ctx: Context) {
+        GlideApp.with(ctx)
+                .`as`(ByteArray::class.java)
+                .load(R.drawable.ic_loading_gif)
+                .override(IMAGE_LOADING_WIDTH, IMAGE_LOADING_HEIGHT)
+                .format(DecodeFormat.PREFER_ARGB_8888)
+                .into(object: SimpleTarget<ByteArray>(){
+                    override fun onResourceReady(resource: ByteArray, transition: Transition<in ByteArray>?) {
+
+                        val top = placeHolderBounds.centerY() - IMAGE_LOADING_HEIGHT / 2
+                        val left = placeHolderBounds.centerX() - IMAGE_LOADING_WIDTH / 2
+                        val right = left + IMAGE_LOADING_WIDTH
+                        val bottom = top + IMAGE_LOADING_HEIGHT
+
+                        gdLoading = GifDrawable(resource)
+//                        val callback = MultiCallback(true)
+//                        callback.addView(textViewRef.get())
+                        gdLoading!!.setBounds(left, top, right, bottom)
+                        gdLoading!!.callback = this@BitmapDrawablePlaceHolder
+                        gdLoading!!.start()
+
+                }})
+//                .into(object : SimpleTarget<GifDrawable>() {
+//                    override fun onResourceReady(resource: GifDrawable, transition: Transition<in GifDrawable>?) {
+//                        Timber.d("loading-gif's intrinsicWidth = ${resource.intrinsicWidth}")
+//                        Timber.d("loading-gif's intrinsicHeight = ${resource.intrinsicHeight}")
+//                        val top = placeHolderBounds.height() / 2 - IMAGE_LOADING_HEIGHT / 2
+//                        val left = placeHolderBounds.width() / 2 - IMAGE_LOADING_WIDTH / 2
+//                        val right = left + IMAGE_LOADING_WIDTH
+//                        val bottom = top + IMAGE_LOADING_HEIGHT
+//                        resource.setBounds(left, top, right, bottom)
+//                        resource.callback = this@BitmapDrawablePlaceHolder
+//                        resource.setLoopCount(GifDrawable.LOOP_FOREVER)
+//                        gdLoading = resource
+//                        gdLoading?.start()
+//                    }
+//
+//                })
     }
 }
