@@ -1,16 +1,13 @@
 package com.example.linh.vietkitchen.ui.adapter
 
 import com.example.linh.vietkitchen.extension.findIndex
-import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.ShimmerAdapter
-import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.ShimmerItemDelegate
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
 
 class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
-                    val listener: OnItemClickListener? = null) : ShimmerAdapter() {
+                    val listener: OnItemClickListener? = null) : LoadMoreAdapter() {
     init {
         delegatesManager.addDelegate(RecipeAdapterDelegate(listener))
-        delegatesManager.addDelegate(ShimmerItemDelegate())
         setItems(items)
     }
 
