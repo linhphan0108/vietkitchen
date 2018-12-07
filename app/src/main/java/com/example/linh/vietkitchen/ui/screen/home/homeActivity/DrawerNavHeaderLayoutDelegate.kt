@@ -3,7 +3,6 @@ package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.ui.home.homeActivity.DrawerNavHeaderViewHolder
 import com.example.linh.vietkitchen.ui.model.DrawerNavHeader
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.UserInfo
