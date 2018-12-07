@@ -9,6 +9,7 @@ interface BasePresenterContract<V> {
 
 interface BaseViewContract {
     val viewContext: Context?
+    fun onNoInternetException()
     fun showProgress()
     fun hideProgress()
 }
