@@ -12,14 +12,15 @@ import java.io.*
 import android.graphics.BitmapFactory
 import timber.log.Timber
 
-
-const val IMAGE_COMPRESSION_DIR = "/ImageCompressor"
-const val MAX_IMAGE_WIDTH = 1080
-const val MAX_IMAGE_HEIGHT = 810 // w/h = 4/3
-const val MAX_THUMB_IMAGE_WIDTH = 540 // ~0.5 MAX WIDTH
-const val MAX_THUMB_IMAGE_HEIGHT = 405
-
 class ImageOptimizationUtil {
+    companion object {
+        const val IMAGE_COMPRESSION_DIR = "/ImageCompressor"
+        const val MAX_IMAGE_WIDTH = 1080
+        const val MAX_IMAGE_HEIGHT = 810 // w/h = 4/3
+        const val MAX_THUMB_IMAGE_WIDTH = 540 // ~0.5 MAX WIDTH
+        const val MAX_THUMB_IMAGE_HEIGHT = 405
+    }
+
     /**
      * compress the file/photo from @param <b>uri</b> to a private location on the current device and return the compressed file.
         @param uri = The original image uri

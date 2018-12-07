@@ -11,8 +11,15 @@ import android.widget.TextView
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.attractAnnotationSpan
 import com.example.linh.vietkitchen.extension.ctx
+import timber.log.Timber
+
+
+private const val TIME_BETWEEN_EACH_INVALIDATION = 16 // milliseconds
 
 class ImageSpanTextView : TextView{
+    private var lastTimeInvalidate = 0L //milliseconds
+    private var hasQueueValidationCAll = false
+
     constructor(context: Context): super(context) {
         this.onConstructor(context, null, 0, 0)
     }
@@ -47,6 +54,32 @@ class ImageSpanTextView : TextView{
             super.setText(ssb, type)
         }else {
             super.setText(text, type)
+        }
+    }
+
+
+    override fun invalidate() {
+        val currentTime = System.currentTimeMillis()
+        val elapsedTime = currentTime - lastTimeInvalidate
+        if(elapsedTime >= TIME_BETWEEN_EACH_INVALIDATION && !hasQueueValidationCAll){
+            lastTimeInvalidate = currentTime
+            Timber.d("super.invalidate()")
+            super.invalidate()
+        }else{
+            if(!hasQueueValidationCAll){
+                hasQueueValidationCAll = true
+                val delay = TIME_BETWEEN_EACH_INVALIDATION - elapsedTime
+                postDelayed({
+                    val curr = System.currentTimeMillis()
+                    val elapsed = curr - lastTimeInvalidate
+                    if(elapsed >= TIME_BETWEEN_EACH_INVALIDATION) {
+                        Timber.d("super.invalidate()")
+                        lastTimeInvalidate = curr
+                        hasQueueValidationCAll = false
+                        super.invalidate()
+                    }
+                }, delay)
+            }
         }
     }
 

@@ -7,7 +7,6 @@ import android.widget.TextView
 import com.example.linh.vietkitchen.extension.ctx
 import com.example.linh.vietkitchen.util.ScreenUtil
 
-private val SCREEN_WIDTH = ScreenUtil.screenWidth()
 object ImageSpanUtil{
     fun replaceAnnotationByImageSpan(textView: TextView, ssb: SpannableStringBuilder, annotation: Annotation) {
         val ctx = textView.ctx
@@ -16,9 +15,9 @@ object ImageSpanUtil{
         val imageSpan = if (id != 0){//local drawable resource
             ImageSpan(ctx, id, ImageSpan.ALIGN_BASELINE)
         }else{//internet resource
-            val w = SCREEN_WIDTH - ScreenUtil.dp2px(ctx, 64)//minus the parent's padding
-            val h = (w * 3) / 4
             val cornerRadius = ScreenUtil.dp2px(8)
+            val w = ScreenUtil.screenWidth() - ScreenUtil.dp2px(32)//minus the parent's padding
+            val h = (w * 3) / 4
             val imageGetter = GlideImageGetter(textView, w, h, cornerRadius)
             ImageSpan(imageGetter.getDrawable(url), url)
         }

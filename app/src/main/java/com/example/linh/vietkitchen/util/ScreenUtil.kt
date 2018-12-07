@@ -21,4 +21,9 @@ object ScreenUtil {
 
     fun screenWidth() = Resources.getSystem().displayMetrics.widthPixels
     fun screenHeight() = Resources.getSystem().displayMetrics.heightPixels
+
+    fun getMaxWidthImage(): Int{
+        val screenWidth = screenWidth()
+        return Math.min(screenWidth, ImageOptimizationUtil.MAX_IMAGE_WIDTH)
+    }
 }
