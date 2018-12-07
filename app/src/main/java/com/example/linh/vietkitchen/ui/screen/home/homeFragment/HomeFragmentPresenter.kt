@@ -57,7 +57,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
 
     override fun requestFoods(category: String?){
         if (isLoadMoreRecipe){
-            viewContract?.onLoadingMore()
+            viewContract?.onStartLoadMore()
         }else {
             viewContract?.onRefreshRecipe()
         }
@@ -69,7 +69,6 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe ({
-                    viewContract?.hideShimmer()
                     if (it != null && it.isEmpty()) {
                         viewContract?.onFoodsRequestFailed("Oops! something went wrong, no data found")
                     }else{
@@ -84,7 +83,6 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                     }
 
                 }, {
-                    viewContract?.hideShimmer()
                     Timber.e(it)
                     when {
                         it is FirebaseNoDataException -> {
