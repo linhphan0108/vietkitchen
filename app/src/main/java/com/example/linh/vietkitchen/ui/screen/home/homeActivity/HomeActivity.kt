@@ -83,6 +83,10 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun onNoInternetException() {
+
+    }
+
     override fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
         drawerNavAdapter.updateItemThenNotify(items)
         navItems = items

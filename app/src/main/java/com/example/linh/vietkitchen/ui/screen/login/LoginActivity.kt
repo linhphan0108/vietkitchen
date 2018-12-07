@@ -32,5 +32,9 @@ class LoginActivity : BaseActivity<LoginContractView, LoginPresenter>(),
     override fun getViewContract() = this
 
     override fun getActivityLayoutRes() = R.layout.activity_login
+
+    override fun onNoInternetException() {
+
+    }
     //endregion MVP callbacks
 }

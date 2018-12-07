@@ -103,6 +103,8 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 
     override fun getActivityLayoutRes() = R.layout.activity_detail
 
+    override fun onNoInternetException() {
+    }
 
     override fun onLikeChangedSuccess(state: Boolean) {
         likeState = state

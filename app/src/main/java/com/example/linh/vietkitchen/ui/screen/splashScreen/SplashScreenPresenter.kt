@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.command.RequestRecipesIdCommand
+import com.example.linh.vietkitchen.exception.NoInternetConnection
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
@@ -11,7 +12,6 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.internal.operators.flowable.FlowableEmpty
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -138,12 +138,20 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
 
     override fun requestLikedRecipesId(uid: String) {
         requestRecipesIdCommand.uid = uid
-        compositeDisposable.add(requestRecipesIdCommand.execute()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({ recipesId ->
-                    viewContract?.onRequestLikedRecipesIdSuccess(recipesId)
-                }, {
-                    viewContract?.onRequestLikedRecipesIdFailed()
-                }))
+        compositeDisposable.add(requestRecipesIdCommand.executeOnTheInternet(context!!)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe ({ recipesId ->
+                            viewContract?.onRequestLikedRecipesIdSuccess(recipesId)
+                        }, {e ->
+                            when(e){
+                                is NoInternetConnection ->{
+                                    viewContract?.onNoInternetException()
+                                }
+
+                                else -> {
+                                    viewContract?.onRequestLikedRecipesIdFailed(e.message)
+                                }
+                            }
+                        }))
     }
 }

@@ -3,8 +3,11 @@ package com.example.linh.vietkitchen.ui.screen.splashScreen
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.extension.showSnackBar
+import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.model.UserInfo
@@ -14,7 +17,6 @@ import kotlinx.android.synthetic.main.activity_splash_screen.*
 
 class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreenContractPresenter>(),
         SplashScreenContractView {
-
     lateinit var userInfo: UserInfo
 
     //region lifecycle callbacks ===================================================================
@@ -29,6 +31,10 @@ class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreen
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         presenter.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 
     //endregion lifecycle callbacks
@@ -49,6 +55,11 @@ class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreen
 
     override fun getActivityLayoutRes() = R.layout.activity_splash_screen
 
+    override fun onNoInternetException() {
+        slackLoadingView.reset()
+        txtDotLoader.visibility = View.INVISIBLE
+    }
+
     override fun onHasLoggedIn() {
         userInfo = VietKitchenApp.userInfo
         presenter.requestLikedRecipesId(userInfo.uid)
@@ -63,7 +74,10 @@ class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreen
         presenter.gotoNextScreen()
     }
 
-    override fun onRequestLikedRecipesIdFailed() {
+    override fun onRequestLikedRecipesIdFailed(message: String?) {
+        message?.also {
+            toast(it)
+        }
     }
 
     override fun gotoHomeScreen(){

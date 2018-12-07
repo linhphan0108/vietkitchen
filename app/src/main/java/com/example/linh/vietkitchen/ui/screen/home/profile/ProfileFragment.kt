@@ -40,6 +40,10 @@ class ProfileFragment : BaseFragment<ProfileContractView, ProfileContractPresent
     override fun hideProgress() {
     }
 
+    override fun onNoInternetException() {
+
+    }
+
     override fun onLogoutSuccess() {
         activity?.finish()
     }
