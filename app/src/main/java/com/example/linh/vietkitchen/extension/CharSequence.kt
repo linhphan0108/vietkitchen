@@ -24,6 +24,7 @@ fun CharSequence.attractUrlFromAnnotation(): List<String>? {
 }
 
 fun CharSequence.generateAnnotationSpan(): CharSequence{
+    if (length == 0) return ""
     val source = this
     val ssb = SpannableStringBuilder(source)
     val imgAnnotationPattern: Pattern = Pattern.compile("(<annotation src=\"(.*?)\"/>)")
