@@ -5,11 +5,9 @@ import com.example.linh.vietkitchen.ui.screen.home.BaseHomeContractPresenter
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeContractView
 
 interface HomeFragmentContractView : BaseHomeContractView {
-    fun showShimmer()
-    fun hideShimmer()
+    fun onStartLoadMore()
     fun onFoodsRequestSuccess(recipes: List<Recipe>)
     fun onFoodsRequestFailed(msg: String)
-    fun onLoadingMore()
     fun onRefreshRecipe()
     fun onLoadMoreSuccess(recipes: List<Recipe>)
     fun onLoadMoreFailed()

@@ -142,25 +142,21 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     }
 
     override fun onRefreshRecipe() {
-        showShimmer()
-    }
-
-    override fun onLoadingMore() {
-        recipeAdapter.startLoadMoreAnimation()
+//        onStartLoadMore()
     }
 
     override fun onLoadMoreSuccess(recipes: List<Recipe>) {
         toast("onLoadMoreSuccess ${recipes.size}")
-        recipeAdapter.stopLoadMoreAnimation()
+        recipeAdapter.stopLoadMore()
         recipeAdapter.setMoreItems(recipes.toMutableList())
     }
 
     override fun onLoadMoreFailed() {
-        recipeAdapter.stopLoadMoreAnimation()
+        recipeAdapter.stopLoadMore()
     }
 
     override fun onLoadMoreReachEndRecord() {
-        recipeAdapter.stopLoadMoreAnimation()
+        recipeAdapter.stopLoadMore()
         toast("onLoadMoreReachEndRecord")
     }
 
@@ -181,12 +177,8 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         toast(msg)
     }
 
-    override fun showShimmer() {
-        recipeAdapter.startShimmerAnimation()
-    }
-
-    override fun hideShimmer() {
-        recipeAdapter.stopShimmerAnimation()
+    override fun onStartLoadMore() {
+        recipeAdapter.startLoadMore()
     }
 
     override fun showProgress() {
@@ -224,12 +216,10 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     //region inner methods =========================================================================
     private fun setupSwipeRefreshLayout(){
-        val waveColor = context?.color(R.color.color_wave_refresh) ?: 0
         val progressColor1 = context?.color(R.color.color_wave_refresh_progress_1) ?: 0
         val progressColor2 = context?.color(R.color.color_wave_refresh_progress_2) ?: 0
         val progressColor3 = context?.color(R.color.color_wave_refresh_progress_3) ?: 0
         swipeRefresh.setColorSchemeColors(progressColor1, progressColor2, progressColor3)
-        swipeRefresh.setWaveColor(waveColor)
         swipeRefresh.isRefreshing = true
         swipeRefresh.setOnRefreshListener {
             rcvLoadMoreListener.onRefresh()
