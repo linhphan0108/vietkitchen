@@ -24,7 +24,7 @@ import java.io.InputStream
 @GlideModule
 class CustomGlideModule : AppGlideModule() {
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        val memoryCacheSizeBytes = 1024 * 1024 * 20 // 20mb
+        val memoryCacheSizeBytes = 1024 * 1024 * 20 // 20MB
         builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, memoryCacheSizeBytes.toLong()))
         builder.setDefaultRequestOptions(requestOptions(context))
@@ -44,12 +44,12 @@ class CustomGlideModule : AppGlideModule() {
         return RequestOptions()
                 .signature(ObjectKey(
                         System.currentTimeMillis() / (24 * 60 * 60 * 1000)))
-                .override(ScreenUtil.dp2px(400))
+                .override(ScreenUtil.dp2px(100))
                 .centerCrop()
                 .encodeFormat(Bitmap.CompressFormat.PNG)
-                .encodeQuality(100)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .encodeQuality(80)
                 .format(DecodeFormat.PREFER_RGB_565)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .skipMemoryCache(false)
 
     }
