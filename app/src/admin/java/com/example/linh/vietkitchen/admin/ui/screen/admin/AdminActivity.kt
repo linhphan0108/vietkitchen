@@ -355,14 +355,14 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     private fun onRequestPreparationImage(uri: Uri){
         val pos = edtPreparation.selectionEnd
         val editable = edtPreparation.editableText
-        val annotation = "<annotation src=\"$uri\"/>"
+        val annotation = "\n<annotation src=\"$uri\"/>\n"
         editable.insert(pos, annotation)
     }
 
     private fun onRequestProcessImage(uri: Uri){
         val pos = edtProcess.selectionEnd
         val editable = edtProcess.editableText
-        val annotation = "<annotation src=\"$uri\"/>"
+        val annotation = "\n<annotation src=\"$uri\"/>\n"
         editable.insert(pos, annotation)
     }
 
@@ -384,7 +384,7 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                 }
                 return false
             }
-        })
+        }).into(imgHeaderImage)
     }
 
     //#endregion inner methods
