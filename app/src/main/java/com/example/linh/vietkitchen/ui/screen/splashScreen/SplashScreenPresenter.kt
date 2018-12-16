@@ -10,8 +10,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.internal.operators.flowable.FlowableEmpty
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -80,12 +79,10 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
             viewContract?.gotoHomeScreen()
         }else{
             val delayTime = TIME_WAITING_IN_SPLASH_SCREEN - duration
-            compositeDisposable.add(FlowableEmpty.just(true)
-                    .delay(delayTime, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        viewContract?.gotoHomeScreen()
-                    })
+            launchDataLoad({
+                delay(delayTime)
+                viewContract?.gotoHomeScreen()
+            })
         }
     }
 
@@ -137,21 +134,22 @@ class SplashScreenPresenter(private val requestRecipesIdCommand: RequestRecipesI
     }
 
     override fun requestLikedRecipesId(uid: String) {
-        requestRecipesIdCommand.uid = uid
-        compositeDisposable.add(requestRecipesIdCommand.executeOnTheInternet(context!!)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe ({ recipesId ->
-                            viewContract?.onRequestLikedRecipesIdSuccess(recipesId)
-                        }, {e ->
-                            when(e){
-                                is NoInternetConnection ->{
-                                    viewContract?.onNoInternetException()
-                                }
+        launchDataLoad({
+            val recipesId = withIoContext {
+                requestRecipesIdCommand.uid = uid
+                requestRecipesIdCommand.executeOnTheInternet(context!!)
+            }
+            viewContract?.onRequestLikedRecipesIdSuccess(recipesId)
+        }, {e->
+            when(e){
+                is NoInternetConnection ->{
+                    viewContract?.onNoInternetException()
+                }
+                else -> {
+                    viewContract?.onRequestLikedRecipesIdFailed(e.message)
 
-                                else -> {
-                                    viewContract?.onRequestLikedRecipesIdFailed(e.message)
-                                }
-                            }
-                        }))
+                }
+            }
+        })
     }
 }

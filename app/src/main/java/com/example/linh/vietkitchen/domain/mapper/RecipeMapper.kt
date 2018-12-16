@@ -6,7 +6,11 @@ import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.google.firebase.database.DataSnapshot
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
-class RecipeMapper() {
+class RecipeMapper {
+
+    fun convertToDomain(children: List<DataSnapshot>): List<RecipeDomain> {
+        return convertToDomain(children.asIterable())
+    }
 
     fun convertToDomain(children: Iterable<DataSnapshot>): List<RecipeDomain> {
         return if (children.none()){

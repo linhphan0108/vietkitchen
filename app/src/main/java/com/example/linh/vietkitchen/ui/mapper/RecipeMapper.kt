@@ -4,7 +4,6 @@ import com.example.linh.vietkitchen.extension.generateAnnotationSpan
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.model.Ingredient
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Ingredient as IngredientDomain
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain

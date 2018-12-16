@@ -14,19 +14,14 @@ import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
-import com.example.linh.vietkitchen.ui.home.homeActivity.*
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
 import com.example.linh.vietkitchen.util.Constants
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
 import kotlinx.android.synthetic.main.activity_home_content.*
-import org.greenrobot.eventbus.EventBus
 
 
 class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContractPresenter>(),
@@ -42,7 +37,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
-    internal var likeOrUnLikePublisher: Subject<Recipe> = PublishSubject.create()
     private lateinit var navItems: List<DrawerNavGroupItem>
 
     //region lifecycle =============================================================================
@@ -76,11 +70,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     override fun initPresenter() = HomeActivityPresenter()
 
     override fun showProgress() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun hideProgress() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onNoInternetException() {
@@ -90,7 +82,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     override fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
         drawerNavAdapter.updateItemThenNotify(items)
         navItems = items
-        EventBus.getDefault().post(items)
     }
 
     override fun onRequestCategoriesFailed(message: String) {

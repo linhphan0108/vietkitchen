@@ -69,7 +69,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         Timber.e("on activity created")
         setupSwipeRefreshLayout()
         setupRecyclerView()
-        presenter.refreshFoods()
+        presenter.refreshRecipes()
     }
 
     override fun onStart() {
@@ -197,7 +197,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     //region callbacks =============================================================================
     override fun onDrawerNavChanged(category: String?) {
-        presenter.refreshFoods(category)
+        presenter.refreshRecipes(category)
     }
 
     override fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean {
@@ -223,7 +223,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         swipeRefresh.isRefreshing = true
         swipeRefresh.setOnRefreshListener {
             rcvLoadMoreListener.onRefresh()
-            presenter.refreshFoods()
+            presenter.refreshRecipes()
         }
     }
     //endregion inner methods

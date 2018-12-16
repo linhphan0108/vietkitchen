@@ -1,16 +1,16 @@
 package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
+import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.provider.TagsProvider
-import io.reactivex.Completable
 
-class PutTagsCommand(private val provider: TagsProvider = TagsProvider()) : CommandCompletable {
+class PutTagsCommand(private val provider: TagsProvider = TagsProvider()) : CommandCoroutines<Response<Boolean>> {
     lateinit var tags: Map<String, Boolean>
 
-    override fun executeOnTheInternet(context: Context): Completable {
-        return isInternetOn(context)
-                .flatMapCompletable { execute() }
+    override suspend fun executeOnTheInternet(context: Context): Response<Boolean> {
+        isInternetOn(context)
+        return execute()
     }
 
-    override fun execute(): Completable = provider.putTags(tags)
+    override suspend fun execute(): Response<Boolean> = provider.putTags(tags)
 }

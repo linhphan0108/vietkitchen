@@ -1,10 +1,8 @@
 package com.example.linh.vietkitchen.ui.screen.home.favorite
 
 import com.example.linh.vietkitchen.domain.command.RequestLikedRecipesCommand
-import com.example.linh.vietkitchen.exception.FirebaseNoDataException
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomePresenter
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
-import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 
 class FavoritePresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
@@ -13,26 +11,23 @@ class FavoritePresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
     : BaseHomePresenter<FavoriteContractView>(), FavoriteContractPresenter {
 
     override fun requestLikedRecipes(ids: List<String>?) {
-        if (ids == null || ids.isEmpty()){
-            viewContract?.onRequestLikedRecipesSuccess(listOf())
-            return
-        }
-        likedRecipesCommand.ids = ids
-        compositeDisposable.add(likedRecipesCommand.execute()
-                .map {
-                    recipeMapper.convertToUi(it, true)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({
-                    viewContract?.onRequestLikedRecipesSuccess(it)
-                }, {
-                    if (it is FirebaseNoDataException){
-                        viewContract?.onRequestLikedRecipesNoData()
-                    }else {
-                        viewContract?.onRequestLikedRecipesFailed()
-                    }
-                    Timber.e(it)
-                }))
+        launchDataLoad(ioBlock = {
+            val likedRecipes = withIoContext {
+                likedRecipesCommand.ids = ids
+                val response = likedRecipesCommand.executeOnTheInternet(context!!)
+                recipeMapper.convertToUi(response.data!!, true)
+            }
+
+            if (likedRecipes.isNullOrEmpty()){
+                viewContract?.onRequestLikedRecipesNoData()
+            }else{
+                viewContract?.onRequestLikedRecipesSuccess(likedRecipes)
+            }
+        }, onError = {
+            viewContract?.onRequestLikedRecipesFailed()
+            Timber.e(it)
+        })
+
     }
 
     override fun requestLikedRecipes(uid: String) {

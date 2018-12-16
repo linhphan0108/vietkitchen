@@ -2,16 +2,28 @@ package com.example.linh.vietkitchen.ui.mvpBase
 
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
-import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.*
+import java.lang.Exception
 
 
 abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
-
     protected var viewContract: T? = null
     protected var context: Context? = null
     protected var activity: AppCompatActivity? = null
-    protected val  compositeDisposable : CompositeDisposable by lazy {
-        CompositeDisposable()}
+    /**
+     * This is the job for all coroutines started by this ViewModel.
+     *
+     * Cancelling this job will cancel all coroutines started by this ViewModel.
+     */
+    private val viewModelJob: Job by lazy { Job() }
+
+    /**
+     * This is the main scope for all coroutines launched by MainViewModel.
+     *
+     * Since we pass viewModelJob, you can cancel all coroutines launched by uiScope by calling
+     * viewModelJob.cancel()
+     */
+    private val uiScope: CoroutineScope by lazy { CoroutineScope(Dispatchers.Main + viewModelJob) }
 
     private val isViewAttached: Boolean
         get() = viewContract != null
@@ -35,42 +47,49 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
 
     override fun detachView() {
         viewContract = null
-        compositeDisposable.clear()
+        viewModelJob.cancel()
     }
 
     fun getStringRes(intRes: Int) = this.context?.getString(intRes) ?: ""
 
-//    fun checkViewAttached() {
-//        if (!isViewAttached) {
-//            throw MvpViewNotAttachedException()
-//        }
-//    }
+    /**
+     * Helper function to call a data load function with a loading spinner, errors will trigger a
+     * snackbar.
+     *
+     * By marking `ioBlock` as `suspend` this creates a suspend lambda which can call suspend
+     * functions.
+     *
+     * @param ioBlock lambda to actually load data. It is called in the uiScope. Before calling the
+     *              lambda the loading spinner will display, after completion or onError the loading
+     *              spinner will stop
+     */
+    fun launchDataLoad(ioBlock: suspend () -> Unit, onError: (suspend (ex: Exception) -> Unit)? = null
+                       , shouldShowProgress: Boolean = true): Job {
+        return uiScope.launch {
+            try {
+                if (shouldShowProgress)viewContract?.showProgress()
+                ioBlock()
+            } catch (e: Exception) {
+                onError?.invoke(e)
+            } finally {
+                if (shouldShowProgress)viewContract?.hideProgress()
+            }
+        }
+    }
 
-//    fun addSubscription(subscription: Subscription) {
-//        this.mCompositeSubscription.add(subscription)
-//    }
+    fun launchDataLoad(block: suspend () -> Unit, shouldShowProgress: Boolean = true): Job {
+        return launchDataLoad(block, null, shouldShowProgress)
+    }
 
-//    class MvpViewNotAttachedException : RuntimeException("Please call Presenter.attachView(MvpView) before" + " requesting data to the Presenter")
+    suspend fun <R> withIoContext(block: suspend () -> R): R{
+        return withContext(Dispatchers.IO) {
+            block()
+        }
+    }
 
-    //Reusing Transformers - Singleton
-//    fun <T> applySchedulers(): Observable.Transformer<T, T> {
-//        return schedulersTransformer as Observable.Transformer<T, T>
-//    }
-
-//    fun defaultSubscribeScheduler(): Scheduler {
-//        if (subscribeScheduler == null) {
-//            subscribeScheduler = Schedulers.io()
-//        }
-//        return subscribeScheduler
-//    }
-
-//    fun handleRetrofitError(error: Throwable) {
-//        Timber.e(error)
-//        viewContract!!.hideProgress()
-//        viewContract!!.loadError(error.message, Constants.RETROFIT_ERROR)
-//    }
-
-//    fun checkNotNull(`object`: Any?): Boolean {
-//        return `object` != null
-//    }
+    suspend fun <R> withComputationContext(block: suspend () -> R): R{
+        return withContext(Dispatchers.Default){
+            block()
+        }
+    }
 }

@@ -1,20 +1,20 @@
 package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
+import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
-import io.reactivex.Flowable
 
 class RequestLikedRecipesCommand(private val provider: RecipeProvider = RecipeProvider())
-    : CommandFollowable<List<Recipe>> {
+    : CommandCoroutines<Response<List<Recipe>>> {
     var ids: List<String>? = null
 
-    override fun executeOnTheInternet(context: Context): Flowable<out List<Recipe>> {
-        return isInternetOn(context)
-                .flatMap { execute() }
+    override suspend fun executeOnTheInternet(context: Context): Response<List<Recipe>> {
+        isInternetOn(context)
+        return execute()
     }
 
-    override fun execute(): Flowable<out List<Recipe>> {
+    override suspend fun execute(): Response<List<Recipe>> {
         return if (ids != null && ids!!.isNotEmpty()){
             provider.requestLikedRecipes(ids!!)
         }else {

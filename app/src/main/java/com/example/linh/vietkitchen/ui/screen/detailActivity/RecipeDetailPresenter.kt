@@ -3,7 +3,6 @@ package com.example.linh.vietkitchen.ui.screen.detailActivity
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
-import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 
 class RecipeDetailPresenter(private val likeCommand: PutLikeCommand = PutLikeCommand(),
@@ -19,28 +18,36 @@ class RecipeDetailPresenter(private val likeCommand: PutLikeCommand = PutLikeCom
     }
 
     private fun putLike(uid: String, id: String){
-        likeCommand.uid = uid
-        likeCommand.recipeId = id
-        compositeDisposable.add(likeCommand.execute()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({
-                    viewContract?.onLikeChangedSuccess(true)
-                }, {
-                    viewContract?.onLikeChangedFailed()
-                    Timber.e(it)
-                }))
+        launchDataLoad(ioBlock = {
+            withIoContext {
+                likeCommand.uid = uid
+                likeCommand.recipeId = id
+                likeCommand.executeOnTheInternet(context!!).data!!
+            }
+            viewContract?.onLikeChangedSuccess(true)
+//          viewContract?.onLikeChangedFailed()
+        }, onError = {e->
+            Timber.d(e)
+            viewContract?.onLikeChangedFailed()
+        })
     }
 
     private fun putUnlike(uid: String, id: String){
-        unlikeCommand.uid = uid
-        unlikeCommand.recipeId = id
-        compositeDisposable.add(unlikeCommand.execute()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({
-                    viewContract?.onLikeChangedSuccess(false)
-                }, {
-                    viewContract?.onLikeChangedFailed()
-                    Timber.e(it)
-                }))
+        launchDataLoad(ioBlock = {
+            val isSuccess = withIoContext {
+                unlikeCommand.uid = uid
+                unlikeCommand.recipeId = id
+                unlikeCommand.executeOnTheInternet(context!!).data!!
+            }
+            if (isSuccess) {
+                viewContract?.onLikeChangedSuccess(false)
+            }else {
+                viewContract?.onLikeChangedFailed()
+            }
+        }, onError = {e->
+            Timber.e(e)
+        })
+
+
     }
 }

@@ -1,18 +1,20 @@
 package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
+import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.provider.UserProvider
-import io.reactivex.Completable
-class PutLikeCommand(private val userProvider: UserProvider = UserProvider()) : CommandCompletable {
+
+class PutLikeCommand(private val userProvider: UserProvider = UserProvider())
+    : CommandCoroutines<Response<String>> {
     lateinit var uid: String
     lateinit var recipeId: String
 
-    override fun executeOnTheInternet(context: Context): Completable {
-        return isInternetOn(context)
-                .flatMapCompletable { execute() }
+    override suspend fun executeOnTheInternet(context: Context): Response<String> {
+        isInternetOn(context)
+        return execute()
     }
 
-    override fun execute(): Completable {
+    override suspend fun execute(): Response<String> {
         return userProvider.likeRecipe(uid, recipeId)
     }
 }

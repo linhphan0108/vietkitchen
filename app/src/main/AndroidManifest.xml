@@ -33,6 +33,7 @@
                   android:screenOrientation="portrait"/>
 
         <service android:name=".ui.service.PutRecipeService"/>
+        <service android:name=".ui.service.ReStructureImageFileService"/>
     </application>
 
 </manifest>
