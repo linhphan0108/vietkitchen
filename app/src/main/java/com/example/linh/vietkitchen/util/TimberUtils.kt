@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.extension
+package com.example.linh.vietkitchen.util
 
 import android.os.Looper
 import android.os.NetworkOnMainThreadException

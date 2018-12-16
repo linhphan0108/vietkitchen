@@ -18,7 +18,7 @@ interface HomeFragmentContractView : BaseHomeContractView {
 
 interface HomeFragmentContractPresenter : BaseHomeContractPresenter<HomeFragmentContractView> {
     fun requestFoods(category: String? = null)
-    fun refreshFoods(category: String? = null)
+    fun refreshRecipes(category: String? = null)
     fun loadMoreRecipe()
     fun deleteRecipe(recipe: Recipe, adapterPosition: Int)
 }

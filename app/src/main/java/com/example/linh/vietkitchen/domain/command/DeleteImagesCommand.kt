@@ -1,20 +1,20 @@
 package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
+import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
-import io.reactivex.Flowable
 
 class DeleteImagesCommand(private val recipeProvider: RecipeProvider = RecipeProvider())
-    : CommandFollowable<Boolean> {
+    : CommandCoroutines<Response<Boolean>> {
 
-    override fun executeOnTheInternet(context: Context): Flowable<out Boolean> {
-        return isInternetOn(context)
-                .flatMap { execute() }
+    override suspend fun executeOnTheInternet(context: Context): Response<Boolean> {
+        isInternetOn(context)
+        return execute()
     }
 
     lateinit var fileUrls: List<String>
 
-    override fun execute(): Flowable<out Boolean> {
+    override suspend fun execute(): Response<Boolean> {
         return recipeProvider.deleteImages(fileUrls)
     }
 }

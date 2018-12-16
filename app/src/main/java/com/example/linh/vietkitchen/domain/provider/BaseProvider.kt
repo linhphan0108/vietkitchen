@@ -5,6 +5,6 @@ import com.example.linh.vietkitchen.extension.lastResult
 
 abstract class BaseProvider<T>(private val sources: List<T>) {
 
-    protected fun <H : Any> requestToSources(f: (T) -> H?): H = sources.firstResult { f(it) }
-    protected fun <H : Any> putToSources(f: (T) -> H?): H = sources.lastResult{ f(it) }
+    protected suspend fun <H : Any> requestFirstSources(f: suspend (T) -> H?): H = sources.firstResult { f(it) }
+    protected suspend fun <H : Any> requestAllSources(f: suspend (T) -> H?): H = sources.lastResult{ f(it) }
 }

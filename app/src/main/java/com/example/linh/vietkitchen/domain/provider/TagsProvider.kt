@@ -2,10 +2,9 @@ package com.example.linh.vietkitchen.domain.provider
 
 import com.example.linh.vietkitchen.data.cloud.TagsCloudDataSource
 import com.example.linh.vietkitchen.data.local.TagsLocalDataSource
+import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.datasource.TagsDataSource
 import com.example.linh.vietkitchen.domain.mapper.TagsMapper
-import io.reactivex.Completable
-import io.reactivex.Flowable
 
 class TagsProvider(private val mapper: TagsMapper = TagsMapper(),
                    sources: List<TagsDataSource> = SOURCES) : BaseProvider<TagsDataSource>(sources) {
@@ -15,13 +14,14 @@ class TagsProvider(private val mapper: TagsMapper = TagsMapper(),
         }
     }
 
-    fun getTags() : Flowable<Map<String, Boolean>> = requestToSources { it ->
-        it.getTags()?.map { dataSnapshot ->
-            mapper.convertToDomain(dataSnapshot)
+    suspend fun getTags() : Response<Map<String, Boolean>> = requestFirstSources { it ->
+        val dataResponse = it.getTags()
+        dataResponse?.let {
+            mapper.convertToDomain(dataResponse)
         }
     }
 
-    fun putTags(tags: Map<String, Boolean>) : Completable = requestToSources {
+    suspend fun putTags(tags: Map<String, Boolean>) : Response<Boolean> = requestAllSources {
         it.putTags(tags)
     }
 }

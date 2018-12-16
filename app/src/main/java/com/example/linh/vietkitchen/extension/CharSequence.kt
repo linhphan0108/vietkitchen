@@ -7,13 +7,13 @@ import timber.log.Timber
 import java.util.regex.Pattern
 
 fun CharSequence.attractAnnotationSpan(): Array<out Annotation>? {
-    if(isEmpty()) return arrayOf()
+    if(isBlank()) return arrayOf()
     val spannable = this as Spannable
     return spannable.getSpans(0, spannable.length, Annotation::class.java)
 }
 
 fun CharSequence.attractUrlFromAnnotation(): List<String>? {
-    if(isEmpty()) return null
+    if(isBlank()) return null
     val srcPattern = Pattern.compile("(?<=<annotation src=\")(.*?)(?=\"/>)")
     val matcher = srcPattern.matcher(this)
     val result = mutableListOf<String>()
@@ -24,7 +24,7 @@ fun CharSequence.attractUrlFromAnnotation(): List<String>? {
 }
 
 fun CharSequence.generateAnnotationSpan(): CharSequence{
-    if (length == 0) return ""
+    if (isBlank()) return ""
     val source = this
     val ssb = SpannableStringBuilder(source)
     val imgAnnotationPattern: Pattern = Pattern.compile("(<annotation src=\"(.*?)\"/>)")

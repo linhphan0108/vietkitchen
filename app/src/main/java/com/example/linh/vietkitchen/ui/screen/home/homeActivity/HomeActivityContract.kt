@@ -1,4 +1,4 @@
-package com.example.linh.vietkitchen.ui.home.homeActivity
+package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
@@ -12,5 +12,4 @@ interface HomeActivityContractView : BaseViewContract {
 
 interface HomeActivityContractPresenter : BasePresenterContract<HomeActivityContractView> {
     fun requestCategory()
-    fun putARecipe()
 }

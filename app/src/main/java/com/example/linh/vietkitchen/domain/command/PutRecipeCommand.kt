@@ -1,18 +1,18 @@
 package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
+import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
-import io.reactivex.Flowable
 
-class PutRecipeCommand(private val provider: RecipeProvider = RecipeProvider()) : CommandFollowable<String>{
+class PutRecipeCommand(private val provider: RecipeProvider = RecipeProvider()) : CommandCoroutines<Response<String>>{
     lateinit var recipe: Recipe
 
-    override fun executeOnTheInternet(context: Context): Flowable<String> {
-        return isInternetOn(context)
-                .flatMap { execute() }
+    override suspend fun executeOnTheInternet(context: Context): Response<String> {
+        isInternetOn(context)
+        return execute()
     }
 
-    override fun execute() = provider.putFood(recipe)
+    override suspend fun execute() = provider.putRecipe(recipe)
 
 }

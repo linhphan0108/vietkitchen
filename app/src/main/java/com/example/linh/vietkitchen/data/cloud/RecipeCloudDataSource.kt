@@ -1,259 +1,133 @@
 package com.example.linh.vietkitchen.data.cloud
 
-import android.net.Uri
-import com.example.linh.vietkitchen.domain.mapper.RecipeMapper
-import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
-import com.example.linh.vietkitchen.exception.FirebaseDataException
-import com.example.linh.vietkitchen.exception.FirebaseNoDataException
+import com.example.linh.vietkitchen.data.response.PagingResponse
+import com.example.linh.vietkitchen.data.response.Response
+import com.example.linh.vietkitchen.domain.datasource.*
 import com.example.linh.vietkitchen.util.Constants.STARAGE_RECIPES_CHILD_CATEGORIES
-import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
-import com.google.android.gms.tasks.Continuation
-import com.google.android.gms.tasks.Task
+import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.FlowableOnSubscribe
-import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
-import java.io.File
-import java.util.*
+import java.lang.NullPointerException
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
-class RecipeCloudDataSource(private val mapper: RecipeMapper = RecipeMapper()) : RecipeDataSource {
-
+class RecipeCloudDataSource : RecipeDataSource {
     private val database by lazy { FirebaseDatabase.getInstance() }
     private val dbRefRecipe by lazy { database.getReference(STORAGE_RECIPES_PATH) }
     private val dbRefUser by lazy { database.getReference(STORAGE_USER_PATH) }
     private val storage = FirebaseStorage.getInstance()
     private val storageRecipeRef = storage.reference.child("images/recipes/")
 
-    override fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): Flowable<List<DataSnapshot>> {
+    override suspend fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
         val isLoadingMore = startAtId != null
         val limitFixed = if (isLoadingMore) limit + 1 else limit
-        return Flowable.create(FlowableOnSubscribe<DataSnapshot> { emitter ->
-            val query = if (tag.isNullOrBlank()) {
-                if (isLoadingMore) {
-                    dbRefRecipe.orderByKey()
-                            .startAt(startAtId)
-                } else {
-                    dbRefRecipe.orderByKey()
-                }
+        val query = if (tag.isNullOrBlank()) {
+            if (isLoadingMore) {
+                dbRefRecipe.orderByKey()
+                        .startAt(startAtId)
             } else {
-                if (isLoadingMore) {
-                    dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
-                            .equalTo(true)
-                            .startAt(startAtId)
-                } else {
-                    dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
-                            .equalTo(true)
-                }
-            }.limitToFirst(limitFixed)
-            query.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    if(!emitter.isCancelled) {
-                        emitter.onError(FirebaseDataException(p0))
-                        emitter.onComplete()
-                    }
-                }
-
-                override fun onDataChange(p0: DataSnapshot) {
-                    if(!emitter.isCancelled) {
-                        if (p0.value != null) {
-                            emitter.onNext(p0)
-                        }
-                        emitter.onComplete()
-                    }
-                }
-            })
-        }, BackpressureStrategy.DROP)
-                .observeOn(Schedulers.computation())
-                .doOnNext {
-                    val minCount = if (isLoadingMore) 1 else 0
-                    if (it.children.count() <= minCount) throw FirebaseNoDataException()
-                }
-                .map {
-                    val shouldRemoveItems = if (isLoadingMore) 1 else 0
-                    it.children.drop(shouldRemoveItems)
-                }
-
-    }
-
-    override fun getLikedRecipes(ids: List<String>): Flowable<DataSnapshot> {
-        return Flowable.fromIterable(ids)
-                .observeOn(Schedulers.computation())
-                .flatMap {key ->
-                    Flowable.create(FlowableOnSubscribe<DataSnapshot> {emitter ->
-                        val query = dbRefRecipe.child(key)
-                        query.addListenerForSingleValueEvent(object: ValueEventListener{
-                            override fun onCancelled(p0: DatabaseError) {
-                                if(!emitter.isCancelled) {
-                                    emitter.onError(FirebaseDataException(p0))
-                                    emitter.onComplete()
-                                }
-                            }
-                            override fun onDataChange(p0: DataSnapshot) {
-                                if(!emitter.isCancelled) {
-                                    if (p0.value != null) {
-                                        emitter.onNext(p0)
-                                    }
-                                    emitter.onComplete()
-                                }
-                            }
-                        })
-                    }, BackpressureStrategy.DROP)
-                }
-    }
-
-//    override fun getLikedRecipes(uid: String): Flowable<List<RecipeDomain>>? {
-//        return getLikedRecipesId(uid)
-//                .flatMap {listIds ->
-//                    if (listIds.isNotEmpty()) {
-//                        Flowable.fromIterable(listIds)
-//                    } else {
-//                        throw EmptyException()
-//                    }
-//                }.flatMap {key ->
-//                    Flowable.create(FlowableOnSubscribe<DataSnapshot> {emitter ->
-//                        val query = dbRefRecipe.child(key)
-//                        query.addListenerForSingleValueEvent(object: ValueEventListener{
-//                            override fun onCancelled(p0: DatabaseError) {
-//                                emitter.onError(FirebaseDataException(p0))
-//                            }
-//                            override fun onDataChange(p0: DataSnapshot) {
-//                                emitter.onNext(p0)
-//                            }
-//                        })
-//                    }, BackpressureStrategy.DROP)
-//                }.map {mapper.convertToDomain(it)}
-//                .toList().toFlowable()
-//
-//    }
-
-    override fun deleteRecipe(recipe: Recipe): Completable {
-        return Completable.create { emitter ->
-            dbRefRecipe.child(recipe.id!!).removeValue()
-                    .addOnSuccessListener {
-                        if(!emitter.isDisposed) {
-                            emitter.onComplete()
-                        }
-                    }
-                    .addOnFailureListener {
-                        if(!emitter.isDisposed) {
-                            emitter.onError(it)
-                        }
-                    }
-        }.observeOn(Schedulers.computation())
-    }
-
-    override fun putRecipe(recipe: Recipe): Flowable<String> {
-        return Flowable.create (FlowableOnSubscribe<String> { emitter ->
-            dbRefRecipe.push().setValue(recipe){databaseError, databaseReference ->
-                if (databaseError == null){
-                    if(!emitter.isCancelled) {
-                        emitter.onNext(databaseReference.key.toString())
-                        emitter.onComplete()
-                    }
-                }else{
-                    if(!emitter.isCancelled) {
-                        emitter.onError(databaseError.toException())
-                    }
-                }
+                dbRefRecipe.orderByKey()
             }
-        }, BackpressureStrategy.DROP)
-                .observeOn(Schedulers.computation())
+        } else {
+            if (isLoadingMore) {
+                dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
+                        .equalTo(true)
+                        .startAt(startAtId)
+            } else {
+                dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
+                        .equalTo(true)
+            }
+        }.limitToFirst(limitFixed)
+
+        val dataSnapshot = query.addListenerForSingleValueEventAwait()
+
+        val hasReachEnd = dataSnapshot.children.count() < limitFixed
+        val shouldRemoveItems = if (isLoadingMore) 1 else 0
+        val listDataSnapshot = if (isLoadingMore){
+            dataSnapshot.children.drop(shouldRemoveItems)
+        }else{
+            dataSnapshot.children
+        }.toList()
+        return PagingResponse(RESPONSE_SUCCESS,
+                listDataSnapshot, hasReachEnd)
     }
 
-    override fun putRecipeWithDumpData(): Completable? {
-        return Completable.create { emitter ->
-            dbRefRecipe.push().setValue(createADumpFood())
-                    .addOnSuccessListener {
-                        if(!emitter.isDisposed) {
-                            emitter.onComplete()
-                        }
-                    }
-                    .addOnFailureListener {
-                        if(!emitter.isDisposed) {
-                            emitter.onError(it)
-                        }
-                    }
-        }.observeOn(Schedulers.computation())
+    override suspend fun getLikedRecipes(ids: List<String>): Response<List<DataSnapshot>> {
+        val result = mutableListOf<DataSnapshot>()
+        ids.forEach {key ->
+            val query = dbRefRecipe.child(key)
+            result.add(query.addListenerForSingleValueEventAwait())
+        }
+        return Response(RESPONSE_SUCCESS, result)
+    }
+
+    override suspend fun deleteRecipe(recipe: Recipe): Response<Boolean> {
+        val isSuccess = dbRefRecipe.child(recipe.id!!).removeValueAwait()
+        return Response(RESPONSE_SUCCESS, isSuccess)
+    }
+
+    override suspend fun putRecipe(recipe: Recipe): Response<String>? {
+        val id = dbRefRecipe.push().setValueAwait(recipe)
+        return Response(RESPONSE_SUCCESS, id)
+    }
+
+    override suspend fun updateRecipe(recipe: Recipe): Response<Boolean> {
+        val id = recipe.id
+        if (id.isNullOrBlank()) throw NullPointerException("id must be not null")
+        recipe.id = null
+        dbRefRecipe.child(id).setValueAwait(recipe)
+        return Response(RESPONSE_SUCCESS, true)
+    }
+
+    override suspend fun putRecipeWithDumpData(): Response<Boolean>? {
+//        return Completable.create { emitter ->
+//            dbRefRecipe.push().setValue(createADumpFood())
+//                    .addOnSuccessListener {
+//                        if(!emitter.isDisposed) {
+//                            emitter.onComplete()
+//                        }
+//                    }
+//                    .addOnFailureListener {
+//                        if(!emitter.isDisposed) {
+//                            emitter.onError(it)
+//                        }
+//                    }
+//        }.observeOn(Schedulers.computation())
 
 //        return RxFirebaseDatabase.setValue(dbRefRecipe, createADumpFood())
+        return null
     }
 
-    override fun uploadImages(multiPartFileList: List<ImageUpload>): Flowable<ImageUpload> {
-        return Flowable.fromIterable(multiPartFileList)
-                .concatMap {
-                    uploadImage(it)
-                }.observeOn(Schedulers.computation())
+    override suspend fun uploadImages(multiPartFileList: List<ImageUpload>): Response<List<ImageUpload>> {
+        multiPartFileList.forEach {
+            uploadImage(it)
+        }
+        return Response(RESPONSE_SUCCESS, multiPartFileList)
     }
 
 
 
-    private fun uploadImage(image: ImageUpload): Flowable<ImageUpload>? {
-        return Flowable.create(FlowableOnSubscribe<ImageUpload> {emitter ->
-            val storageRecipeImageRef = storageRecipeRef.child(image.fileName)
-            storageRecipeImageRef.putFile(Uri.fromFile(File(image.optimizedPath)))
-                    .addOnProgressListener { taskSnapshot ->
-                        val progress: Int = (100 * taskSnapshot.bytesTransferred.toFloat() / taskSnapshot.totalByteCount).toInt()
-                        val message = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, progress)
-                        emitter.onNext(message)
-                    }
-                    .continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-                        if (!task.isSuccessful) {
-                            task.exception?.let {
-                                throw it
-                            }
-                        }
-                        return@Continuation storageRecipeImageRef.downloadUrl
-                    })
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val remoteUri = (task.result as Uri).toString()
-                            val message = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, 100, remoteUri)
-                            emitter.onNext(message)
-                            emitter.onComplete()
-                            Timber.d("uploaded ${image.originalPath} into storage ")
-                        } else {
-                            // Handle failures
-                            Timber.e(task.exception)
-                        }
-                    }
-        }, BackpressureStrategy.DROP)
-                .observeOn(Schedulers.computation())
+    private suspend fun uploadImage(image: ImageUpload): Response<ImageUpload> {
+        val storageRecipeImageRef = storageRecipeRef.child(image.fileName)
+        return storageRecipeImageRef.putImageAwait(image)
     }
 
-    override fun deleteImages(fileUrls: List<String>): Flowable<Boolean> {
-        return Flowable.fromIterable(fileUrls)
-                .concatMap {
-                    deleteImage(it)
-                }
-                .observeOn(Schedulers.computation())
+    override suspend fun deleteImages(fileUrls: List<String>): Response<Boolean> {
+        var result = true
+        fileUrls.forEach {
+            val isSuccess = deleteImage(it)
+            if (!isSuccess.data!!){
+                result = false
+            }
+        }
+        return Response(RESPONSE_SUCCESS, result)
     }
 
-    private fun deleteImage(url: String): Flowable<Boolean>{
-        return Flowable.create(FlowableOnSubscribe<Boolean> { emitter ->
-            storage.getReferenceFromUrl(url)
-                    .delete()
-                    .addOnSuccessListener {
-                        emitter.onNext(true)
-                        emitter.onComplete()
-                        Timber.d("deleted file successfully at $url")
-                    }.addOnFailureListener {
-                        emitter.onNext(false)
-                        emitter.onComplete()
-                        Timber.d("deleted failed successfully at $url")
-                    }
-        }, BackpressureStrategy.DROP)
-                .observeOn(Schedulers.computation())
+    private suspend fun deleteImage(url: String): Response<Boolean>{
+            return storage.getReferenceFromUrl(url)
+                    .deleteAwait()
     }
 
     private fun createADumpFood(): Recipe {

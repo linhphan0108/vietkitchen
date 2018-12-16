@@ -1,11 +1,16 @@
 package com.example.linh.vietkitchen.domain.mapper
 
+import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.data.cloud.Category as CatDataLayer
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.domain.model.CategoryChild
 import com.google.firebase.database.DataSnapshot
 
 class CategoryMapper{
+    fun convertToDomain(res: Response<DataSnapshot>): Response<List<CategoryGroup>> {
+        val data = if (res.data != null) convertToDomain(res.data) else null
+        return Response(res.code, data, res.message, res.exception)
+    }
     fun convertToDomain(categorySnapshot: DataSnapshot): List<CategoryGroup>{
         val categoryGroups = mutableListOf<CategoryGroup>()
         categorySnapshot.children.forEachIndexed { order, orderDataSnapshot ->

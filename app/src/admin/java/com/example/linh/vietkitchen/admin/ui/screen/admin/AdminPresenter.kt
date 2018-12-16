@@ -5,7 +5,6 @@ import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import com.example.linh.vietkitchen.extension.generateAnnotationSpan
 import com.example.linh.vietkitchen.ui.service.PutRecipeService
@@ -101,18 +100,15 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
 
 
     override fun getTags() {
-        compositeDisposable.add(requestTagsCommand.execute()
-                .map { it.toListOfStringOfKey() }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    listTagsOnServer = it
-                    viewContract?.onGetTagsSuccess(it)
-                }, {
-                    viewContract?.onGetTagsFailed(it.message)
-                },{
-                    viewContract?.onGetTagsSuccess(listOf())
-                }))
-
+        launchDataLoad({
+            listTagsOnServer = withIoContext {
+                val map = requestTagsCommand.executeOnTheInternet(context!!)
+                map.data!!.toListOfStringOfKey()
+            }
+            viewContract?.onGetTagsSuccess(listTagsOnServer)
+        }, {
+            viewContract?.onGetTagsFailed(it.message)
+        })
     }
 
     private fun showProgressDialog(){
