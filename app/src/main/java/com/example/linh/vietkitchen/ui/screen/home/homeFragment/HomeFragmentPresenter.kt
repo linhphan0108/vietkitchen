@@ -14,7 +14,6 @@ import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.RecipeUtil
-import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
 import org.greenrobot.eventbus.ThreadMode
 import org.greenrobot.eventbus.Subscribe
@@ -59,7 +58,6 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
             if (listRecipes.isNullOrEmpty()) {
                 viewContract?.onFoodsRequestFailed("Oops! something went wrong, no data found")
             }else{
-                lastRecipeId = listRecipes.last().id
                 if(isLoadMoreRecipe){
                     viewContract?.onLoadMoreSuccess(listRecipes)
 
@@ -68,6 +66,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
 
                 }
             }
+            lastRecipeId = pagingResponse.lastId
             hasReachLastRecord = pagingResponse.isEnd
             isFreshRecipe = false
             isLoadMoreRecipe = false

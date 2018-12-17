@@ -30,7 +30,7 @@ class RecipeProvider(private val mapper: RecipeMapper = RecipeMapper(),
                 Timber.d("onFetchData data's length ${listDataSnapshot.count()}")
                 Timber.d("latest key ${listDataSnapshot.last().key}")
                 mapper.convertToDomain(listDataSnapshot) }
-            PagingResponse(pagingRes.code, listRecipes, pagingRes.isEnd)
+            PagingResponse(pagingRes.code, listRecipes, pagingRes.isEnd, pagingRes.lastId)
         }
     }
 

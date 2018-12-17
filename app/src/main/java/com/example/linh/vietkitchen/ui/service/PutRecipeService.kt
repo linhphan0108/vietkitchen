@@ -12,10 +12,7 @@ import com.example.linh.vietkitchen.R
 import android.os.Messenger
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.domain.command.PutRecipeCommand
-import com.example.linh.vietkitchen.domain.command.PutTagsCommand
-import com.example.linh.vietkitchen.domain.command.UpdateCategoriesCommand
-import com.example.linh.vietkitchen.domain.command.UploadImageCommand
+import com.example.linh.vietkitchen.domain.command.*
 import com.example.linh.vietkitchen.extension.attractUrlFromAnnotation
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
@@ -23,6 +20,9 @@ import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.ImageOptimizationUtil
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 
 const val NOTIFICATION_CHANNEL_ID = "50"
@@ -60,10 +60,10 @@ class PutRecipeService : BaseService() {
         const val MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING = 8
         const val MSG_STORE_RECIPE_TO_DB_SUCCESS = 6
         const val MSG_STORE_RECIPE_TO_DB_FAILED = 7
-        const val MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT = 8
+        const val MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT = 11
         const val MSG_START_UPLOADING_IMAGES = 9
         const val MSG_UPDATE_NEW_CATEGORIES = 10
-        const val MSG_PUT_NEW_TAGS = 11
+        const val MSG_PUT_NEW_TAGS = 12
         const val MSG_STORE_RECIPE_TOTALLY_FINISHED = 99
         /**
          * command to show progress notification
@@ -87,7 +87,7 @@ class PutRecipeService : BaseService() {
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
     private val binder = LocalBinder()
-    private lateinit var nn: NotificationManager
+    private val nn by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     /** Keeps track of all current registered clients.  */
     private var clients = ArrayList<Messenger>()
     /**
@@ -95,15 +95,19 @@ class PutRecipeService : BaseService() {
      */
     private val messenger = Messenger(IncomingHandler())
 
-    private lateinit var recipeMapper: RecipeMapper
-    private lateinit var categoryMapper: CategoryMapper
-    private lateinit var putRecipeCommand: PutRecipeCommand
-    private lateinit var uploadImageCommand: UploadImageCommand
-    private lateinit var imageCompressionUtil: ImageOptimizationUtil
-    private lateinit var putTagsCommand: PutTagsCommand
-    private lateinit var updateCategoriesCommand: UpdateCategoriesCommand
+    private val recipeMapper by lazy { RecipeMapper() }
+    private val categoryMapper by lazy { CategoryMapper() }
+    private val putRecipeCommand by lazy { PutRecipeCommand() }
+    private val updateRecipeCommand by lazy { UpdateRecipeCommand() }
+    private val uploadImageCommand by lazy { UploadImageCommand() }
+    private val putTagsCommand by lazy { PutTagsCommand() }
+    private val updateCategoriesCommand by lazy { UpdateCategoriesCommand() }
+
+    private val imageCompressionUtil by lazy { ImageOptimizationUtil() }
 
     private var shouldShowNotification = false
+    private var uploadingCounter = 1
+    private var totalImageFiles = 0
 
     /**
      * this method can not called if the service was started by call bindService()
@@ -116,18 +120,12 @@ class PutRecipeService : BaseService() {
 
     override fun onCreate() {
         super.onCreate()
-        nn = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        recipeMapper = RecipeMapper()
-        categoryMapper = CategoryMapper()
-        putRecipeCommand = PutRecipeCommand()
-        uploadImageCommand = UploadImageCommand()
-        putTagsCommand = PutTagsCommand()
-        updateCategoriesCommand = UpdateCategoriesCommand()
-        imageCompressionUtil = ImageOptimizationUtil()
+        EventBus.getDefault().register(this)
     }
 
     override fun onDestroy() {
         // Cancel the persistent notification.
+        EventBus.getDefault().unregister(this)
         nn.cancel(NOTIFICATION_ID)
         super.onDestroy()
     }
@@ -155,21 +153,6 @@ class PutRecipeService : BaseService() {
                 MSG_SHOW_PROGRESS_NOTIFICATION -> {
                     shouldShowNotification = true
                 }
-//                MSG_SET_VALUE -> {
-//                    mValue = msg.arg1
-//                    for (i in clients.size() - 1 downTo 0) {
-//                        try {
-//                            clients[i].send(Message.obtain(null,
-//                                    MSG_SET_VALUE, mValue, 0))
-//                        } catch (e: RemoteException) {
-//                            // The client is dead.  Remove it from the list;
-//                            // we are going through the list from back to front
-//                            // so this is safe to do inside the loop.
-//                            clients.remove(i)
-//                        }
-//
-//                    }
-//                }
                 else -> super.handleMessage(msg)
             }
         }
@@ -246,11 +229,14 @@ class PutRecipeService : BaseService() {
         sendMessageToClients(MSG_START_STORING_RECIPE_TO_DB)
         launchDataLoad {
             withIoContext{
+                val recipeId = storeRecipeToDb(recipe)
                 val listImagePaths = extractImagePaths(recipe, listImages)
                 val listOptimizedImagesPaths = optimizeImages(listImagePaths)
+                listOptimizedImagesPaths.forEach { it.apply { this.remoteDir = recipeId } }
                 val uploadImageResponse = uploadImages(listOptimizedImagesPaths)
-                storeRecipeToDb(recipe, uploadImageResponse.data!!)
-                updateCategories(drawerNav)
+                updateRecipeWithRemoteImageUri(recipe, recipeId, uploadImageResponse.data!!)
+                val wasUpdateCattorySuccess = updateCategories(drawerNav).data!!
+                if (wasUpdateCattorySuccess) EventBus.getDefault().post(drawerNav)
                 listNewTags?.let { putNewTags(it) }
                 null
             }
@@ -259,19 +245,30 @@ class PutRecipeService : BaseService() {
         }
     }
 
-    private suspend fun storeRecipeToDb(recipe: Recipe, multipartFiles: List<ImageUpload>){
+    private suspend fun storeRecipeToDb(recipe: Recipe): String {
         Timber.d("store the recipe into remote db")
-        multipartFiles.forEach {
-            updateRemoteUriToRecipe(recipe, it.originalPath, it.remotePath!!)
-        }
         val recipeDomain = recipeMapper.toDomain(recipe)
         putRecipeCommand.recipe = recipeDomain
-        putRecipeCommand.executeOnTheInternet(this)
+        val id = putRecipeCommand.executeOnTheInternet(this)
         sendMessageToClients(MSG_STORE_RECIPE_TO_DB_SUCCESS)
         if (shouldShowNotification) {
             updateUploadNotification("the recipe was put into remote server success")
         }
         Timber.d("a recipe was put into firebase server")
+        return id.data!!
+    }
+
+    private suspend fun updateRecipeWithRemoteImageUri(recipe: Recipe, id: String, remoteUris: List<ImageUpload>): Response<Boolean> {
+        Timber.d("updateRecipeWithRemoteImageUri")
+        val newRecipe = recipe.let {
+            Recipe(id, it.name, it.intro, it.ingredient, it.spice, it.preparation, it.processing,
+                    it.notes, it.categories, it.tags, it.thumbUrl, it.imageUrl, it.hasLiked)
+        }
+        remoteUris.forEach {
+            updateRemoteUriToRecipe(newRecipe, it.originalPath, it.remotePath!!)
+        }
+        updateRecipeCommand.recipe = recipeMapper.toDomain(newRecipe)
+        return updateRecipeCommand.executeOnTheInternet(this)
     }
 
     private suspend fun putNewTags(tags: List<String>) {
@@ -303,7 +300,7 @@ class PutRecipeService : BaseService() {
             //make sure that the first added uri is the image uri
             if(index == 0){
                 val optimizedThumbPath = imageCompressionUtil.optimizeThumbImage(this, uri)
-                val optThumb = ImageUpload(optimizedThumbPath.name, uri.toString(), optimizedThumbPath.absolutePath)
+                val optThumb = ImageUpload("thumb_${optimizedThumbPath.name}", uri.toString(), optimizedThumbPath.absolutePath)
                 result.add(optThumb)
             }
         }
@@ -331,31 +328,9 @@ class PutRecipeService : BaseService() {
     private suspend fun uploadImages(multipartFiles: List<ImageUpload>): Response<List<ImageUpload>> {
         Timber.d("start uploading images")
         sendMessageToClients(MSG_START_UPLOADING_IMAGES)
-//        val result = mutableListOf<ImageUpload>()
-//        val totalFiles = multipartFiles.size
-//        var counter = 1
+        totalImageFiles = multipartFiles.count()
         uploadImageCommand.multiPartFileMap = multipartFiles
         return uploadImageCommand.executeOnTheInternet(this)
-//                            val bundle = Bundle()
-//                            bundle.putInt(BK_UPLOAD_PROGRESS, message.progress)
-//                            bundle.putInt(BK_UPLOAD_COUNTER, counter)
-//                            bundle.putInt(BK_UPLOAD_TOTAL, totalFiles)
-//                            sendMessageToClients(MSG_UPLOAD_IMAGE_PROGRESS, bundle)
-//                            if (shouldShowNotification) {
-//                                updateProgressNotification(totalFiles, counter, message.progress)
-//                            }
-//                            Timber.d("****************************")
-//                            Timber.d("uploading ${message.originalPath}")
-//                            Timber.d("uploading ${message.progress}")
-//                            Timber.d("****************************")
-//                        }.filter {message -> message.progress == 100 && !message.remotePath.isNullOrBlank()}
-//                        .doOnNext {message ->
-//                            result.add(message)
-//                            counter++
-//                        }
-//                        .doOnComplete {
-//                            Timber.d("upload multipartFiles go into doOnComplete()")
-//                        }.toList().toFlowable()
     }
 
     private fun addMultipartFileUri(multiPartFileMap: MutableMap<String, String>, path: String){
@@ -383,6 +358,29 @@ class PutRecipeService : BaseService() {
                     Timber.d("processing $preparation")
                 }
             }
+        }
+    }
+
+    /**
+     * currently coroutines doesn't support multiple times to resume
+     * so that we have to temporarily use EventBus to dispatch uploading-progress
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEventBus(uploadingStatus: ImageUpload){
+        Timber.d("****************************")
+        Timber.d("uploading ${uploadingStatus.originalPath}")
+        Timber.d("uploading ${uploadingStatus.progress}")
+        Timber.d("****************************")
+        val bundle = Bundle()
+        if(uploadingStatus.progress == 100 && !uploadingStatus.remotePath.isNullOrBlank()){
+            uploadingCounter++
+        }
+        bundle.putInt(BK_UPLOAD_PROGRESS, uploadingStatus.progress)
+        bundle.putInt(BK_UPLOAD_COUNTER, uploadingCounter)
+        bundle.putInt(BK_UPLOAD_TOTAL, totalImageFiles)
+        sendMessageToClients(MSG_UPLOAD_IMAGE_PROGRESS, bundle)
+        if (shouldShowNotification) {
+            updateProgressNotification(totalImageFiles, uploadingCounter, uploadingStatus.progress)
         }
     }
 }

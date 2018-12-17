@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
 import java.io.File
 import kotlin.coroutines.resume
@@ -82,11 +83,11 @@ suspend fun StorageReference.deleteAwait(): Response<Boolean>{
 suspend fun StorageReference.putImageAwait(image: ImageUpload): Response<ImageUpload>{
     return suspendCoroutine { continuation ->
         putFile(Uri.fromFile(File(image.optimizedPath)))
-//                .addOnProgressListener { taskSnapshot ->
-//                    val progress: Int = (100 * taskSnapshot.bytesTransferred.toFloat() / taskSnapshot.totalByteCount).toInt()
-//                    val message = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, progress)
-//                    emitter.onNext(message)
-//                }
+                .addOnProgressListener { taskSnapshot ->
+                    val progress: Int = (100 * taskSnapshot.bytesTransferred.toFloat() / taskSnapshot.totalByteCount).toInt()
+                    val message = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, progress)
+                    EventBus.getDefault().post(message)
+                }
                 .continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
                     if (!task.isSuccessful) {
                         task.exception?.let {
