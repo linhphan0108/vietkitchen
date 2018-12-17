@@ -32,4 +32,4 @@ data class Category(var groups: List<Map<String, Any>>?){
 
 data class UserInfo(val favorites: Int, val schedules: Int)
 data class UserProfile(val userName: String, val name: String, val gender: Boolean, val age: Int)
-data class ImageUpload(var fileName: String, var originalPath: String, var optimizedPath: String, var progress: Int = 0, var remotePath: String? = null)
+data class ImageUpload(var fileName: String, var originalPath: String, var optimizedPath: String, var progress: Int = 0, var remoteDir: String? = null, var remotePath: String? = null)

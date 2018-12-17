@@ -228,11 +228,23 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
                         progressDialog.updateMessage(getStringRes(R.string.msg_start_storing_recipe))
                     }
                 }
+                PutRecipeService.MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT -> {
+                    if (progressDialog.isVisible) {
+                        progressDialog.updateMessage(getStringRes(R.string.msg_extract_images))
+                    }
+                }
                 PutRecipeService.MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING -> {
                     if (progressDialog.isVisible) {
                         progressDialog.updateMessage(getStringRes(R.string.msg_optimizing_images))
                     }
                 }
+
+                PutRecipeService.MSG_START_UPLOADING_IMAGES ->{
+                    if (progressDialog.isVisible) {
+                        progressDialog.updateMessage(getStringRes(R.string.msg_start_uploading_images))
+                    }
+                }
+
                 PutRecipeService.MSG_STORE_RECIPE_TO_DB_SUCCESS -> {
                     if (progressDialog.isVisible) {
                         progressDialog.updateMessage(getStringRes(R.string.msg_store_recipe_success))
@@ -241,6 +253,21 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
                 PutRecipeService.MSG_STORE_RECIPE_TO_DB_FAILED -> {
                     if (progressDialog.isVisible) {
                         progressDialog.updateMessage(getStringRes(R.string.msg_store_recipe_failed))
+                    }
+                }
+                PutRecipeService.MSG_UPDATE_NEW_CATEGORIES ->{
+                    if (progressDialog.isVisible) {
+                        progressDialog.updateMessage(getStringRes(R.string.msg_update_category))
+                    }
+                }
+                PutRecipeService.MSG_PUT_NEW_TAGS -> {
+                    if (progressDialog.isVisible) {
+                        progressDialog.updateMessage(getStringRes(R.string.msg_put_new_tags))
+                    }
+                }
+                PutRecipeService.MSG_STORE_RECIPE_TOTALLY_FINISHED ->{
+                    if (progressDialog.isVisible) {
+                        progressDialog.updateMessage(getStringRes(R.string.msg_store_recipe_finished))
                     }
                 }
                 else -> super.handleMessage(msg)

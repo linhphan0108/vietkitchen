@@ -4,13 +4,26 @@ import android.os.Looper
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.command.RequestCategoryCommand
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
+import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
 
 class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryCommand = RequestCategoryCommand(),
                             private val categoryMapper: CategoryMapper = CategoryMapper())
     : BasePresenter<HomeActivityContractView>() , HomeActivityContractPresenter {
+
+    override fun attachView(view: HomeActivityContractView) {
+        super.attachView(view)
+        EventBus.getDefault().register(this)
+    }
+
+    override fun detachView() {
+        EventBus.getDefault().unregister(this)
+        super.detachView()
+    }
 
     override fun requestCategory() {
         launchDataLoad({
@@ -22,11 +35,16 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
                 }
             }
             categories?.let {
-                viewContract?.onRequestCategoriesSuccess(it)
                 EventBus.getDefault().post(it)
             }
         },{e->
             viewContract?.onRequestCategoriesFailed(getStringRes(R.string.message_error))
         }, false)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEventBus(event: List<DrawerNavGroupItem>) {
+        viewContract?.onRequestCategoriesSuccess(event)
+        Timber.d("onMessageEventBus(): DrawerNavGroupItem received")
     }
 }

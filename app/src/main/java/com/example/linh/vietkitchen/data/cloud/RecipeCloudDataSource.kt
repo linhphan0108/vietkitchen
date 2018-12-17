@@ -3,13 +3,14 @@ package com.example.linh.vietkitchen.data.cloud
 import com.example.linh.vietkitchen.data.response.PagingResponse
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.datasource.*
-import com.example.linh.vietkitchen.util.Constants.STARAGE_RECIPES_CHILD_CATEGORIES
+import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_CATEGORIES
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
 import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import timber.log.Timber
 import java.lang.NullPointerException
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
@@ -26,32 +27,33 @@ class RecipeCloudDataSource : RecipeDataSource {
         val query = if (tag.isNullOrBlank()) {
             if (isLoadingMore) {
                 dbRefRecipe.orderByKey()
-                        .startAt(startAtId)
+                        .endAt(startAtId)
             } else {
                 dbRefRecipe.orderByKey()
             }
         } else {
             if (isLoadingMore) {
-                dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
+                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$tag")
                         .equalTo(true)
-                        .startAt(startAtId)
+                        .endAt(startAtId)
             } else {
-                dbRefRecipe.orderByChild("$STARAGE_RECIPES_CHILD_CATEGORIES/$tag")
+                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$tag")
                         .equalTo(true)
             }
-        }.limitToFirst(limitFixed)
+        }.limitToLast(limitFixed)
+
+
+        startAtId?.let { Timber.d("getAllRecipes from $startAtId") }
 
         val dataSnapshot = query.addListenerForSingleValueEventAwait()
-
-        val hasReachEnd = dataSnapshot.children.count() < limitFixed
-        val shouldRemoveItems = if (isLoadingMore) 1 else 0
         val listDataSnapshot = if (isLoadingMore){
-            dataSnapshot.children.drop(shouldRemoveItems)
+            dataSnapshot.children.toList().dropLast(1)
         }else{
             dataSnapshot.children
-        }.toList()
-        return PagingResponse(RESPONSE_SUCCESS,
-                listDataSnapshot, hasReachEnd)
+        }.reversed()
+        val lastId = listDataSnapshot.last().key
+        val hasReachEnd = listDataSnapshot.count() < limitFixed
+        return PagingResponse(RESPONSE_SUCCESS, listDataSnapshot, hasReachEnd, lastId)
     }
 
     override suspend fun getLikedRecipes(ids: List<String>): Response<List<DataSnapshot>> {
@@ -110,7 +112,10 @@ class RecipeCloudDataSource : RecipeDataSource {
 
 
     private suspend fun uploadImage(image: ImageUpload): Response<ImageUpload> {
-        val storageRecipeImageRef = storageRecipeRef.child(image.fileName)
+        val dirRef = image.remoteDir?.let {
+            storageRecipeRef.child(it)
+        } ?: storageRecipeRef
+        val storageRecipeImageRef = dirRef.child(image.fileName)
         return storageRecipeImageRef.putImageAwait(image)
     }
 
