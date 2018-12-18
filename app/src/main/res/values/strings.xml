@@ -60,6 +60,7 @@
     <!--progress dialog-->
     <string name="uploading_image">uploading images</string>
     <string name="store_recipe">store recipe</string>
+    <string name="msg_prepare_uploading">preparing for uploading</string>
     <string name="msg_start_storing_recipe">prepare for storing the recipe!</string>
     <string name="msg_extract_images">extract Image path from the recipe\'s content</string>
     <string name="msg_optimizing_images">optimizing images to upload</string>

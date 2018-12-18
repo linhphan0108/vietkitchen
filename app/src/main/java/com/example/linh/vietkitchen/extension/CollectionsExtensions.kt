@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.extension
 
+import java.io.File.separator
 import java.util.*
 
 fun <K, V : Any> Map<K, V?>.toVarargArray(): Array<out Pair<K, V>> =
@@ -30,6 +31,11 @@ inline fun <T> Iterable<T>.findIndex(predicate: (T) -> Boolean) : Int{
         if (predicate(t)) return index
     }
     return -1
+}
+
+inline fun <T> Iterable<T>.filterFirst(predicate: (T) -> Boolean): T?{
+    forEach { if(predicate(it)) return it }
+    return null
 }
 
 fun List<String>.toString(separator: String): String{
