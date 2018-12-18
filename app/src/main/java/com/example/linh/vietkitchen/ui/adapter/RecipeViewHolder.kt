@@ -2,6 +2,7 @@ package com.example.linh.vietkitchen.ui.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ImageView
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.extension.lookTemporary
 import com.example.linh.vietkitchen.ui.custom.likeButton.AndroidLikeButton
@@ -23,6 +24,7 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
             }
         }else {
             with(recipe) {
+                itemView.imgFoodThumb.scaleType = ImageView.ScaleType.CENTER_CROP
                 GlideUtil.widthLoadingHolder(itemView.context, itemView.imgFoodThumb, recipe.thumbUrl)
                         .override(540, 540)
                         .into(itemView.imgFoodThumb)
