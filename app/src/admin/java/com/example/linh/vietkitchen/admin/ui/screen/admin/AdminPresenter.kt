@@ -14,10 +14,14 @@ import android.content.ServiceConnection
 import android.net.Uri
 import android.os.*
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.extension.filterFirst
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.ui.service.PutRecipeService.Companion.MSG_UPDATE_NEW_CATEGORIES
+import com.example.linh.vietkitchen.util.RecipeUtil
+import com.example.linh.vietkitchen.util.TimberUtils
 
 
 class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand())
@@ -81,21 +85,28 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
 
     override fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>) {
         showProgressDialog()
-        val newTags = recipe.tags?.filterNot {
-            listTagsOnServer.contains(it)
-        }
-
-        recipe.categories.forEach {checkedCat ->
-            categories.forEach { groupCat ->
-                groupCat.itemsList?.forEach { childCat ->
-                    if (checkedCat == childCat.itemTitle) childCat.numberItems++
+        launchDataLoad({
+            val message = Message.obtain(null, PutRecipeService.MSG_PREPARING_FOR_UPLOADING)
+            clientMessage.send(message)
+            val extractedListImageUris = withComputationContext {
+                TimberUtils.checkNotMainThread()
+                extractContentImagePaths(recipe, listImagesUri)
+            }
+            val newTags = withComputationContext {
+                TimberUtils.checkNotMainThread()
+                recipe.tags?.filterNot {
+                    listTagsOnServer.contains(it)
                 }
             }
-        }
-        //increase the all item
-        categories.first().numberItems++
 
-        doBindService(recipe, listImagesUri, newTags, categories)
+            val updatedCategory = withComputationContext{
+                TimberUtils.checkNotMainThread()
+                updateCategories(recipe, categories)
+            }
+            doBindService(recipe, extractedListImageUris, newTags, updatedCategory)
+        }, {
+
+        })
     }
 
 
@@ -111,12 +122,42 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
         })
     }
 
+    private fun extractContentImagePaths(recipe: Recipe, listImages: List<Uri>): List<Uri> {
+        Timber.d("extract Image path from the recipe's content")
+        val listMatchedUris = mutableListOf<Uri>()
+        listImages.filterFirst {it.toString() == recipe.imageUrl}
+                ?.let { listMatchedUris.add(it) }
+        RecipeUtil.extractImagePathOnlyInContent(recipe).forEach {extractedUrl ->
+            listImages.filterFirst {it.toString() == extractedUrl}
+                    ?.let { listMatchedUris.add(it) }
+        }
+        Timber.d("extract ${listMatchedUris.count()} images uri from recipe")
+        return listMatchedUris
+    }
+
+    private fun updateCategories(recipe: Recipe, categories: List<DrawerNavGroupItem>): List<DrawerNavGroupItem> {
+        categories.forEach { groupCat ->
+            var hasContained = false
+            groupCat.itemsList?.forEach { childCat ->
+                if(recipe.categories.contains(childCat.itemTitle)) {
+                    childCat.numberItems++
+                    hasContained = true
+                }
+            }
+            if (hasContained) groupCat.numberItems++
+        }
+
+        //increase the all item
+        categories.first().numberItems++
+        return categories
+    }
+
     private fun showProgressDialog(){
         if (!progressDialog.isVisible)
             progressDialog.show(activity?.supportFragmentManager, ProgressDialog::class.java.name)
     }
 
-    private fun doBindService(recipe: Recipe, listImagesUri: MutableList<Uri>, newTags: List<String>?, newDrawerNav: List<DrawerNavGroupItem>) {
+    private fun doBindService(recipe: Recipe, listImagesUri: List<Uri>, newTags: List<String>?, newDrawerNav: List<DrawerNavGroupItem>) {
         // Attempts to establish a connection with the service.  We use an
         // explicit class name because we want a specific service
         // implementation that we know will be running in our own process
@@ -157,7 +198,7 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
 
     private val mConnection = object : ServiceConnection {
         lateinit var recipe: Recipe
-        lateinit var listImagesUri: MutableList<Uri>
+        lateinit var listImagesUri: List<Uri>
         var newTags: List<String>? = null
         lateinit var newDrawerNav: List<DrawerNavGroupItem>
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -221,6 +262,11 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
                     val total = bundle.getInt(PutRecipeService.BK_UPLOAD_TOTAL)
                     if (progressDialog.isVisible) {
                         progressDialog.updateProgress(total, counter, progress)
+                    }
+                }
+                PutRecipeService.MSG_PREPARING_FOR_UPLOADING -> {
+                    if (progressDialog.isVisible) {
+                        progressDialog.updateMessage(getStringRes(R.string.msg_prepare_uploading))
                     }
                 }
                 PutRecipeService.MSG_START_STORING_RECIPE_TO_DB -> {

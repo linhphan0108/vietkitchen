@@ -83,7 +83,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                     isFreshRecipe = false
                 }
             }
-        }, isFreshRecipe)
+        }, false)
     }
 
     override fun loadMoreRecipe() {
@@ -126,7 +126,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
     }
 
     private suspend fun deleteImages(recipe: Recipe): Response<Boolean> {
-        deleteImagesCommand.fileUrls = RecipeUtil.extractImagePaths(recipe)
+        deleteImagesCommand.fileUrls = RecipeUtil.extractAllImagePaths(recipe)
         return deleteImagesCommand.executeOnTheInternet(context!!)
     }
 

@@ -13,7 +13,6 @@ import android.os.Messenger
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.command.*
-import com.example.linh.vietkitchen.extension.attractUrlFromAnnotation
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
@@ -54,6 +53,7 @@ class PutRecipeService : BaseService() {
          */
         const val MSG_UNREGISTER_CLIENT = 2
 
+        const val MSG_PREPARING_FOR_UPLOADING = 13
         const val MSG_UPLOAD_RECIPE = 3
         const val MSG_UPLOAD_IMAGE_PROGRESS = 4
         const val MSG_START_STORING_RECIPE_TO_DB = 5
@@ -230,13 +230,12 @@ class PutRecipeService : BaseService() {
         launchDataLoad {
             withIoContext{
                 val recipeId = storeRecipeToDb(recipe)
-                val listImagePaths = extractImagePaths(recipe, listImages)
-                val listOptimizedImagesPaths = optimizeImages(listImagePaths)
+                val listOptimizedImagesPaths = optimizeImages(listImages)
                 listOptimizedImagesPaths.forEach { it.apply { this.remoteDir = recipeId } }
                 val uploadImageResponse = uploadImages(listOptimizedImagesPaths)
                 updateRecipeWithRemoteImageUri(recipe, recipeId, uploadImageResponse.data!!)
-                val wasUpdateCattorySuccess = updateCategories(drawerNav).data!!
-                if (wasUpdateCattorySuccess) EventBus.getDefault().post(drawerNav)
+                val wasUpdateCategorySuccess = updateCategories(drawerNav).data!!
+                if (wasUpdateCategorySuccess) EventBus.getDefault().post(drawerNav)
                 listNewTags?.let { putNewTags(it) }
                 null
             }
@@ -280,10 +279,10 @@ class PutRecipeService : BaseService() {
         Timber.d("just put ${tags.size} tags successfully")
     }
 
-    private suspend fun updateCategories(drawerNav: List<DrawerNavGroupItem>): Response<Boolean> {
+    private suspend fun updateCategories(categories: List<DrawerNavGroupItem>): Response<Boolean> {
         Timber.d("update categories")
         sendMessageToClients(MSG_UPDATE_NEW_CATEGORIES)
-        updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(drawerNav)
+        updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(categories)
         return updateCategoriesCommand.executeOnTheInternet(this)
     }
 
@@ -307,23 +306,7 @@ class PutRecipeService : BaseService() {
         return result
     }
 
-    private fun extractImagePaths(recipe: Recipe, listImages: List<Uri>): List<Uri> {
-        Timber.d("extract Image path from the recipe's content")
-        sendMessageToClients(MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT)
-        val multiPartFiles = mutableListOf<String>()
-        with(recipe){
-            if (imageUrl.isNotBlank()) multiPartFiles.add(imageUrl)
-            preparation.attractUrlFromAnnotation()?.forEachIndexed { _, s ->
-                multiPartFiles.add(s)
-            }
-            processing.attractUrlFromAnnotation()?.forEachIndexed { _, s ->
-                multiPartFiles.add(s)
-            }
-        }
-        return listImages.filter {uri ->
-            multiPartFiles.contains(uri.toString())
-        }
-    }
+
 
     private suspend fun uploadImages(multipartFiles: List<ImageUpload>): Response<List<ImageUpload>> {
         Timber.d("start uploading images")
