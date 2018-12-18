@@ -485,7 +485,7 @@ class TagsEditText : AppCompatAutoCompleteTextView {
     }
 
     private fun buildTags(str: String) {
-        if (str.length != 0) {
+        if (str.isNotEmpty()) {
             updateTags(str)
 
             val sb = SpannableStringBuilder()

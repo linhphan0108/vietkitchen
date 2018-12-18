@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.attractAnnotationSpan
 import com.example.linh.vietkitchen.extension.ctx
+import com.example.linh.vietkitchen.extension.isNotNullAndNotBlank
 import timber.log.Timber
 
 
@@ -43,7 +44,7 @@ class ImageSpanTextView : TextView{
     }
 
     override fun setText(text: CharSequence?, type: BufferType?) {
-        if (type == BufferType.SPANNABLE){
+        if (text.isNotNullAndNotBlank() && type == BufferType.SPANNABLE){
             val ssb = SpannableStringBuilder(text)
             text?.attractAnnotationSpan()?.forEach {
                 when(it.key){
