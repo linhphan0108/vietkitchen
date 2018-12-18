@@ -46,6 +46,8 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         fun newInstance() = HomeFragment()
     }
 
+    private var title: String = ""
+
     lateinit var rcvLoadMoreListener: EndlessScrollListener
     private var bottomSheetOptions: BottomSheetOptions? = null
     private var loadingDialog: LoadingDialog? = null
@@ -79,7 +81,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     override fun onResume() {
         super.onResume()
-        toolbarActions?.changeToolbarTitle("home fragment")
+        toolbarActions?.changeToolbarTitle(title)
         Timber.e("on resume")
     }
 
@@ -196,7 +198,8 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     //endregion MVP callbacks
 
     //region callbacks =============================================================================
-    override fun onDrawerNavChanged(category: String?) {
+    override fun onDrawerNavChanged(category: String) {
+        title = category
         presenter.refreshRecipes(category)
     }
 

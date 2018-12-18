@@ -48,7 +48,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         setupViewPager()
         setupAdminFab()
         presenter.requestCategory()
-
     }
 
     override fun onBackPressed() {
@@ -100,12 +99,17 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     }
 
     override fun changeToolbarTitle(title: String) {
-        toolbar.title = title
+        toolbar.title = if(title.isBlank()){
+            "tất cả"
+        }else{
+            title
+        }
     }
 
     //drawer navigation callback
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: DrawerNavChildItem?) {
-        val category = data?.itemTitle
+        val category = data?.itemTitle ?: ""
+        changeToolbarTitle(category)
         onDrawerNavItemChangedListener?.onDrawerNavChanged(category)
         drawerLayout.closeDrawer(GravityCompat.START)
     }
@@ -188,6 +192,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
 
 //region inner classes ========================================================================
 interface OnDrawerNavItemChangedListener{
-    fun onDrawerNavChanged(category: String?)
+    fun onDrawerNavChanged(category: String)
 }
 //endregion inner classes
