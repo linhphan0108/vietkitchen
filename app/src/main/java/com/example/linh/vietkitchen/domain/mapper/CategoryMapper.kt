@@ -6,6 +6,7 @@ import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.domain.model.CategoryChild
 import com.google.firebase.database.DataSnapshot
 
+const val NUMBER_ITEMS_COUNT = "COUNT"
 class CategoryMapper{
     fun convertToDomain(res: Response<DataSnapshot>): Response<List<CategoryGroup>> {
         val data = if (res.data != null) convertToDomain(res.data) else null
@@ -26,10 +27,13 @@ class CategoryMapper{
                 }else {
                     groupDataSnapshot.children.forEach { childDataSnapshot ->
                         val itemTitle: String = childDataSnapshot.key.toString()
-                        val path = "$groupPath/$itemTitle"
-                        val numberItems: Int = childDataSnapshot.getValue(Int::class.java) ?: 0
-                        numberItemsOfGroup += numberItems
-                        categoryChildren.add(CategoryChild(itemTitle, path, numberItems))
+                        if (itemTitle == NUMBER_ITEMS_COUNT) {
+                            numberItemsOfGroup = childDataSnapshot.getValue(Int::class.java) ?: 0
+                        }else{
+                            val path = "$groupPath/$itemTitle"
+                            val numberItems: Int = childDataSnapshot.getValue(Int::class.java) ?: 0
+                            categoryChildren.add(CategoryChild(itemTitle, path, numberItems))
+                        }
                     }
                 }
                 categoryGroups.add(CategoryGroup(groupTitle, groupPath, numberItemsOfGroup, categoryChildren))
@@ -41,7 +45,7 @@ class CategoryMapper{
 
     fun convertToData(listCatGroup: List<CategoryGroup>): CatDataLayer{
         val groups: MutableList<Map<String, Any>> = mutableListOf()
-        listCatGroup.forEach {groupItem ->
+        listCatGroup.forEachIndexed { index, groupItem ->
             val key = groupItem.headerTile
             val children: MutableMap<String, Int> = mutableMapOf()
             groupItem.itemsList?.forEach { childItem ->
@@ -49,7 +53,12 @@ class CategoryMapper{
                 val value = childItem.numberItems
                 children[k] = value
             }
-            val mapGroup = mapOf(Pair(key, if (children.isEmpty()) groupItem.numberItems else children))
+            val mapGroup = if (index == 0){
+                mapOf(Pair(key, groupItem.numberItems))
+            }else{
+                children[NUMBER_ITEMS_COUNT] = groupItem.numberItems
+                mutableMapOf(Pair(key, children))
+            }
             groups.add(mapGroup)
         }
 

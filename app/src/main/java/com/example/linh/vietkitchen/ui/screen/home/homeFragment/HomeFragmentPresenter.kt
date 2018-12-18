@@ -133,10 +133,15 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
     private suspend fun updateCategory(recipe: Recipe): Response<Boolean> {
         recipe.categories.forEach {checkedCat ->
             categories.forEach { groupCat ->
+                var isContained = false
                 groupCat.itemsList?.forEach { childCat ->
-                    if (checkedCat == childCat.itemTitle) childCat.numberItems--
-                    if(childCat.numberItems < 0) childCat.numberItems = 0
+                    if (checkedCat == childCat.itemTitle) {
+                        isContained = true
+                        childCat.numberItems--
+                        if (childCat.numberItems < 0) childCat.numberItems = 0
+                    }
                 }
+                if(isContained) groupCat.numberItems--
             }
         }
         //decrease the item all

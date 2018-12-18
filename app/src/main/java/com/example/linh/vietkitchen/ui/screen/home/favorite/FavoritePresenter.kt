@@ -11,6 +11,10 @@ class FavoritePresenter(private val recipeMapper: RecipeMapper = RecipeMapper(),
     : BaseHomePresenter<FavoriteContractView>(), FavoriteContractPresenter {
 
     override fun requestLikedRecipes(ids: List<String>?) {
+        if (ids != null && ids.isNotEmpty()){
+            viewContract?.onRequestLikedRecipesNoData()
+            return
+        }
         launchDataLoad(ioBlock = {
             val likedRecipes = withIoContext {
                 likedRecipesCommand.ids = ids
