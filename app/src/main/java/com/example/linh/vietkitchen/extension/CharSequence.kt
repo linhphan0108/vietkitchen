@@ -10,7 +10,7 @@ import java.util.regex.Pattern
  * Returns `true` if this nullable char sequence is either `null` or empty or consists solely of whitespace characters.
  */
 fun CharSequence?.isNotNullAndNotBlank(): Boolean {
-    return this != null && this.isBlank()
+    return this != null && this.isNotBlank()
 }
 
 fun CharSequence.attractAnnotationSpan(): Array<out Annotation>? {

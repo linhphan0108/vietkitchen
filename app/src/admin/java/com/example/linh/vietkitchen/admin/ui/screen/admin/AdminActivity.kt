@@ -28,6 +28,7 @@ import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.extension.showSnackBar
 import com.example.linh.vietkitchen.extension.toBitmap
 import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
@@ -39,8 +40,8 @@ private const val REQUEST_IMAGE = 98
 private const val REQUEST_IMAGE_PREPARATION = 97
 private const val REQUEST_IMAGE_PROCESS = 96
 
-class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(), AdminContractView, View.OnClickListener {
-
+class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(), AdminContractView,
+        View.OnClickListener, ProgressDialog.Listener {
     companion object {
         fun createIntent(context: Context): Intent{
             return Intent(context, AdminActivity::class.java)
@@ -50,6 +51,8 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
 
         }
     }
+
+    private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
 
     private var imageUri: Uri? = null
     private lateinit var listImagesUri: MutableList<Uri>
@@ -127,6 +130,13 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
             else -> false
         }
     }
+
+    override fun onDestroy() {
+        if (progressDialog.isVisible)
+            progressDialog.dismiss()
+        super.onDestroy()
+    }
+
     //#endregion life circle
 
     //#region MVP callbacks ========================================================================
@@ -148,6 +158,22 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     override fun onNoInternetException() {
 
     }
+
+    override fun updateProgress(totalFiles: Int, counter: Int, progress: Int) {
+        if (progressDialog.isVisible) {
+            progressDialog.updateProgress(totalFiles, counter, progress)
+        }
+    }
+
+    override fun updateMessage(msg: String) {
+        progressDialog.updateMessage(msg)
+    }
+
+    override fun showProgressDialog() {
+        if (!progressDialog.isVisible)
+            progressDialog.show(supportFragmentManager, ProgressDialog::class.java.name)
+    }
+
 
     override fun onGetTagsSuccess(tags: List<String>) {
         if (tags.isEmpty()) return
@@ -190,6 +216,10 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
             R.id.iBtnProcessBrowser ->
                 requestImage(REQUEST_IMAGE_PROCESS)
         }
+    }
+    //ProgressDialog.Listener
+    override fun onNewRecipe() {
+        resetComposer()
     }
     //#ednregion callbacks
 
@@ -385,6 +415,20 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
                 return false
             }
         }).into(imgHeaderImage)
+    }
+
+    private fun resetComposer(){
+        imageUri = null
+        listImagesUri.clear()
+        listCatsChecked.clear()
+        edtRecipeTitle.setText("")
+        edtShortIntro.setText("")
+        edtIngredients.setText("")
+        edtSpices.setText("")
+        edtPreparation.setText("")
+        edtProcess.setText("")
+        edtNotes.setText("")
+        edtTags.setTags(null)
     }
 
     //#endregion inner methods

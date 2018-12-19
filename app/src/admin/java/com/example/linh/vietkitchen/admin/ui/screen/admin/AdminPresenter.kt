@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
+import android.annotation.SuppressLint
 import com.example.linh.vietkitchen.domain.command.RequestTagsCommand
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
@@ -43,18 +44,14 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
      */
     val clientMessage = Messenger(IncomingHandler())
 
-    private lateinit var progressDialog: ProgressDialog
 
     override fun attachView(view: AdminContractView) {
         super.attachView(view)
-        progressDialog = ProgressDialog()
     }
 
     override fun detachView() {
         super.detachView()
         doUnbindService()
-        if (progressDialog.isVisible)
-            progressDialog.dismiss()
     }
 
     //==============================================================================================
@@ -84,7 +81,7 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
     }
 
     override fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>) {
-        showProgressDialog()
+        viewContract?.showProgressDialog()
         launchDataLoad({
             val message = Message.obtain(null, PutRecipeService.MSG_PREPARING_FOR_UPLOADING)
             clientMessage.send(message)
@@ -150,11 +147,6 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
         //increase the all item
         categories.first().numberItems++
         return categories
-    }
-
-    private fun showProgressDialog(){
-        if (!progressDialog.isVisible)
-            progressDialog.show(activity?.supportFragmentManager, ProgressDialog::class.java.name)
     }
 
     private fun doBindService(recipe: Recipe, listImagesUri: List<Uri>, newTags: List<String>?, newDrawerNav: List<DrawerNavGroupItem>) {
@@ -252,6 +244,7 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
     /**
      * Handler of incoming messages from service.
      */
+    @SuppressLint("HandlerLeak")
     internal inner class IncomingHandler : Handler() {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
@@ -260,61 +253,39 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
                     val progress = bundle.getInt(PutRecipeService.BK_UPLOAD_PROGRESS)
                     val counter = bundle.getInt(PutRecipeService.BK_UPLOAD_COUNTER)
                     val total = bundle.getInt(PutRecipeService.BK_UPLOAD_TOTAL)
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateProgress(total, counter, progress)
-                    }
+                    viewContract?.updateProgress(total, counter, progress)
                 }
                 PutRecipeService.MSG_PREPARING_FOR_UPLOADING -> {
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_prepare_uploading))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_prepare_uploading))
                 }
                 PutRecipeService.MSG_START_STORING_RECIPE_TO_DB -> {
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_start_storing_recipe))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_start_storing_recipe))
                 }
                 PutRecipeService.MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT -> {
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_extract_images))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_extract_images))
                 }
                 PutRecipeService.MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING -> {
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_optimizing_images))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_optimizing_images))
                 }
 
                 PutRecipeService.MSG_START_UPLOADING_IMAGES ->{
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_start_uploading_images))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_start_uploading_images))
                 }
 
                 PutRecipeService.MSG_STORE_RECIPE_TO_DB_SUCCESS -> {
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_store_recipe_success))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_store_recipe_success))
                 }
                 PutRecipeService.MSG_STORE_RECIPE_TO_DB_FAILED -> {
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_store_recipe_failed))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_store_recipe_failed))
                 }
                 PutRecipeService.MSG_UPDATE_NEW_CATEGORIES ->{
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_update_category))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_update_category))
                 }
                 PutRecipeService.MSG_PUT_NEW_TAGS -> {
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_put_new_tags))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_put_new_tags))
                 }
                 PutRecipeService.MSG_STORE_RECIPE_TOTALLY_FINISHED ->{
-                    if (progressDialog.isVisible) {
-                        progressDialog.updateMessage(getStringRes(R.string.msg_store_recipe_finished))
-                    }
+                    viewContract?.updateMessage(getStringRes(R.string.msg_store_recipe_finished))
                 }
                 else -> super.handleMessage(msg)
             }
