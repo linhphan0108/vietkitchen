@@ -1,12 +1,10 @@
-package com.example.linh.vietkitchen.ui.home.homeActivity
+package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.example.linh.vietkitchen.ui.screen.home.homeActivity.DrawerNavChildViewHolder
-import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnItemClickListener
 import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
 
 class DrawerNavChildItemDelegate(private val listener: OnItemClickListener? = null) : AbsListItemAdapterDelegate<DrawerNavChildItem, Entity, DrawerNavChildViewHolder>() {

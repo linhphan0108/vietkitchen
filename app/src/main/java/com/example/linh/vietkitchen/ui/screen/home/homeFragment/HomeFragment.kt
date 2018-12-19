@@ -199,6 +199,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     //region callbacks =============================================================================
     override fun onDrawerNavChanged(category: String) {
+        if (title == category) return
         title = category
         presenter.refreshRecipes(category)
     }

@@ -4,7 +4,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
-import com.example.linh.vietkitchen.ui.home.homeActivity.DrawerNavChildItemDelegate
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavHeader
 import com.example.linh.vietkitchen.ui.model.Entity

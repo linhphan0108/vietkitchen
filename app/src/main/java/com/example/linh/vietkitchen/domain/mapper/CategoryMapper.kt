@@ -36,7 +36,7 @@ class CategoryMapper{
                         }
                     }
                 }
-                categoryGroups.add(CategoryGroup(groupTitle, groupPath, numberItemsOfGroup, categoryChildren))
+                categoryGroups.add(CategoryGroup(groupTitle, groupPath, numberItemsOfGroup, if (categoryChildren.isEmpty()) null else categoryChildren))
             }
         }
         //add the total item
