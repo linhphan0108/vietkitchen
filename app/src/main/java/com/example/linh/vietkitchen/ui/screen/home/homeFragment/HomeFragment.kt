@@ -49,7 +49,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     private var title: String = ""
 
     lateinit var rcvLoadMoreListener: EndlessScrollListener
-    private var bottomSheetOptions: BottomSheetOptions? = null
+    private val bottomSheetOptions: BottomSheetOptions by lazy {BottomSheetOptions()}
     private var loadingDialog: LoadingDialog? = null
 
     //region lifecycle =============================================================================
@@ -204,15 +204,12 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     }
 
     override fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean {
-        if (bottomSheetOptions == null){
-            bottomSheetOptions = BottomSheetOptions()
-            bottomSheetOptions!!.listeners = object: BottomSheetOptions.BottomSheetOptionsListeners {
-                override fun onDelete() {
-                    presenter.deleteRecipe(data, adapterPosition)
-                }
+        bottomSheetOptions.listeners = object: BottomSheetOptions.BottomSheetOptionsListeners {
+            override fun onDelete() {
+                presenter.deleteRecipe(data, adapterPosition)
             }
         }
-        bottomSheetOptions!!.show(childFragmentManager, BottomSheetOptions::class.java.name)
+        bottomSheetOptions.show(childFragmentManager, BottomSheetOptions::class.java.name)
         return true
     }
     //endregion callbacks

@@ -29,4 +29,8 @@ class DrawerNavChildItem(val itemTitle: String, val path: String, var numberItem
             return arrayOfNulls(size)
         }
     }
+
+    fun clone(): DrawerNavChildItem{
+        return DrawerNavChildItem(itemTitle, path, numberItems)
+    }
 }

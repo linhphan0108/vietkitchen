@@ -14,6 +14,7 @@ import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.RecipeUtil
+import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
 import org.greenrobot.eventbus.ThreadMode
 import org.greenrobot.eventbus.Subscribe
@@ -107,7 +108,12 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                 deleteImages(recipe).data!!}
 
             val wasUpdateCategorySuccess = withIoContext {
-                withIoContext { updateCategory(recipe).data!! }
+                withIoContext {
+                    val updatedCat = updateCategory(recipe)
+                    val isSuccess = updateCategoryToServer(updatedCat).data!!
+                    if (isSuccess) EventBus.getDefault().post(updatedCat)
+                    isSuccess
+                }
             }
             val wasDeleteRecipeSuccess = withIoContext {
                 withIoContext{deleteRecipeInDb(recipe).data!!} }
@@ -130,9 +136,15 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
         return deleteImagesCommand.executeOnTheInternet(context!!)
     }
 
-    private suspend fun updateCategory(recipe: Recipe): Response<Boolean> {
+    private suspend fun updateCategoryToServer(cat: List<DrawerNavGroupItem>): Response<Boolean> {
+        updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(cat)
+        return updateCategoriesCommand.executeOnTheInternet(context!!)
+    }
+
+    private suspend fun updateCategory(recipe: Recipe): List<DrawerNavGroupItem> {
+        val clonedCat = categories.map { it.clone() }
         recipe.categories.forEach {checkedCat ->
-            categories.forEach { groupCat ->
+            clonedCat.forEach { groupCat ->
                 var isContained = false
                 groupCat.itemsList?.forEach { childCat ->
                     if (checkedCat == childCat.itemTitle) {
@@ -145,9 +157,8 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
             }
         }
         //decrease the item all
-        categories.first().numberItems--
-        updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(categories)
-        return updateCategoriesCommand.executeOnTheInternet(context!!)
+        clonedCat.first().numberItems--
+        return clonedCat
     }
 
     private suspend fun deleteRecipeInDb(recipe: Recipe): Response<Boolean> {
