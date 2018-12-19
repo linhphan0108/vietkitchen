@@ -52,7 +52,7 @@ class RecipeCloudDataSource : RecipeDataSource {
             dataSnapshot.children
         }.reversed()
         val lastId = listDataSnapshot.last().key
-        val hasReachEnd = listDataSnapshot.count() < limitFixed
+        val hasReachEnd = listDataSnapshot.count() < limit
         return PagingResponse(RESPONSE_SUCCESS, listDataSnapshot, hasReachEnd, lastId)
     }
 
