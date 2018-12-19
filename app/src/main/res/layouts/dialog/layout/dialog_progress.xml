@@ -54,6 +54,18 @@
         gpb:layout_constraintTop_toBottomOf="@id/txtCounter"
         android:max="100"
         />
+
+    <Button
+        android:id="@+id/btnNewRecipe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        gpb:layout_constraintTop_toBottomOf="@id/progressBar"
+        gpb:layout_constraintEnd_toStartOf="@id/btnHide"
+        android:text="@string/label_new"
+        android:visibility="gone"
+        tools:visibility="visible"
+        style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"/>
+
     <Button
         android:id="@+id/btnHide"
         android:layout_width="wrap_content"

@@ -351,7 +351,7 @@ class PutRecipeService : BaseService() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onMessageEventBus(uploadingStatus: ImageUpload){
         Timber.d("****************************")
-        Timber.d("uploading ${uploadingStatus.originalPath}")
+        Timber.d("uploading ${uploadingStatus.remotePath}")
         Timber.d("uploading ${uploadingStatus.progress}")
         Timber.d("****************************")
         val bundle = Bundle()

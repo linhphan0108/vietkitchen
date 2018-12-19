@@ -14,6 +14,9 @@ interface AdminContractView : BaseViewContract{
     fun onPutNewTagsFailed(message: String?)
     fun onPutRecipeSuccess()
     fun onPutRecipeFailed(message: String?)
+    fun showProgressDialog()
+    fun updateProgress(totalFiles: Int, counter: Int, progress: Int)
+    fun updateMessage(msg: String)
 }
 
 interface AdminContractPresenter: BasePresenterContract<AdminContractView>{

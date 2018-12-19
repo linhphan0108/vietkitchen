@@ -1,6 +1,7 @@
 package com.example.linh.vietkitchen.domain.datasource
 
 import android.net.Uri
+import com.example.linh.vietkitchen.R.string.progress
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.util.ResponseCode
@@ -102,6 +103,7 @@ suspend fun StorageReference.putImageAwait(image: ImageUpload): Response<ImageUp
                         val remoteUri = (task.result as Uri).toString()
                         image.progress = 100
                         image.remotePath = remoteUri
+                        EventBus.getDefault().post(image)
                         continuation.resume(Response(ResponseCode.RESPONSE_SUCCESS, image))
                     } else {
                         // Handle failures

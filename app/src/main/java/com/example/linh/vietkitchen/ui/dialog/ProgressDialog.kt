@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.ui.dialog
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -14,6 +15,17 @@ import kotlinx.android.synthetic.main.dialog_progress.*
 
 class ProgressDialog : DialogFragment() {
 
+    lateinit var listener: Listener
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if(context is Listener) {
+            listener = context
+        }else{
+            throw ClassCastException("can not cast context to ${Listener::class.java.name}")
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return inflater.inflate(R.layout.dialog_progress, container)
@@ -23,6 +35,10 @@ class ProgressDialog : DialogFragment() {
         super.onActivityCreated(savedInstanceState)
         isCancelable = false
         btnHide.setOnClickListener {
+            dismiss()
+        }
+        btnNewRecipe.setOnClickListener {
+            listener.onNewRecipe()
             dismiss()
         }
     }
@@ -55,5 +71,9 @@ class ProgressDialog : DialogFragment() {
         txtCounter.visibility = View.GONE
         progressBar.visibility = View.GONE
         txtTitle.text = msg
+    }
+
+    interface Listener{
+        fun onNewRecipe()
     }
 }
