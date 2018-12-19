@@ -36,4 +36,8 @@ class DrawerNavGroupItem(val headerTile: String, val path: String, var numberIte
             return arrayOfNulls(size)
         }
     }
+
+    fun clone(): DrawerNavGroupItem{
+        return DrawerNavGroupItem(headerTile, path, numberItems, itemsList?.map { it.clone()}, isChildrenVisible)
+    }
 }

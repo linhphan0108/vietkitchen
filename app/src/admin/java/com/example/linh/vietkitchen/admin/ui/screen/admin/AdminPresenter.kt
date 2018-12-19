@@ -133,7 +133,8 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
     }
 
     private fun updateCategories(recipe: Recipe, categories: List<DrawerNavGroupItem>): List<DrawerNavGroupItem> {
-        categories.forEach { groupCat ->
+        val clonedCat = categories.map { it.clone() }
+        clonedCat.forEach { groupCat ->
             var hasContained = false
             groupCat.itemsList?.forEach { childCat ->
                 if(recipe.categories.contains(childCat.itemTitle)) {
@@ -145,8 +146,8 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
         }
 
         //increase the all item
-        categories.first().numberItems++
-        return categories
+        clonedCat.first().numberItems++
+        return clonedCat
     }
 
     private fun doBindService(recipe: Recipe, listImagesUri: List<Uri>, newTags: List<String>?, newDrawerNav: List<DrawerNavGroupItem>) {
