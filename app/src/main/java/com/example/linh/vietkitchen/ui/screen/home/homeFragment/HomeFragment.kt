@@ -233,7 +233,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     private fun setupRecyclerView() {
 //        recyclerView.itemAnimator = DefaultItemAnimator()
         rcvRecipes.layoutManager = LinearLayoutManager(context)
-        rcvRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
+        rcvRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration), resources.getDimensionPixelSize(R.dimen.padding_16), resources.getDimensionPixelSize(R.dimen.padding_16)))
         rcvRecipes.adapter = recipeAdapter
         rcvLoadMoreListener = object : EndlessScrollListener(3) {
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {

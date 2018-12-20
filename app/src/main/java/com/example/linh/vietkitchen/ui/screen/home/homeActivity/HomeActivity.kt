@@ -1,8 +1,12 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
+import android.animation.ObjectAnimator
+import android.animation.StateListAnimator
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
@@ -19,9 +23,11 @@ import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
 import com.example.linh.vietkitchen.util.Constants
+import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
 import kotlinx.android.synthetic.main.activity_home_content.*
+import timber.log.Timber
 
 
 class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContractPresenter>(),
@@ -161,6 +167,19 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
 
     private fun setupAppBarAndDrawerNav(){
         setSupportActionBar(toolbar)
+        val appBarElevationMax = ScreenUtil.dp2px(1)
+        appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appbar, verticalOffset ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Timber.d("addOnOffsetChangedListener $verticalOffset")
+                val currentPercent = Math.abs(verticalOffset) * 100 / Math.abs(appbar.totalScrollRange + 1).toFloat()
+                val appBarElevationCurrent = (currentPercent * appBarElevationMax) / 100
+                val stateListAnimator = StateListAnimator()
+                stateListAnimator.addState(IntArray(0), ObjectAnimator.ofFloat(appbar, "elevation", appBarElevationCurrent))
+                appbar.stateListAnimator = stateListAnimator
+            } else {
+            }
+
+        })
 
         val toggle = ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)

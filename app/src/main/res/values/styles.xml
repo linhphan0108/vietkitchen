@@ -2,13 +2,14 @@
 
     <style name="AppTheme.Base" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="chipIconTint">@color/colorAccent</item>
         <item name="colorError">@color/colorError</item>
         <item name="android:textColor">@color/textPrimary</item>
         <item name="android:textColorSecondary">@color/textSecondary</item>
+        <item name="android:windowIsTranslucent">false</item>
         <!-- New MaterialComponents attributes. -->
         <!--<item name="colorPrimaryVariant">@color/colorPrimaryDark</item>-->
         <!--<item name="colorSecondaryVariant">@color/colorSecondaryDark</item>-->
@@ -42,8 +43,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="AppTheme.Base" />
     <style name="NoTranslucentStatusBar" parent="AppTheme" />
+    <style name="TranslucentStatusBar" parent="AppTheme" />
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>
 
     <style name="DialogAnimation">
