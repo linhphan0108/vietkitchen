@@ -16,7 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.screen.splashScreen.SplashScreenActivity"
-                  android:theme="@style/NoTranslucentStatusBar"
                   android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -28,8 +27,10 @@
                   android:theme="@style/AppTheme"
                   android:screenOrientation="portrait"/>
         <activity android:name=".ui.screen.detailActivity.RecipeDetailActivity"
+                  android:theme="@style/TranslucentStatusBar"
                   android:screenOrientation="portrait"/>
         <activity android:name=".admin.ui.screen.admin.AdminActivity"
+                  android:theme="@style/TranslucentStatusBar"
                   android:screenOrientation="portrait"/>
 
         <service android:name=".ui.service.PutRecipeService"/>

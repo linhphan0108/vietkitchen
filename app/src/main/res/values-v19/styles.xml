@@ -2,8 +2,7 @@
 <resources>
     <style name="AppTheme" parent="AppTheme.Base" >
         <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
@@ -11,5 +10,9 @@
     <style name="NoTranslucentStatusBar" parent="AppTheme">
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowTranslucentStatus">false</item>
+    </style>
+    <style name="TranslucentStatusBar" parent="AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 </resources>

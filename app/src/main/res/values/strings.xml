@@ -17,6 +17,7 @@
     <string name="label_hide">hide</string>
     <string name="label_new">new</string>
     <string name="label_delete">delete</string>
+    <string name="label_search">search</string>
     <string name="title_options">options</string>
 
     <!--drawer navigation-->
