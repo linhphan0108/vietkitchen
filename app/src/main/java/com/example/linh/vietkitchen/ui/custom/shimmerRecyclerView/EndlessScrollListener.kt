@@ -2,6 +2,7 @@ package com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.StaggeredGridLayoutManager
 
 abstract class EndlessScrollListener(
         // The minimum number of items to have below your current scroll position
@@ -21,7 +22,7 @@ abstract class EndlessScrollListener(
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         // If the total item count is zero and the previous isn't, assume the
         // list is invalidated and should be reset back to initial state
-        val totalItemCount = recyclerView?.adapter?.itemCount ?: 0
+        val totalItemCount = recyclerView.adapter?.itemCount ?: 0
         if (totalItemCount < previousTotalItemCount) {
             this.currentPage = this.startingPageIndex
             this.previousTotalItemCount = totalItemCount
@@ -39,10 +40,12 @@ abstract class EndlessScrollListener(
         // If it isn't currently loading, we check to see if we have breached
         // the visibleThreshold and need to reload more data.
         // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-        var lastVisibleItem = 0
-        val layoutManager = recyclerView?.layoutManager
-        if (layoutManager is LinearLayoutManager){
-            lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+        val layoutManager = recyclerView.layoutManager
+        val lastVisibleItem = when (layoutManager) {
+            is LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
+            is StaggeredGridLayoutManager ->
+                layoutManager.findLastVisibleItemPositions(null).min() ?: 0
+            else -> 0
         }
         if (!loading && (lastVisibleItem + visibleThreshold) >= totalItemCount ) {
             loading = onLoadMore(currentPage + 1, totalItemCount)

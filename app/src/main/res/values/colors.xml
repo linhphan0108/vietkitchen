@@ -45,6 +45,7 @@
 
     <!--<color notes="divider">#BDBDBD</color>-->
     <color name="divider">#fafafa</color>
+    <color name="divider_white_theme">#bcbbbb</color>
     <color name="divider_dark">#757575</color>
     <color name="state_icon_unselected">#323232</color>
     <color name="color_wave_refresh">#f44336</color>

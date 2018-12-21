@@ -2,7 +2,6 @@ package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +17,10 @@ import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnDrawerNavItemC
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
 import com.example.linh.vietkitchen.util.Constants
-import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
+import com.example.linh.vietkitchen.util.Constants.VISIBLE_THRESHOLD_TO_LOAD_MORE
+import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
-
-
-
 
 class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(),
         HomeFragmentContractView, OnDrawerNavItemChangedListener {
@@ -216,7 +213,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     //endregion callbacks
 
     //region inner methods =========================================================================
-    private fun setupSwipeRefreshLayout(){
+    private fun setupSwipeRefreshLayout() {
         val progressColor1 = context?.color(R.color.color_wave_refresh_progress_1) ?: 0
         val progressColor2 = context?.color(R.color.color_wave_refresh_progress_2) ?: 0
         val progressColor3 = context?.color(R.color.color_wave_refresh_progress_3) ?: 0
@@ -227,15 +224,13 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
             presenter.refreshRecipes()
         }
     }
-    //endregion inner methods
 
-    //region inner classes =========================================================================
     private fun setupRecyclerView() {
 //        recyclerView.itemAnimator = DefaultItemAnimator()
-        rcvRecipes.layoutManager = LinearLayoutManager(context)
-        rcvRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration), resources.getDimensionPixelSize(R.dimen.padding_16), resources.getDimensionPixelSize(R.dimen.padding_16)))
+        rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
+        rcvRecipes.addItemDecoration(getRecyclerViewItemDecoration())
         rcvRecipes.adapter = recipeAdapter
-        rcvLoadMoreListener = object : EndlessScrollListener(3) {
+        rcvLoadMoreListener = object : EndlessScrollListener(VISIBLE_THRESHOLD_TO_LOAD_MORE) {
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
                 rcvRecipes.post { presenter.loadMoreRecipe() }
                 Timber.d("rcvLoadMoreListener")
@@ -244,5 +239,10 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         }
         rcvRecipes.addOnScrollListener(rcvLoadMoreListener)
     }
+
+    override fun requestRecyclerViewLayoutChange() {
+        rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
+    }
+
     //endregion inner classes
 }

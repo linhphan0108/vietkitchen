@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
@@ -54,6 +55,16 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         setupViewPager()
         setupAdminFab()
         presenter.requestCategory()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.home_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return false
     }
 
     override fun onBackPressed() {
@@ -118,6 +129,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
         changeToolbarTitle(category)
         onDrawerNavItemChangedListener?.onDrawerNavChanged(category)
         drawerLayout.closeDrawer(GravityCompat.START)
+        showToolbar()
     }
     //endregion callbacks
 
@@ -138,6 +150,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
                     2 -> R.id.action_profile
                     else -> R.id.action_home
                 }
+                showToolbar()
             }
 
         })
@@ -161,6 +174,7 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
                 else -> {
                 }
             }
+            showToolbar()
             true
         }
     }
@@ -205,6 +219,12 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
             intent.putExtras(bundle)
             startActivityWithAnimation(intent)
         }
+    }
+
+    private fun showToolbar(){
+        appBarLayout.postDelayed({
+            appBarLayout.setExpanded(true, true)
+        }, 500)
     }
     //endregion inner methods
 }
