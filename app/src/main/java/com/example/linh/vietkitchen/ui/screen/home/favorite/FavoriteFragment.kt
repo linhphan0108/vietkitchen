@@ -93,10 +93,14 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
 
     //region inner classes =========================================================================
     private fun setupRecyclerView() {
-        rcvLikedRecipes.layoutManager = LinearLayoutManager(context)
+        rcvLikedRecipes.layoutManager = getRecyclerViewLayoutManager()
 //        rcvLikedRecipes.itemAnimator = DefaultItemAnimator()
         rcvLikedRecipes.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
         rcvLikedRecipes.adapter = recipeAdapter
+    }
+
+    override fun requestRecyclerViewLayoutChange() {
+        rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
     }
     //endregion inner classes
 }

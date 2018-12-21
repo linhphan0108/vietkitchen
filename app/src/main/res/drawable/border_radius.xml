@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle" >
+    <solid android:color="@color/colorBackground" />
+    <stroke android:width="@dimen/rcv_item_border_width"
+            android:color="@color/divider_white_theme"/>
+    <corners android:radius="@dimen/rcv_item_cardView_radius"/>
+</shape>

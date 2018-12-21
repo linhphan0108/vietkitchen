@@ -20,7 +20,7 @@ open class RecipeAdapterDelegate(val listener: OnItemClickListener?) : AbsListIt
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecipeViewHolder {
-        val itemView = LayoutInflater.from(parent.ctx).inflate(R.layout.item_recipe, parent, false)
+        val itemView = LayoutInflater.from(parent.ctx).inflate(R.layout.item_recipe_vertical, parent, false)
         return RecipeViewHolder(itemView, listener)
     }
 }

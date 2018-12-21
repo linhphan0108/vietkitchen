@@ -33,12 +33,8 @@ abstract class BaseActivity<T : BaseViewContract, V : BasePresenterContract<T>> 
     abstract fun getActivityLayoutRes(): Int
 
     protected fun startActivityWithAnimation(intent: Intent){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            val activityOptions = ActivityOptions.makeCustomAnimation(this, R.anim.translate_enter_right_to_left, R.anim.delay)
-            startActivity(intent, activityOptions.toBundle())
-        } else {
-            startActivity(intent)
-        }
+        val activityOptions = ActivityOptions.makeCustomAnimation(this, R.anim.translate_enter_right_to_left, R.anim.delay)
+        startActivity(intent, activityOptions.toBundle())
     }
 
     internal fun applyPalette(palette: Palette?, collapsingToolbarLayout: CollapsingToolbarLayout) {

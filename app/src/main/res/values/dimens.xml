@@ -11,6 +11,8 @@
     <dimen name="rcv_item_decoration_top">56dp</dimen>
     <dimen name="rcv_item_decoration">8dp</dimen>
     <dimen name="rcv_item_decoration_1dp">1dp</dimen>
+    <dimen name="rcv_item_cardView_radius">8dp</dimen>
+    <dimen name="rcv_item_border_width">1dp</dimen>
     <dimen name="app_bar_height">220dp</dimen>
     <dimen name="dialog_Width">220dp</dimen>
 
