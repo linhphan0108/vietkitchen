@@ -40,25 +40,35 @@ class BitmapDrawablePlaceHolder : BitmapDrawable, Drawable.Callback {
         placeHolderBounds = Rect(left, top, right, bottom)
         bounds = placeHolderBounds
         val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565)
+        BitmapDrawablePlaceHolder(textView.resources, bitmap)
+        loadLoadingGif(textView.ctx)
         target = object: SimpleTarget<Bitmap>(){
             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                val newBottom = (placeHolderBounds.width().toFloat() * resource.height / resource.width).toInt()
+                placeHolderBounds.bottom = newBottom
+
                 Timber.d("SimpleTarget image's width = ${resource.width}")
                 Timber.d("SimpleTarget image's height = ${resource.height}")
-                placeHolderBounds.bottom = (placeHolderBounds.width().toFloat() * resource.height / resource.width).toInt()
+                Timber.d("SplaceHolderBounds = $placeHolderBounds")
+
                 drawable = BitmapDrawable(contextRef.get()?.resources, resource)
                 drawable?.bounds = placeHolderBounds
                 bounds = placeHolderBounds
-                if (gdLoading != null && gdLoading!!.isRunning){
-                    Timber.d("stop gif loading")
-                    gdLoading!!.stop()
+                if (gdLoading != null){
+                    if(gdLoading!!.isRunning) {
+                        Timber.d("stop gif loading")
+                        gdLoading!!.stop()
+                    }
                     gdLoading!!.callback = null
                     gdLoading!!.recycle()
                 }
-                textViewRef.get()?.postInvalidate()
+                textViewRef.get()?.post {
+                    textViewRef.get()?.let {txt ->
+                        txt.setText(txt.text, TextView.BufferType.SPANNABLE)
+                    }
+                }
             }
         }
-        BitmapDrawablePlaceHolder(textView.resources, bitmap)
-        loadLoadingGif(textView.ctx)
     }
 
     constructor(res: Resources, bitmap: Bitmap): super(res, bitmap)
@@ -67,6 +77,7 @@ class BitmapDrawablePlaceHolder : BitmapDrawable, Drawable.Callback {
         super.draw(canvas)
         if (drawable != null) {
             Timber.d("draw drawable")
+            Timber.d("draw drawable bounds = $bounds")
             drawable?.draw(canvas)
         }else {
             Timber.d("draw loading-gif")
@@ -81,7 +92,7 @@ class BitmapDrawablePlaceHolder : BitmapDrawable, Drawable.Callback {
 
     override fun invalidateDrawable(who: Drawable?) {
         Timber.d("gif invalidateDrawable")
-        textViewRef.get()?.postInvalidate()
+        textViewRef.get()?.invalidate()
     }
 
     override fun scheduleDrawable(who: Drawable?, what: Runnable?, `when`: Long) {
@@ -89,6 +100,7 @@ class BitmapDrawablePlaceHolder : BitmapDrawable, Drawable.Callback {
     }
 
     private fun loadLoadingGif(ctx: Context) {
+        Timber.d("loadLoadingGif")
         GlideApp.with(ctx)
                 .`as`(ByteArray::class.java)
                 .load(R.drawable.ic_loading_gif)

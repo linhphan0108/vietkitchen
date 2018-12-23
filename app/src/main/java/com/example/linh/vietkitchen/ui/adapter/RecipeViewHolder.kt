@@ -24,10 +24,10 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
             }
         }else {
             with(recipe) {
-                itemView.imgFoodThumb.scaleType = ImageView.ScaleType.CENTER_CROP
-                GlideUtil.widthLoadingHolder(itemView.context, itemView.imgFoodThumb, recipe.thumbUrl)
+                itemView.imgCover.scaleType = ImageView.ScaleType.CENTER_CROP
+                GlideUtil.widthLoadingHolder(itemView.context, itemView.imgCover, recipe.thumbUrl)
                         .override(540, 540)
-                        .into(itemView.imgFoodThumb)
+                        .into(itemView.imgCover)
                 itemView.txtFoodName.text = name
                 itemView.txtShortIntro.text = intro
                 itemView.btnFavorite.setCurrentlyLiked(hasLiked)
@@ -39,11 +39,11 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
 
     private fun bindListeners(recipe: Recipe) {
         itemView.setOnClickListener {
-            listener?.onItemClick(itemView.imgFoodThumb, layoutPosition, adapterPosition, recipe)
+            listener?.onItemClick(itemView.imgCover, layoutPosition, adapterPosition, recipe)
         }
         if(BuildConfig.IS_ADMIN) {
             itemView.setOnLongClickListener {
-                listener?.onItemLongClick(itemView.imgFoodThumb, layoutPosition, adapterPosition, recipe)
+                listener?.onItemLongClick(itemView.imgCover, layoutPosition, adapterPosition, recipe)
                         ?: false
             }
         }

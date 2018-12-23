@@ -42,7 +42,6 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin_end"
-        android:layout_marginRight="@dimen/fab_margin_end"
         android:layout_marginBottom="@dimen/fab_margin_bottom_home"
         app:srcCompat="@drawable/ic_add_24"
         app:layout_scrollFlags="scroll"

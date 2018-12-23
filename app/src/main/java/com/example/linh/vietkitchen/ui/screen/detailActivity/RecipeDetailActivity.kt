@@ -19,6 +19,8 @@ import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
 import android.view.MenuItem
+import android.view.ViewGroup
+import android.view.ViewParent
 import android.widget.TextView
 import com.example.linh.vietkitchen.R.id.*
 import com.example.linh.vietkitchen.extension.*
@@ -165,22 +167,23 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
 //            txtTitle.text = name.capWords()
             txtDescription.text = intro
             txtIngredients.text = ingredient
-            txtSpices.text = spice
 
-            if (preparation.isBlank()) {
-                llStepsToPreProcess.visibility = View.GONE
-            }else{
-                txtStepsToPreparation.setText(preparation, TextView.BufferType.SPANNABLE)
-            }
+            (txtSpices.parent as ViewGroup).visibility = if (spice.isNotBlank()){
+                txtSpices.text = spice
+                View.VISIBLE
+            } else View.INVISIBLE
 
-            txtStepsToProcess.setText(processing, TextView.BufferType.SPANNABLE)
+            llStepsToPreProcess.visibility = if (preparation.isNotBlank()){
+                txtStepsToPreparation.setTextAsSpannable(preparation)
+                View.VISIBLE
+            } else View.INVISIBLE
 
-            if(notes.isNullOrBlank()) {
-                llNotes.visibility = View.GONE
-            }else{
-                llNotes.visibility = View.VISIBLE
+            txtStepsToProcess.setTextAsSpannable(processing)
+
+            (txtNotes.parent as ViewGroup).visibility = if(notes.isNotNullAndNotBlank()){
                 txtNotes.text = notes
-            }
+                View.VISIBLE
+            } else View.INVISIBLE
         }
     }
 
@@ -188,8 +191,6 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
         val fabIcon = if(state) R.drawable.ic_heart_pink else R.drawable.ic_heart_grey
         fab.setImageResource(fabIcon)
     }
-
-
 
     private fun updateBackground(fab: FloatingActionButton, palette: Palette) {
         val lightVibrantColor = palette.getLightVibrantColor(color(android.R.color.white))
