@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/padding_16">
             <ImageView
-                android:id="@+id/imgFoodThumb"
+                android:id="@+id/imgCover"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintDimensionRatio="1:1"
@@ -41,7 +41,7 @@
                 android:layout_marginBottom="@dimen/margin_8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/imgFoodThumb"
+                app:layout_constraintTop_toBottomOf="@id/imgCover"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="@tools:sample/full_names"

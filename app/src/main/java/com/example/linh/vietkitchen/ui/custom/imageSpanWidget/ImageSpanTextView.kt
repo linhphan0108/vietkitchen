@@ -8,10 +8,8 @@ import android.text.Annotation
 import android.text.style.AlignmentSpan
 import android.util.AttributeSet
 import android.widget.TextView
-import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.R.anim.delay
 import com.example.linh.vietkitchen.extension.attractAnnotationSpan
-import com.example.linh.vietkitchen.extension.ctx
-import com.example.linh.vietkitchen.extension.isNotNullAndNotBlank
 import timber.log.Timber
 
 
@@ -43,51 +41,51 @@ class ImageSpanTextView : TextView{
 
     }
 
+    /**
+     * @deprecated
+     * for displaying images and more use {@link ImageSpanTextView#setTextAsSpannable} instead
+     */
     override fun setText(text: CharSequence?, type: BufferType?) {
-        if (text.isNotNullAndNotBlank() && type == BufferType.SPANNABLE){
-            val ssb = SpannableStringBuilder(text)
-            text?.attractAnnotationSpan()?.forEach {
-                when(it.key){
-                    "p" -> replaceAnnotationByAlignmentSpan(ssb, it)
-                    "src" -> ImageSpanUtil.replaceAnnotationByImageSpan(this, ssb, it)
-                }
-            }
-            super.setText(ssb, type)
-        }else {
-            super.setText(text, type)
-        }
+        super.setText(text, type)
     }
-
 
     override fun invalidate() {
-        val currentTime = System.currentTimeMillis()
-        val elapsedTime = currentTime - lastTimeInvalidate
-        if(elapsedTime >= TIME_BETWEEN_EACH_INVALIDATION && !hasQueueValidationCAll){
-            lastTimeInvalidate = currentTime
+        if(hasQueueValidationCAll) return
+        val elapsedTime = System.currentTimeMillis() - lastTimeInvalidate
+        if(elapsedTime >= TIME_BETWEEN_EACH_INVALIDATION){
+            lastTimeInvalidate = System.currentTimeMillis()
             Timber.d("super.invalidate()")
             super.invalidate()
+            lastTimeInvalidate = System.currentTimeMillis()
         }else{
-            if(!hasQueueValidationCAll){
-                hasQueueValidationCAll = true
-                val delay = TIME_BETWEEN_EACH_INVALIDATION - elapsedTime
-                postDelayed({
-                    val curr = System.currentTimeMillis()
-                    val elapsed = curr - lastTimeInvalidate
-                    if(elapsed >= TIME_BETWEEN_EACH_INVALIDATION) {
-                        Timber.d("super.invalidate()")
-                        lastTimeInvalidate = curr
-                        hasQueueValidationCAll = false
-                        super.invalidate()
-                    }
-                }, delay)
-            }
+            hasQueueValidationCAll = true
+            postDelayed({
+                super.invalidate()
+                Timber.d("super.invalidate()")
+                lastTimeInvalidate = System.currentTimeMillis()
+                hasQueueValidationCAll = false
+            }, TIME_BETWEEN_EACH_INVALIDATION.toLong())
         }
     }
 
-    fun setTextAsSpannable(text: String){
-        val vv = ctx.resources.getText(R.string.context_annotation) as SpannedString
-        val sp = SpannedString(text)
-        setText(sp, BufferType.SPANNABLE)
+    //========= inner methods ======================================================================
+    fun setTextAsSpannable(text: CharSequence){
+        setText(replaceSpan(text), TextView.BufferType.SPANNABLE)
+    }
+
+    private fun replaceSpan(txt: CharSequence?): CharSequence {
+        if (txt.isNullOrBlank()) return ""
+        val ssb = SpannableStringBuilder(txt.trim())
+        ssb.attractAnnotationSpan()?.forEach { annotation ->
+            when(annotation.key){
+                "p" -> replaceAnnotationByAlignmentSpan(ssb, annotation)
+                "src" -> ImageSpanUtil.replaceAnnotationByImageSpan(this, ssb, annotation)
+            }
+        }
+        Timber.d(ssb.toString())
+        return ssb
+//        (Regex.fromLiteral("\\n\\n"), "\n")
+//                .(Pattern.compile("[\\r\\n]+")), "\n")
     }
 
     private fun replaceAnnotationByAlignmentSpan(ssb: SpannableStringBuilder, annotation: Annotation){
@@ -102,7 +100,6 @@ class ImageSpanTextView : TextView{
         val flag = ssb.getSpanFlags(annotation)
         val alignmentSpan = AlignmentSpan.Standard(alignment)
         ssb.removeSpan(annotation)
-        ssb.insert(end, System.getProperty("line.separator"))
         ssb.insert(end, System.getProperty("line.separator"))
         ssb.setSpan(alignmentSpan, start, end, flag)
     }

@@ -37,17 +37,12 @@ fun CharSequence.generateAnnotationSpan(): CharSequence{
     val imgAnnotationPattern: Pattern = Pattern.compile("(<annotation src=\"(.*?)\"/>)")
     val srcPattern = Pattern.compile("(?<=src=\")(.*?)(?=\")")
     val matcher = imgAnnotationPattern.matcher(source)
-    var lastEnd = 0
     while (matcher.find()){
         val startAnnotation = matcher.start()
         val endAnnotation = matcher.end()
-        Timber.d(startAnnotation.toString() + " - " + endAnnotation.toString())
+        Timber.d("$startAnnotation - $endAnnotation")
 
-        //add paragraph annotation
-        ssb.setSpan(Annotation("p", "start"), lastEnd, startAnnotation, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        lastEnd = endAnnotation
-
-        //add image annotation
+        //add image'url into the annotation
         val imgAnnotation = source.substring(startAnnotation, endAnnotation)
         val srcMatcher = srcPattern.matcher(imgAnnotation)
         if (srcMatcher.find()){
@@ -55,8 +50,6 @@ fun CharSequence.generateAnnotationSpan(): CharSequence{
             val url = imgAnnotation.substring(srcMatcher.start(), srcMatcher.end())
             ssb.setSpan(Annotation("src", url), startAnnotation, endAnnotation, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-
     }
-
     return ssb
 }

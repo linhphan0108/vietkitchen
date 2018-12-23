@@ -19,15 +19,14 @@ object ImageSpanUtil{
             val w = ScreenUtil.screenWidth() - ScreenUtil.dp2px(32)//minus the parent's padding
             val h = (w * 3) / 4
             val imageGetter = GlideImageGetter(textView, w, h, cornerRadius)
-            ImageSpan(imageGetter.getDrawable(url), url)
+            ImageSpan(imageGetter.getDrawable(url), url, ImageSpan.ALIGN_BASELINE)
         }
         val start = ssb.getSpanStart(annotation)
         val end = ssb.getSpanEnd(annotation)
         val flag = ssb.getSpanFlags(annotation)
         ssb.removeSpan(annotation)
-        ssb.insert(end, System.getProperty("line.separator"))
-        ssb.insert(end, System.getProperty("line.separator"))
         ssb.setSpan(imageSpan, start, end, flag)
-//        ssb.insert(end, "\n\n")
+        ssb.insert(start, System.getProperty("line.separator"))
+        ssb.insert(end+1, System.getProperty("line.separator"))
     }
 }
