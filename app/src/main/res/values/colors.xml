@@ -48,6 +48,8 @@
     <color name="divider_white_theme">#bcbbbb</color>
     <color name="divider_dark">#757575</color>
     <color name="state_icon_unselected">#323232</color>
+
+    <!--swipe to refresh-->
     <color name="color_wave_refresh">#f44336</color>
     <color name="color_wave_refresh_progress_1">#448AFF</color>
     <color name="color_wave_refresh_progress_2">#fff344</color>
@@ -88,5 +90,7 @@
     <dimen name="defaultTagsCloseImagePadding">10dp</dimen>
     <dimen name="defaultTagsPadding">0dp</dimen>
 
-
+    <!--drawer navigation-->
+    <color name="drawer_nav_child_item_color_default">@color/divider</color>
+    <color name="drawer_nav_child_item_color_selected">#c3448aff</color>
 </resources>

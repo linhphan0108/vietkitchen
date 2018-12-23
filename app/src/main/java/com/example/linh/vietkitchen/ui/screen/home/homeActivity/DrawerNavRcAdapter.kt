@@ -4,6 +4,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
+import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavHeader
 import com.example.linh.vietkitchen.ui.model.Entity
@@ -13,11 +14,15 @@ import timber.log.Timber
 class DrawerNavRcAdapter(private val recyclerView: RecyclerView,
                          private val childItemClickListener: OnItemClickListener? = null,
                          items: List<Entity> = listOf())
-    : ListDelegationAdapter<MutableList<Entity>>(), OnGroupItemClickListener {
+    : ListDelegationAdapter<MutableList<Entity>>(), OnGroupItemClickListener, OnItemClickListener {
+
+    private var currentSelectedPosition = 0
+
     init {
         delegatesManager.addDelegate(DrawerNavHeaderLayoutDelegate(userInfo))
         delegatesManager.addDelegate(DrawerNavGroupItemDelegate(this))
-        delegatesManager.addDelegate(DrawerNavChildItemDelegate(childItemClickListener))
+        delegatesManager.addDelegate(DrawerNavChildItemDelegate(this))
+        if(items.isNotEmpty()) items[currentSelectedPosition].isSelected = true
         setItems(items.toMutableList())
         addHeaderLayoutItem()
     }
@@ -74,7 +79,22 @@ class DrawerNavRcAdapter(private val recyclerView: RecyclerView,
             }
         }else{
             //the group item for request all recipes
-            childItemClickListener?.onItemClick(itemView, layoutPosition, adapterPosition)
+            onItemClick(itemView, layoutPosition, adapterPosition)
         }
     }
+
+    override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: DrawerNavChildItem?) {
+        if(currentSelectedPosition != adapterPosition) {
+            items[currentSelectedPosition].isSelected = false
+            notifyItemChanged(currentSelectedPosition, PayLoads.SELECTED_CHANGED)
+            items[adapterPosition].isSelected = true
+            currentSelectedPosition = adapterPosition
+            notifyItemChanged(currentSelectedPosition, PayLoads.SELECTED_CHANGED)
+            childItemClickListener?.onItemClick(itemView, layoutPosition, adapterPosition, data)
+        }
+    }
+}
+
+enum class PayLoads{
+    SELECTED_CHANGED
 }
