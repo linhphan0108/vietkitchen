@@ -25,9 +25,9 @@
     <dimen name="padding_24dp">24dp</dimen>
     <dimen name="margin_drawer_nav_group_item">12dp</dimen>
     <dimen name="margin_drawer_nav_rv_padding_bottom">26dp</dimen>
-    <dimen name="drawer_nav_group_height">56dp</dimen>
-    <dimen name="drawer_nav_group_radius">28dp</dimen>
-    <dimen name="drawer_nav_group_margin_start">-28dp</dimen>
+    <dimen name="drawer_nav_group_height">48dp</dimen>
+    <dimen name="drawer_nav_group_radius">24dp</dimen>
+    <dimen name="drawer_nav_group_margin_start">-24dp</dimen>
     <dimen name="drawer_nav_group_title_drawable_padding">@dimen/padding_8dp</dimen>
     <dimen name="drawer_nav_group_title_drawable_padding_no_child">40dp</dimen>
     <dimen name="drawer_nav_child_height">40dp</dimen>

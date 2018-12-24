@@ -6,7 +6,7 @@
                         tools:initialView="@sample/item_type">
 
     <include layout="@layout/activity_home_nav_header" />
-    <include layout="@layout/item_header_drawer_nav" />
+    <include layout="@layout/item_group_drawer_nav" />
     <include layout="@layout/item_child_drawer_nav" />
 
 </com.example.linh.vietkitchen.ui.custom.HotViewFlipper>

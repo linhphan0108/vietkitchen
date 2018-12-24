@@ -7,6 +7,7 @@
     android:layout_height="@dimen/drawer_nav_group_height"
     android:orientation="horizontal"
     android:layout_marginStart="@dimen/drawer_nav_group_margin_start"
+    android:layout_marginEnd="@dimen/margin_16dp"
     card_view:contentPaddingLeft="@dimen/drawer_nav_group_radius"
     card_view:cardCornerRadius="@dimen/drawer_nav_group_radius"
     card_view:cardElevation="0dp"
@@ -16,8 +17,8 @@
     android:foreground="?android:attr/selectableItemBackground"
     tools:targetApi="lollipop">
 
-    <TextView
-        android:id="@+id/txtListHeader"
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/txtGroupTitle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
@@ -27,7 +28,8 @@
         android:paddingRight="@dimen/margin_drawer_nav_group_item"
         tools:drawableStart="@drawable/ic_outline_expand_more_24"
         android:drawablePadding="@dimen/drawer_nav_group_title_drawable_padding"
-        android:textSize="14sp"
-        android:textStyle="bold"
+        android:background="@drawable/bg_states_drawer_nav_item_group"
+        android:textColor="@color/text_color_states_drawer_nav_group_item"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
         tools:text="@sample/item_nav_group_title"/>
 </android.support.v7.widget.CardView>

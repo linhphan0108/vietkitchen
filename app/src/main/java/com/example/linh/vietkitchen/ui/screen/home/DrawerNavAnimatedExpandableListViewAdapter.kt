@@ -20,8 +20,8 @@ class DrawerNavAnimatedExpandableListViewAdapter : AnimatedExpandableListAdapter
 
     override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup?): View {
         val headerTitle = getGroup(groupPosition)
-        val viewGroup = convertView ?: LayoutInflater.from(parent!!.ctx).inflate(R.layout.item_header_drawer_nav, parent, false)
-        val txtListHeader = viewGroup.findViewById(R.id.txtListHeader) as TextView
+        val viewGroup = convertView ?: LayoutInflater.from(parent!!.ctx).inflate(R.layout.item_group_drawer_nav, parent, false)
+        val txtListHeader = viewGroup.findViewById(R.id.txtGroupTitle) as TextView
         txtListHeader.setTypeface(null, Typeface.BOLD)
         txtListHeader.text = headerTitle
 
