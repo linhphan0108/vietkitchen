@@ -8,7 +8,7 @@ import com.example.linh.vietkitchen.util.Constants.PAGINATION_LENGTH
 import com.google.firebase.database.DataSnapshot
 
 interface RecipeDataSource{
-    suspend fun getAllRecipes(tag: String? = null, limit: Int = PAGINATION_LENGTH, startAtId: String? = null) : PagingResponse<List<DataSnapshot>>?
+    suspend fun getRecipes(tag: String? = null, limit: Int = PAGINATION_LENGTH, startAtId: String? = null) : PagingResponse<List<DataSnapshot>>?
     suspend fun putRecipeWithDumpData(): Response<Boolean>?
     suspend fun putRecipe(recipe: Recipe): Response<String>?
     suspend fun updateRecipe(recipe: Recipe): Response<Boolean>?

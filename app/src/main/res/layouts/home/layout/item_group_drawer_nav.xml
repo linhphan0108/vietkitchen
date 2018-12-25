@@ -29,7 +29,6 @@
         tools:drawableStart="@drawable/ic_outline_expand_more_24"
         android:drawablePadding="@dimen/drawer_nav_group_title_drawable_padding"
         android:background="@drawable/bg_states_drawer_nav_item_group"
-        android:textColor="@color/text_color_states_drawer_nav_group_item"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         tools:text="@sample/item_nav_group_title"/>
 </android.support.v7.widget.CardView>

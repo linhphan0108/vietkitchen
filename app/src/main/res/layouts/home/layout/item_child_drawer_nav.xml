@@ -27,7 +27,6 @@
         android:gravity="center_vertical"
         android:drawableStart="@drawable/ic_outline_label_24"
         android:drawablePadding="@dimen/padding_8dp"
-        android:textColor="@color/text_color_states_drawer_nav_item"
         android:background="@drawable/bg_states_drawer_nav_item"
         android:maxLines="1"
         android:textAppearance="?attr/textAppearanceSubtitle2"

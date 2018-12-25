@@ -145,9 +145,9 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     }
 
     override fun onLoadMoreSuccess(recipes: List<Recipe>) {
-        toast("onLoadMoreSuccess ${recipes.size}")
         recipeAdapter.stopLoadMore()
         recipeAdapter.setMoreItems(recipes.toMutableList())
+        Timber.d("onLoadMoreSuccess ${recipes.size}")
     }
 
     override fun onLoadMoreFailed() {
@@ -156,7 +156,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     override fun onLoadMoreReachEndRecord() {
         recipeAdapter.stopLoadMore()
-        toast("onLoadMoreReachEndRecord")
+        Timber.d("onLoadMoreReachEndRecord")
     }
 
     override fun onLikeEventObserve(recipe: Recipe) {

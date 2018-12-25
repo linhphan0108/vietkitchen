@@ -22,7 +22,7 @@ class RecipeProvider(private val mapper: RecipeMapper = RecipeMapper(),
     suspend fun requestFoods(tag: String? = null, limit: Int = Constants.PAGINATION_LENGTH,
                              startAtId: String? = null) : PagingResponse<List<Recipe>>
             = requestFirstSources {
-        val pagingResponse = it.getAllRecipes(tag, limit, startAtId)
+        val pagingResponse = it.getRecipes(tag, limit, startAtId)
         pagingResponse?.let { pagingRes ->
             TimberUtils.checkNotMainThread()
             val listDataSnapshot = pagingRes.data

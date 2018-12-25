@@ -21,7 +21,7 @@ class RecipeCloudDataSource : RecipeDataSource {
     private val storage = FirebaseStorage.getInstance()
     private val storageRecipeRef = storage.reference.child("images/recipes/")
 
-    override suspend fun getAllRecipes(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
+    override suspend fun getRecipes(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
         val isLoadingMore = startAtId != null
         val limitFixed = if (isLoadingMore) limit + 1 else limit
         val query = if (tag.isNullOrBlank()) {
@@ -43,7 +43,7 @@ class RecipeCloudDataSource : RecipeDataSource {
         }.limitToLast(limitFixed)
 
 
-        startAtId?.let { Timber.d("getAllRecipes from $startAtId") }
+        startAtId?.let { Timber.d("getRecipes from $startAtId") }
 
         val dataSnapshot = query.addListenerForSingleValueEventAwait()
         val listDataSnapshot = if (isLoadingMore){

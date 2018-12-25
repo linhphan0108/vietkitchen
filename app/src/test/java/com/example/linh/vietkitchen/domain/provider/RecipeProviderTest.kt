@@ -3,7 +3,6 @@ package com.example.linh.vietkitchen.domain.provider
 import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Ingredient
-import io.reactivex.Flowable
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -14,17 +13,17 @@ class RecipeProviderTest {
 //        val ds = mock(RecipeDataSource::class.java)
 //        val food = createDumpFood()
 //        val flowable = Flowable.just(listOf(food))
-//        `when`(ds.getAllRecipes()).then{flowable}
+//        `when`(ds.getRecipes()).then{flowable}
 //        val provider = RecipeProvider(listOf(ds))
-//        assertNotNull(provider.requestFoods())
+//        assertNotNull(provider.requestRecipes())
     }
 
     @Test fun testRequestFoodNoValue(){
 //        val ds = mock(RecipeDataSource::class.java)
 //        val flowable = Flowable.empty<List<Recipe>>()
-//        `when`(ds.getAllRecipes()).then{flowable}
+//        `when`(ds.getRecipes()).then{flowable}
 //        val provider = RecipeProvider(listOf(ds))
-//        assertNotNull(provider.requestFoods())
+//        assertNotNull(provider.requestRecipes())
 
     }
 

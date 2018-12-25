@@ -92,5 +92,5 @@
 
     <!--drawer navigation-->
     <color name="drawer_nav_child_item_color_default">@color/divider</color>
-    <color name="drawer_nav_child_item_color_selected">#c3448aff</color>
+    <color name="drawer_nav_child_item_color_selected">#64448aff</color>
 </resources>

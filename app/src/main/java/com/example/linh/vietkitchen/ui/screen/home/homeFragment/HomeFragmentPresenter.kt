@@ -29,6 +29,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
                             private val updateCategoriesCommand: UpdateCategoriesCommand = UpdateCategoriesCommand())
     : BaseHomePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
 
+    private var category: String? = null
     private var lastRecipeId: String? = null
     private var isLoadMoreRecipe = false
     private var isFreshRecipe = false
@@ -36,7 +37,7 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
 
     lateinit var categories: List<DrawerNavGroupItem>
 
-    override fun requestFoods(category: String?){
+    override fun requestRecipes(){
         if (isLoadMoreRecipe){
             viewContract?.onStartLoadMore()
         }else {
@@ -73,14 +74,15 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
             isLoadMoreRecipe = false
             if(hasReachLastRecord) viewContract?.onLoadMoreReachEndRecord()
 
-        }, {
+        }, { e ->
+            Timber.e(e)
             when{
                 isLoadMoreRecipe -> {
                     viewContract?.onLoadMoreFailed()
                     isLoadMoreRecipe = false
                 }
                 else -> {
-                    viewContract?.onFoodsRequestFailed("Opps some things went wrong. ${it.message}")
+                    viewContract?.onFoodsRequestFailed("Opps some things went wrong. ${e.message}")
                     isFreshRecipe = false
                 }
             }
@@ -90,15 +92,16 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
     override fun loadMoreRecipe() {
         if(isLoadMoreRecipe || isFreshRecipe || hasReachLastRecord) return
         isLoadMoreRecipe = true
-        requestFoods()
+        requestRecipes()
     }
 
     override fun refreshRecipes(category: String?) {
         isFreshRecipe = true
         isLoadMoreRecipe = false
-        lastRecipeId = null
         hasReachLastRecord = false
-        requestFoods(category)
+        lastRecipeId = null
+        category?.let { this.category = it}
+        requestRecipes()
     }
 
     override fun deleteRecipe(recipe: Recipe, adapterPosition: Int) {
