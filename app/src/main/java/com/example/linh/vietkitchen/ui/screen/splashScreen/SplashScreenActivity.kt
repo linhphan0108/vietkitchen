@@ -6,17 +6,18 @@ import android.os.Bundle
 import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.extension.showSnackBar
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
+import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 
 
-class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreenContractPresenter>(),
+class SplashScreenActivity : BaseActivity<SplashScreenContractView>(),
         SplashScreenContractView {
+    private val presenter: SplashScreenContractPresenter by lazy { SplashScreenPresenter() }
     lateinit var userInfo: UserInfo
 
     //region lifecycle callbacks ===================================================================
@@ -49,7 +50,9 @@ class SplashScreenActivity : BaseActivity<SplashScreenContractView, SplashScreen
     override fun hideProgress() {
     }
 
-    override fun initPresenter() = SplashScreenPresenter()
+    override fun getPresenter(): BasePresenterContract<SplashScreenContractView> {
+        return presenter
+    }
 
     override fun getViewContract() = this
 

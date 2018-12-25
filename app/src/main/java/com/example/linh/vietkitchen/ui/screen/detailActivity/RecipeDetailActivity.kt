@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.graphics.Palette
@@ -20,13 +19,10 @@ import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import kotlinx.android.synthetic.main.activity_detail.*
 import android.view.MenuItem
 import android.view.ViewGroup
-import android.view.ViewParent
-import android.widget.TextView
-import com.example.linh.vietkitchen.R.id.*
 import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
 import com.example.linh.vietkitchen.ui.model.UserInfo
+import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import com.example.linh.vietkitchen.util.GlideUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_detail_content.*
@@ -37,8 +33,9 @@ private const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
 private const val BK_RECIPE = "BK_RECIPE"
 const val BK_LIKE_STATE_JUST_CHANGED = "BK_LIKE_STATE_JUST_CHANGED"
 
-class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetailPresenter>(),
+class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract>(),
         RecipeDetailViewContract, View.OnClickListener {
+    private val presenter: RecipeDetailPresenterContract by lazy { RecipeDetailPresenter() }
     companion object {
         fun createIntent(context: Context?, thumbImageTransitionName: String, recipe: Recipe): Intent{
             val intent = Intent(context, RecipeDetailActivity::class.java)
@@ -99,7 +96,9 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract, RecipeDetail
     override fun hideProgress() {
     }
 
-    override fun initPresenter() = RecipeDetailPresenter()
+    override fun getPresenter(): BasePresenterContract<RecipeDetailViewContract> {
+        return presenter
+    }
 
     override fun getViewContract() = this
 

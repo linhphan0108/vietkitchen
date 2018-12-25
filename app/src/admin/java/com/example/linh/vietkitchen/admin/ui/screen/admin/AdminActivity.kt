@@ -32,6 +32,7 @@ import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.GlideUtil
 
@@ -40,8 +41,9 @@ private const val REQUEST_IMAGE = 98
 private const val REQUEST_IMAGE_PREPARATION = 97
 private const val REQUEST_IMAGE_PROCESS = 96
 
-class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(), AdminContractView,
+class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         View.OnClickListener, ProgressDialog.Listener {
+    private val presenter: AdminContractPresenter by lazy { AdminPresenter() }
     companion object {
         fun createIntent(context: Context): Intent{
             return Intent(context, AdminActivity::class.java)
@@ -149,7 +151,9 @@ class AdminActivity : BaseActivity<AdminContractView, AdminContractPresenter>(),
     override fun hideProgress() {
     }
 
-    override fun initPresenter() = AdminPresenter()
+    override fun getPresenter(): BasePresenterContract<AdminContractView> {
+        return presenter
+    }
 
     override fun getViewContract() = this
 
