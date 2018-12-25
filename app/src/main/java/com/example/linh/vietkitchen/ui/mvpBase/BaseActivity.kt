@@ -2,31 +2,26 @@ package com.example.linh.vietkitchen.ui.mvpBase
 
 import android.app.ActivityOptions
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.CollapsingToolbarLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.graphics.Palette
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.color
-import kotlinx.android.synthetic.main.activity_detail.*
 
-abstract class BaseActivity<T : BaseViewContract, V : BasePresenterContract<T>> : AppCompatActivity() {
-    protected lateinit var presenter: V
-
+abstract class BaseActivity<T : BaseViewContract> : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(getActivityLayoutRes())
-        presenter = initPresenter()
-        presenter.attachView(getViewContract())
+        getPresenter().attachView(getViewContract())
     }
 
     override fun onDestroy() {
-        presenter.detachView()
+        getPresenter().detachView()
         super.onDestroy()
     }
 
-    abstract fun initPresenter(): V
+    protected abstract fun getPresenter() : BasePresenterContract<T>
 
     abstract fun getViewContract() : T
 

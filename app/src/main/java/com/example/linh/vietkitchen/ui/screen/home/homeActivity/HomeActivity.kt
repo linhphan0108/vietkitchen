@@ -22,6 +22,7 @@ import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
+import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.ScreenUtil
@@ -31,10 +32,10 @@ import kotlinx.android.synthetic.main.activity_home_content.*
 import timber.log.Timber
 
 
-class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContractPresenter>(),
+class HomeActivity : BaseActivity<HomeActivityContractView>(),
         NavigationView.OnNavigationItemSelectedListener, HomeActivityContractView,
         OnItemClickListener, ToolbarActions {
-
+    private val presenter: HomeActivityPresenter by lazy { HomeActivityPresenter() }
     companion object {
         fun createIntent(context: Context): Intent{
             return Intent(context, HomeActivity::class.java)
@@ -83,7 +84,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView, HomeActivityContract
     override val viewContext: Context?
         get() = this
 
-    override fun initPresenter() = HomeActivityPresenter()
+    override fun getPresenter(): BasePresenterContract<HomeActivityContractView> {
+        return presenter
+    }
 
     override fun showProgress() {
     }

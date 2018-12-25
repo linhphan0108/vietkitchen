@@ -4,13 +4,12 @@ import android.content.Context
 import android.content.Intent
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
+import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 
 
-
-
-class LoginActivity : BaseActivity<LoginContractView, LoginPresenter>(),
+class LoginActivity : BaseActivity<LoginContractView>(),
         LoginContractView{
-
+    private val presenter: LoginContractPresenter by lazy{ LoginPresenter() }
     companion object {
         fun createIntent(context: Context): Intent {
             return Intent(context, LoginActivity::class.java)
@@ -27,7 +26,9 @@ class LoginActivity : BaseActivity<LoginContractView, LoginPresenter>(),
     override fun hideProgress() {
     }
 
-    override fun initPresenter() = LoginPresenter()
+    override fun getPresenter(): BasePresenterContract<LoginContractView> {
+        return presenter
+    }
 
     override fun getViewContract() = this
 
