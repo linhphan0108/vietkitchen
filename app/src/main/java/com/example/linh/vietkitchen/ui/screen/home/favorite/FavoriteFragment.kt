@@ -54,7 +54,7 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
     }
 
     override fun onRequestLikedRecipesSuccess(recipes: List<Recipe>) {
-        recipeAdapter.updateItemThenNotify(recipes.toMutableList())
+        recipeAdapter.items = recipes.toMutableList()
         checkNoData()
     }
 

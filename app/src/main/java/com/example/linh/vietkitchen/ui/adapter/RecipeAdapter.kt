@@ -11,8 +11,8 @@ class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
         setItems(items)
     }
 
-    fun updateItemThenNotify(items: MutableList<Entity>){
-        setItems(items)
+    override fun setItems(items: MutableList<Entity>?) {
+        super.setItems(items)
         notifyDataSetChanged()
     }
 

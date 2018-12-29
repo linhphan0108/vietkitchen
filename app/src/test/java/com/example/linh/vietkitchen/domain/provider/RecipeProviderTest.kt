@@ -13,17 +13,17 @@ class RecipeProviderTest {
 //        val ds = mock(RecipeDataSource::class.java)
 //        val food = createDumpFood()
 //        val flowable = Flowable.just(listOf(food))
-//        `when`(ds.getRecipes()).then{flowable}
+//        `when`(ds.requestRecipesByCategory()).then{flowable}
 //        val provider = RecipeProvider(listOf(ds))
-//        assertNotNull(provider.requestRecipes())
+//        assertNotNull(provider.requestRecipesByTag())
     }
 
     @Test fun testRequestFoodNoValue(){
 //        val ds = mock(RecipeDataSource::class.java)
 //        val flowable = Flowable.empty<List<Recipe>>()
-//        `when`(ds.getRecipes()).then{flowable}
+//        `when`(ds.requestRecipesByCategory()).then{flowable}
 //        val provider = RecipeProvider(listOf(ds))
-//        assertNotNull(provider.requestRecipes())
+//        assertNotNull(provider.requestRecipesByTag())
 
     }
 

@@ -19,16 +19,30 @@ class RecipeProvider(private val mapper: RecipeMapper = RecipeMapper(),
         val SOURCES by lazy { listOf(RecipeLocalDataSource(), RecipeCloudDataSource()) }
     }
 
-    suspend fun requestFoods(tag: String? = null, limit: Int = Constants.PAGINATION_LENGTH,
-                             startAtId: String? = null) : PagingResponse<List<Recipe>>
+    suspend fun requestRecipeByCategory(cat: String? = null, limit: Int = Constants.PAGINATION_LENGTH,
+                                        startAtId: String? = null) : PagingResponse<List<Recipe>>
             = requestFirstSources {
-        val pagingResponse = it.getRecipes(tag, limit, startAtId)
+        val pagingResponse = it.requestRecipesByCategory(cat, limit, startAtId)
         pagingResponse?.let { pagingRes ->
             TimberUtils.checkNotMainThread()
             val listDataSnapshot = pagingRes.data
             val listRecipes = listDataSnapshot?.let {
                 Timber.d("onFetchData data's length ${listDataSnapshot.count()}")
                 Timber.d("latest key ${listDataSnapshot.last().key}")
+                mapper.convertToDomain(listDataSnapshot) }
+            PagingResponse(pagingRes.code, listRecipes, pagingRes.isEnd, pagingRes.lastId)
+        }
+    }
+
+    suspend fun requestRecipeByTag(tag: String? = null, limit: Int = Constants.PAGINATION_LENGTH,
+                                        startAtId: String? = null) : PagingResponse<List<Recipe>>
+            = requestFirstSources {
+        val pagingResponse = it.requestRecipesByTag(tag, limit, startAtId)
+        pagingResponse?.let { pagingRes ->
+            TimberUtils.checkNotMainThread()
+            val listDataSnapshot = pagingRes.data
+            val listRecipes = listDataSnapshot?.let {
+                Timber.d("onFetchData data's length ${listDataSnapshot.count()}")
                 mapper.convertToDomain(listDataSnapshot) }
             PagingResponse(pagingRes.code, listRecipes, pagingRes.isEnd, pagingRes.lastId)
         }
