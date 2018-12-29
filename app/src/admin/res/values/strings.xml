@@ -16,6 +16,7 @@
     <string name="hint_tags">Tags</string>
     <string name="hint_special_day">special days</string>
     <string name="hint_region">region</string>
+    <string name="hint_search">search recipes</string>
 
     <string name="region_vietnam">vietnam</string>
     <string name="label_categories">categories</string>

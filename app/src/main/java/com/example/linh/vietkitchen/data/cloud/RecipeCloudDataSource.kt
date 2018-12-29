@@ -3,7 +3,9 @@ package com.example.linh.vietkitchen.data.cloud
 import com.example.linh.vietkitchen.data.response.PagingResponse
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.datasource.*
+import com.example.linh.vietkitchen.extension.isNotNullAndNotBlank
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_CATEGORIES
+import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
 import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
@@ -21,39 +23,12 @@ class RecipeCloudDataSource : RecipeDataSource {
     private val storage = FirebaseStorage.getInstance()
     private val storageRecipeRef = storage.reference.child("images/recipes/")
 
-    override suspend fun getRecipes(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
-        val isLoadingMore = startAtId != null
-        val limitFixed = if (isLoadingMore) limit + 1 else limit
-        val query = if (tag.isNullOrBlank()) {
-            if (isLoadingMore) {
-                dbRefRecipe.orderByKey()
-                        .endAt(startAtId)
-            } else {
-                dbRefRecipe.orderByKey()
-            }
-        } else {
-            if (isLoadingMore) {
-                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$tag")
-                        .equalTo(true)
-                        .endAt(startAtId)
-            } else {
-                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$tag")
-                        .equalTo(true)
-            }
-        }.limitToLast(limitFixed)
+    override suspend fun requestRecipesByTag(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? {
+        return requestRecipes(null, tag, limit, startAtId)
+    }
 
-
-        startAtId?.let { Timber.d("getRecipes from $startAtId") }
-
-        val dataSnapshot = query.addListenerForSingleValueEventAwait()
-        val listDataSnapshot = if (isLoadingMore){
-            dataSnapshot.children.toList().dropLast(1)
-        }else{
-            dataSnapshot.children
-        }.reversed()
-        val lastId = listDataSnapshot.last().key
-        val hasReachEnd = listDataSnapshot.count() < limit
-        return PagingResponse(RESPONSE_SUCCESS, listDataSnapshot, hasReachEnd, lastId)
+    override suspend fun requestRecipesByCategory(category: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
+        return requestRecipes(category, null, limit, startAtId)
     }
 
     override suspend fun getLikedRecipes(ids: List<String>): Response<List<DataSnapshot>> {
@@ -133,6 +108,52 @@ class RecipeCloudDataSource : RecipeDataSource {
     private suspend fun deleteImage(url: String): Response<Boolean>{
             return storage.getReferenceFromUrl(url)
                     .deleteAwait()
+    }
+
+    private suspend fun requestRecipes(category: String?, tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
+        val isLoadingMore = startAtId != null
+        val limitFixed = if (isLoadingMore) limit + 1 else limit
+        val query = if (category.isNotNullAndNotBlank()) {
+            if (isLoadingMore) {
+                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$category")
+                        .equalTo(true)
+                        .endAt(startAtId)
+            } else {
+                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$category")
+                        .equalTo(true)
+            }
+        } else if (tag.isNotNullAndNotBlank()){
+            if (isLoadingMore) {
+                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_TAGS/$tag")
+                        .equalTo(true)
+                        .endAt(startAtId)
+            } else {
+                dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_TAGS/$tag")
+                        .equalTo(true)
+            }
+        }else{
+            if (isLoadingMore) {
+                dbRefRecipe.orderByKey()
+                        .endAt(startAtId)
+            } else {
+                dbRefRecipe.orderByKey()
+            }
+        }.limitToLast(limitFixed)
+
+
+        startAtId?.let { Timber.d("requestRecipesByCategory from $startAtId") }
+
+        val dataSnapshot = query.addListenerForSingleValueEventAwait()
+        val listDataSnapshot = if (isLoadingMore){
+            dataSnapshot.children.toList().dropLast(1)
+        }else{
+            dataSnapshot.children
+        }.reversed()
+        val lastId = if(!listDataSnapshot.isNullOrEmpty()){
+            listDataSnapshot.last().key
+        }else {null}
+        val hasReachEnd = listDataSnapshot.count() < limit
+        return PagingResponse(RESPONSE_SUCCESS, listDataSnapshot, hasReachEnd, lastId)
     }
 
     private fun createADumpFood(): Recipe {

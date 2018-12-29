@@ -28,5 +28,9 @@ class RecipeLocalDataSource : RecipeDataSource {
 
     override suspend fun putRecipeWithDumpData(): Response<Boolean>? = null
 
-    override suspend fun getRecipes(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? = null
+    override suspend fun requestRecipesByCategory(category: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? = null
+
+    override suspend fun requestRecipesByTag(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? {
+        return null
+    }
 }

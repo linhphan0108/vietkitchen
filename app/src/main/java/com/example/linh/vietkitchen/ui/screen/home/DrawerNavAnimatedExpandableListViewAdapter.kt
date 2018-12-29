@@ -12,7 +12,7 @@ import java.util.*
 
 class DrawerNavAnimatedExpandableListViewAdapter : AnimatedExpandableListAdapter() {
 
-    override fun getGroup(groupPosition: Int) = "header title"
+    override fun getGroup(groupPosition: Int) = "header query"
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int) = true
 
