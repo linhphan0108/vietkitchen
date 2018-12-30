@@ -4,8 +4,20 @@ import com.example.linh.vietkitchen.domain.model.CategoryChild
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.ui.model.SearchItem
 
 class CategoryMapper {
+    fun toSearchItem(categories: List<CategoryGroup>): MutableList<SearchItem>{
+        val result = mutableListOf<SearchItem>()
+        categories.forEach {group ->
+            group.itemsList?.forEach { child ->
+                result.add(SearchItem(child.itemTitle, SearchItem.SearchItemType.CATEGORY))
+            }
+        }
+
+        return result
+    }
+
     fun convertToUI(categories: List<CategoryGroup>): List<DrawerNavGroupItem> {
         return categories.map {
             var navChildren: List<DrawerNavChildItem>?  = null

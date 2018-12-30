@@ -137,8 +137,8 @@ class RecipeCloudDataSource : RecipeDataSource {
                         .endAt(startAtId)
             } else {
                 dbRefRecipe.orderByKey()
-            }
-        }.limitToLast(limitFixed)
+            }.limitToLast(limitFixed)
+        }
 
 
         startAtId?.let { Timber.d("requestRecipesByCategory from $startAtId") }

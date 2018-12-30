@@ -7,6 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    android:visibility="gone"
-    tools:context=".ui.screen.home.homeActivity.HomeActivity">
+    android:visibility="visible"
+    tools:context=".ui.screen.searchScreen.SearchScreenActivity">
 </android.support.v7.widget.RecyclerView>

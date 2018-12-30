@@ -1,6 +1,8 @@
 package com.example.linh.vietkitchen.extension
 
 import android.text.SpannableStringBuilder
+import java.text.Normalizer
+import java.util.regex.Pattern
 
 
 fun String.capWords(): String{
@@ -24,4 +26,11 @@ fun String.generateAnnotations(): CharSequence{
     val ssb = SpannableStringBuilder()
 
     return ssb
+}
+
+fun String.removeAccent(): String {
+    if (isBlank()) return ""
+    val temp = Normalizer.normalize(this, Normalizer.Form.NFD)
+    val pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+    return pattern.matcher(temp).replaceAll("")
 }

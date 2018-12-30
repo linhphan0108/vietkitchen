@@ -16,12 +16,8 @@ import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
 
 class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryCommand = RequestCategoryCommand(),
-                            private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand(),
-                            private val categoryMapper: CategoryMapper = CategoryMapper(),
-                            private val tagMapper: TagMapper = TagMapper())
+                            private val categoryMapper: CategoryMapper = CategoryMapper())
     : BasePresenter<HomeActivityContractView>() , HomeActivityContractPresenter {
-
-    private var listTagsOnServer: List<SearchItem>? = null
 
     override fun attachView(view: HomeActivityContractView) {
         super.attachView(view)
@@ -46,38 +42,8 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
                 EventBus.getDefault().post(it)
             }
         },{e->
+            Timber.e(e)
             viewContract?.onRequestCategoriesFailed(getStringRes(R.string.message_error))
-        }, false)
-    }
-
-    override fun requestTags() {
-        launchDataLoad({
-            val tags = withIoContext {
-                val map = requestTagsCommand.executeOnTheInternet(context!!)
-                map.data!!.toListOfStringOfKey()
-            }
-            listTagsOnServer = tagMapper.toSearchItem(tags)
-            viewContract?.onGetTagsSuccess(listTagsOnServer!!)
-        }, {
-            viewContract?.onGetTagsFailed(it.message)
-        })
-    }
-
-    override fun getListTags(): List<SearchItem> {
-        return listTagsOnServer ?: emptyList()
-    }
-
-    override fun filterListTags(query: String?){
-        launchDataLoad({
-            val filteredTags = withIoContext {
-                if(query.isNullOrBlank() || getListTags().isNullOrEmpty()) {
-                    return@withIoContext emptyList<SearchItem>()
-                }
-                return@withIoContext getListTags().filter { s ->
-                    s.query.toLowerCase().startsWith(query.toLowerCase())
-                }
-            }
-            viewContract?.onFilterListTag(filteredTags)
         }, false)
     }
 
