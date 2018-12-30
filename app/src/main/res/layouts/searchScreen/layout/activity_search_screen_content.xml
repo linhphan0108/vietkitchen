@@ -11,8 +11,14 @@
         android:id="@+id/rcvLikedRecipes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/divider"
         tools:listitem="@layout/item_recipe"/>
+
+    <ViewStub
+        android:id="@+id/stub_search_suggestion"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/layout_search_view_suggestion"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <TextView
         android:id="@+id/txtNoData"

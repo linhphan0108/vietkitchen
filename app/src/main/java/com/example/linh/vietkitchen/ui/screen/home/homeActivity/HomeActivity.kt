@@ -2,7 +2,6 @@ package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
-import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -18,17 +17,11 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.support.v7.widget.SearchView
-import android.view.inputmethod.EditorInfo
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
-import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionAdapter
-import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionViewHolder
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.model.SearchItem
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
@@ -38,13 +31,12 @@ import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
 import kotlinx.android.synthetic.main.activity_home_content.*
-import kotlinx.android.synthetic.main.layout_search_view_suggestion.*
 import timber.log.Timber
 
 
 class HomeActivity : BaseActivity<HomeActivityContractView>(),
         NavigationView.OnNavigationItemSelectedListener, HomeActivityContractView,
-        OnItemClickListener, ToolbarActions, SearchView.OnQueryTextListener, SearchSuggestionViewHolder.OnItemListeners {
+        OnItemClickListener, ToolbarActions{
 
     companion object {
         fun createIntent(context: Context): Intent{
@@ -54,11 +46,9 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
     private val presenter: HomeActivityPresenter by lazy { HomeActivityPresenter() }
     private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
-    private val searchSuggestionAdapter: SearchSuggestionAdapter by lazy { SearchSuggestionAdapter(mutableListOf(), this) }
     internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
     private lateinit var navItems: List<DrawerNavGroupItem>
 
-    private var isSearchSuggestionAdapterAttached = false
 
     //region lifecycle =============================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,48 +59,22 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
         setupViewPager()
         setupAdminFab()
         presenter.requestCategory()
-        presenter.requestTags()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.home_options, menu)
 
-        // Associate searchable configuration with the SearchView
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchItem = menu.findItem(R.id.action_search)
-        (searchItem.actionView as SearchView).apply {
-//            setSearchableInfo(searchManager.getSearchableInfo(ComponentName(this@HomeActivity, SearchScreenActivity::class.java)))
-            setSearchableInfo(searchManager.getSearchableInfo(componentName))
-            queryHint = getString(R.string.hint_search)
-            setIconifiedByDefault(true) // Do not iconify the widget; expand it by default
-            imeOptions = EditorInfo.IME_ACTION_SEARCH
-            setOnQueryTextListener(this@HomeActivity)
-            setOnSearchClickListener {
-                Timber.d("SearchView onSearchClickListener")
-            }
-            searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener{
-                override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                    Timber.d("SearchView onMenuItemActionExpand")
-                    setMenuItemsVisibility(menu, searchItem, false)
-                    setSearchSuggestionVisibility(true)
-                    return true
-                }
-
-                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                    Timber.d("SearchView onMenuItemActionCollapse")
-                    setMenuItemsVisibility(menu, searchItem, true)
-                    setSearchSuggestionVisibility(false)
-                    return true
-                }
-
-            })
-            Timber.d("SearchView created")
-        }
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return false
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.action_search -> {
+                startActivity(SearchScreenActivity.createIntent(this))
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                true
+            }else -> false
+        }
     }
 
     override fun onBackPressed() {
@@ -150,18 +114,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
 
     override fun onRequestCategoriesFailed(message: String) {
     }
-
-    override fun onGetTagsSuccess(tags: List<SearchItem>) {
-    }
-
-    override fun onGetTagsFailed(message: String?) {
-        message?.let { toast(it)}
-    }
-
-    override fun onFilterListTag(filteredTags: List<SearchItem>) {
-        searchSuggestionAdapter.items = filteredTags.toMutableList()
-    }
-
     //endregion MVP callbacks
 
 
@@ -190,24 +142,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
         onDrawerNavItemChangedListener?.onDrawerNavChanged(category)
         drawerLayout.closeDrawer(GravityCompat.START)
         showToolbar()
-    }
-
-    //SearchView's callback
-    override fun onQueryTextSubmit(p0: String?): Boolean {
-        return false
-    }
-
-    override fun onQueryTextChange(p0: String?): Boolean {
-        presenter.filterListTags(p0)
-        return true
-    }
-
-    //on search item suggestion clicked
-    override fun onItemClick(item: SearchItem) {
-        val intent = Intent(this, SearchScreenActivity::class.java)
-        intent.action = Intent.ACTION_SEARCH
-        intent.putExtra(SearchManager.USER_QUERY, item)
-        startActivity(intent)
     }
     //endregion callbacks
 
@@ -316,20 +250,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
         }, 500)
     }
 
-    private fun setSearchSuggestionVisibility(isVisible: Boolean){
-        if(!isSearchSuggestionAdapterAttached && isVisible){
-            stub_search_suggestion.visibility = View.VISIBLE
-            rcvSearchSuggestion.adapter = searchSuggestionAdapter
-            rcvSearchSuggestion.layoutManager = LinearLayoutManager(this)
-            isSearchSuggestionAdapterAttached = true
-        }
-        changeToolbarScrollable(!isVisible)
-        rcvSearchSuggestion.visibility = if (isVisible) View.VISIBLE else View.GONE
-        setBottomNavVisibility(!isVisible)
-        setFabVisibility(!isVisible)
-        Timber.d("setSearchSuggestionVisibility $isVisible")
-    }
-
     private fun changeToolbarScrollable(scrollable: Boolean){
         // Show toolbar when we are in maps mode
         val params = toolbar.layoutParams as AppBarLayout.LayoutParams
@@ -353,13 +273,6 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
         if (isVisible) fabAdmin.show() else fabAdmin.hide()
     }
 
-    private fun setMenuItemsVisibility(menu: Menu, exception: MenuItem, visible: Boolean) {
-        for (i in 0 until menu.size()) {
-            val item = menu.getItem(i)
-            if (item !== exception) item.isVisible = visible
-        }
-        if (visible)invalidateOptionsMenu()
-    }
     //endregion inner methods
 }
 

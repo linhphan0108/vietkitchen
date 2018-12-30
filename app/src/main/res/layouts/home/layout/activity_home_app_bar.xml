@@ -48,12 +48,4 @@
         app:layout_behavior="com.example.linh.vietkitchen.ui.custom.ScrollAwareFABBehavior"
         android:visibility="gone"
         tools:visibility="visible"/>
-
-    <ViewStub
-        android:id="@+id/stub_search_suggestion"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout="@layout/layout_search_view_suggestion"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
 </android.support.design.widget.CoordinatorLayout>
