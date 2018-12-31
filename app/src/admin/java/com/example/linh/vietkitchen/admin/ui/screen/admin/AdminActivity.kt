@@ -14,7 +14,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.extension.capWords
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.util.SDKUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
@@ -25,9 +24,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.example.linh.vietkitchen.extension.showSnackBar
-import com.example.linh.vietkitchen.extension.toBitmap
-import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
@@ -42,8 +39,8 @@ private const val REQUEST_IMAGE_PREPARATION = 97
 private const val REQUEST_IMAGE_PROCESS = 96
 
 class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
-        View.OnClickListener, ProgressDialog.Listener {
-    private val presenter: AdminContractPresenter by lazy { AdminPresenter() }
+        View.OnClickListener, ProgressDialog.Listener, View.OnFocusChangeListener {
+
     companion object {
         fun createIntent(context: Context): Intent{
             return Intent(context, AdminActivity::class.java)
@@ -54,11 +51,14 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         }
     }
 
+    private val presenter: AdminContractPresenter by lazy { AdminPresenter() }
     private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
 
     private var imageUri: Uri? = null
     private lateinit var listImagesUri: MutableList<Uri>
     private lateinit var listCatsChecked: MutableList<DrawerNavChildItem>
+    private var styleableEditableHasFocused = false
+    private var styleableEditableImageHasFocused = false
 
     //#region life circle ==================================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,8 +68,7 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         setupToolbar()
         setupCategoryChip(categories)
         iBtnUpdateImage.setOnClickListener(this)
-        iBtnPreparationBrowser.setOnClickListener(this)
-        iBtnProcessBrowser.setOnClickListener(this)
+        setStyleableEditableViews()
         listImagesUri = mutableListOf()
         listCatsChecked = mutableListOf()
         presenter.getTags()
@@ -109,7 +108,18 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.admin_menu, menu)
+        if(styleableEditableHasFocused){
+            menuInflater.inflate(R.menu.styleable_editable_tool_bar, menu)
+            val addPhotoMenuItem = menu.findItem(R.id.action_insert_image)
+            val addPhotoIcon = if(styleableEditableImageHasFocused) {
+                R.drawable.ic_baseline_add_photo_24_enable
+            }else{
+                R.drawable.ic_baseline_add_photo_24_disable
+            }
+            addPhotoMenuItem.setIcon(addPhotoIcon)
+        }else{
+            menuInflater.inflate(R.menu.admin_menu, menu)
+        }
         return true
     }
 
@@ -129,6 +139,18 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
                 onBackPressed()
                 true
             }
+
+            R.id.action_insert_image -> {
+                if (styleableEditableImageHasFocused) {
+                    requestImage(getRequestCodeForRequestImage())
+                }
+                true
+            }
+
+            R.id.action_style_bold -> {
+                onActionStyleBoldSelected()
+                true
+            }
             else -> false
         }
     }
@@ -137,6 +159,17 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         if (progressDialog.isVisible)
             progressDialog.dismiss()
         super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        if(styleableEditableHasFocused){
+            styleableEditableHasFocused = false
+            styleableEditableImageHasFocused = false
+            currentFocus?.clearFocus()
+            invalidateOptionsMenu()
+        }else {
+            super.onBackPressed()
+        }
     }
 
     //#endregion life circle
@@ -214,13 +247,25 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
             R.id.iBtnUpdateImage ->
                 requestImage(REQUEST_IMAGE)
 
-            R.id.iBtnPreparationBrowser ->
-                requestImage(REQUEST_IMAGE_PREPARATION)
-
-            R.id.iBtnProcessBrowser ->
-                requestImage(REQUEST_IMAGE_PROCESS)
+//            R.id.iBtnPreparationBrowser ->
+//                requestImage(REQUEST_IMAGE_PREPARATION)
+//
+//            R.id.iBtnProcessBrowser ->
+//                requestImage(REQUEST_IMAGE_PROCESS)
         }
     }
+
+    //on edit text view focus changed
+    override fun onFocusChange(v: View, hasFocus: Boolean) {
+        styleableEditableHasFocused = hasFocus
+        styleableEditableImageHasFocused = hasFocus && v == edtPreparation || v == edtProcess
+        invalidateOptionsMenu()
+        appBarLayout.setExpanded(false, true)
+        if (styleableEditableImageHasFocused){
+            scrollToTop(v)
+        }
+    }
+
     //ProgressDialog.Listener
     override fun onNewRecipe() {
         resetComposer()
@@ -233,7 +278,52 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
+        title = ""
         collapsingToolbarLayout.title = title
+    }
+
+    private fun setStyleableEditableViews(){
+        tilRecipeTitle.onFocusChangeListener = this
+        edtShortIntro.onFocusChangeListener = this
+        edtIngredients.onFocusChangeListener = this
+        edtSpices.onFocusChangeListener = this
+        edtPreparation.onFocusChangeListener = this
+        edtProcess.onFocusChangeListener = this
+        edtNotes.onFocusChangeListener = this
+    }
+
+    private fun getRequestCodeForRequestImage(): Int{
+        return if (edtPreparation.isFocused){
+            REQUEST_IMAGE_PREPARATION
+        }else{
+            REQUEST_IMAGE_PROCESS
+        }
+    }
+
+    private fun getCurrentFocusedStyleableEdt(): EditText{
+        return currentFocus as EditText
+    }
+
+    private fun scrollToTop(view: View){
+//        val toolbarLocation = IntArray(2)
+        val viewLocation = IntArray(2)
+//        toolbar.getLocationOnScreen(toolbarLocation)
+        (view.parent.parent as View).getLocationOnScreen(viewLocation)
+        val marginTop = getDimension(R.dimen.margin_16dp).toInt()
+        val scrollTo = viewLocation[1] - toolbar.height - ScreenUtil.getStatusBarHeight(window)- marginTop
+        nestedScrollView.smoothScrollBy(0, scrollTo)
+    }
+
+    private fun onActionStyleBoldSelected(){
+        val currentFocusedEdt = getCurrentFocusedStyleableEdt()
+        val editable = currentFocusedEdt.editableText
+        val currentSelectionStart = currentFocusedEdt.selectionStart
+        val currentSelectionEnd = currentFocusedEdt.selectionEnd
+        val selectionText = editable.subSequence(currentSelectionStart, currentSelectionEnd)
+        val annotation = "<annotation style=\"bold\">$selectionText</annotation>"
+        editable.replace(currentSelectionStart, currentSelectionEnd, annotation)
+        val newSelection = currentSelectionStart + annotation.length - 13
+        currentFocusedEdt.setSelection(newSelection)
     }
 
     private fun setupCategoryChip(categories: List<DrawerNavGroupItem>) {
@@ -243,7 +333,7 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
             val txtTitle = llChipGroup.getChildAt(0) as TextView
             val chipGroup = llChipGroup.getChildAt(1) as ChipGroup
             txtTitle.text = groupItem.headerTile
-            groupItem.itemsList?.forEach {childItem ->
+            groupItem.itemsList.forEach {childItem ->
                 val chip = Chip(this)
                 chip.setChipBackgroundColorResource(R.color.bg_chip_states)
                 chip.setTextAppearance(R.style.ChipTextStyle_Selected)
@@ -389,7 +479,10 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     private fun onRequestPreparationImage(uri: Uri){
         val pos = edtPreparation.selectionEnd
         val editable = edtPreparation.editableText
-        val annotation = "\n<annotation src=\"$uri\"/>\n"
+        var annotation: CharSequence = "<annotation src=\"$uri\"/>"
+        if (editable.isNotBlank()){
+            annotation = annotation.breakLineFirst().breakLineLast()
+        }
         editable.insert(pos, annotation)
     }
 

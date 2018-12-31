@@ -2,6 +2,13 @@ package com.example.linh.vietkitchen.util
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Rect
+import android.util.Log
+import android.view.View
+import android.view.Window
+import android.view.Window.ID_ANDROID_CONTENT
+import timber.log.Timber
+
 
 object ScreenUtil {
     /**
@@ -25,5 +32,15 @@ object ScreenUtil {
     fun getMaxWidthImage(): Int{
         val screenWidth = screenWidth()
         return Math.min(screenWidth, ImageOptimizationUtil.MAX_IMAGE_WIDTH)
+    }
+
+    fun getStatusBarHeight(window: Window): Int {
+        val rectangle = Rect()
+        window.decorView.getWindowVisibleDisplayFrame(rectangle)
+        val statusBarHeight = rectangle.top
+        val contentViewTop = window.findViewById<View>(Window.ID_ANDROID_CONTENT).top
+        val titleBarHeight = contentViewTop - statusBarHeight
+        Timber.i("*** Elenasys :: StatusBar Height= $statusBarHeight , TitleBar Height = $titleBarHeight")
+        return statusBarHeight
     }
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/layout_edit_text_tool_bar_height"
+    android:orientation="horizontal"
+    android:gravity="end">
+    <ImageButton
+        android:id="@+id/iBtnStyleBold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_6dp"
+        android:layout_marginEnd="12dp"
+        android:layout_gravity="top|end"
+        app:srcCompat="@drawable/ic_baseline_format_bold_24"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
+    <ImageButton
+        android:id="@+id/iBtnInsertImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:padding="@dimen/padding_6dp"
+        android:layout_gravity="top|end"
+        android:src="@drawable/ic_menu_camera"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
+</LinearLayout>

@@ -23,7 +23,6 @@
     <!--drawer navigation-->
     <string name="drawer_nav_item_title">%s (%d)</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_temp">Temp</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -74,4 +73,8 @@
     <string name="msg_store_recipe_finished">done!</string>
     <string name="progress">%d%%</string>
     <string name="progress_counter">%d/%d files</string>
+
+    <!--admin activity-->
+    <string name="label_option_style_bold">bold</string>
+    <string name="label_option_insert_image">insert image</string>
 </resources>

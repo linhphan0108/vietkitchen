@@ -53,3 +53,30 @@ fun CharSequence.generateAnnotationSpan(): CharSequence{
     }
     return ssb
 }
+
+fun CharSequence.findLastIndex(predicate: (char: Char) -> Boolean): Int{
+    if (isNullOrEmpty()) return -1
+    for (i in length downTo 0 step 1){
+        if (predicate(this[i])) return i
+    }
+    return -1
+}
+
+fun CharSequence.isLastLineBlank(): Boolean{
+    if (isNotNullAndNotBlank()) {
+        val lastBreakLine = findLastIndex { it == '\n' }
+        if (lastBreakLine > -1) {
+            val lastLine = this.subSequence(lastBreakLine, length)
+            return lastLine.isBlank()
+        }
+    }
+    return true
+}
+
+fun CharSequence.breakLineFirst(): CharSequence {
+    return "${System.getProperty("line.separator")}$this"
+}
+
+fun CharSequence.breakLineLast(): CharSequence {
+    return "$this${System.getProperty("line.separator")}"
+}
