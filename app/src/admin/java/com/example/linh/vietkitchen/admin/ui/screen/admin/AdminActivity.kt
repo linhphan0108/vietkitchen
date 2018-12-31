@@ -8,10 +8,7 @@ import android.os.Bundle
 import android.support.design.chip.Chip
 import android.support.design.chip.ChipGroup
 import android.support.v7.graphics.Palette
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.*
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
@@ -258,7 +255,7 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     //on edit text view focus changed
     override fun onFocusChange(v: View, hasFocus: Boolean) {
         styleableEditableHasFocused = hasFocus
-        styleableEditableImageHasFocused = hasFocus && v == edtPreparation || v == edtProcess
+        styleableEditableImageHasFocused = hasFocus && (v == edtPreparation || v == edtProcess)
         invalidateOptionsMenu()
         appBarLayout.setExpanded(false, true)
         if (styleableEditableImageHasFocused){
@@ -305,13 +302,15 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     }
 
     private fun scrollToTop(view: View){
-//        val toolbarLocation = IntArray(2)
-        val viewLocation = IntArray(2)
-//        toolbar.getLocationOnScreen(toolbarLocation)
-        (view.parent.parent as View).getLocationOnScreen(viewLocation)
-        val marginTop = getDimension(R.dimen.margin_16dp).toInt()
-        val scrollTo = viewLocation[1] - toolbar.height - ScreenUtil.getStatusBarHeight(window)- marginTop
-        nestedScrollView.smoothScrollBy(0, scrollTo)
+        appBarLayout.setExpanded(false, true)
+        var parentView: View = view.parent as View
+        var targetView: View = view
+        while (parentView.id != llContent.id){
+            targetView = parentView
+            parentView = parentView.parent as View
+        }
+        val relativeToScrollView =  targetView.top - llContent.paddingTop - nestedScrollView.scrollY
+        nestedScrollView.smoothScrollBy(0, relativeToScrollView)
     }
 
     private fun onActionStyleBoldSelected(){
@@ -353,7 +352,7 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
                 }
                 chipGroup.addView(chip as View)
             }
-            llContent.addView(llChipGroup)
+            llChips.addView(llChipGroup)
         }
     }
 
@@ -400,34 +399,56 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
      * @return true if the input data is valid otherwise return false
      */
     private fun invalidateRecipe(): Boolean{
-
-        if(imageUri.toString().isBlank()){
-            toast(getString(R.string.error_msg_thumb_image_null))
+        if(imageUri != null && imageUri.toString().isNullOrBlank()){
+            showSnackBar(llContent, R.string.error_msg_thumb_image_null)
+            appBarLayout.setExpanded(true, true)
             return false
         }
 
         if(edtRecipeTitle.text.isNullOrBlank()){
+            appBarLayout.setExpanded(false, true)
+            scrollToTop(edtRecipeTitle)
             edtRecipeTitle.error = getString(R.string.error_msg_title_empty)
+            edtRecipeTitle.postDelayed({
+                edtRecipeTitle.requestFocus()
+            }, 500)
             return false
         }
 
         if(edtIngredients.text.isNullOrBlank()){
+            appBarLayout.setExpanded(false, true)
+            scrollToTop(edtIngredients)
             edtIngredients.error = getString(R.string.error_msg_ingredient_empty)
+            edtIngredients.postDelayed({
+                edtIngredients.requestFocus()
+            }, 500)
+            return false
+        }
+
+        if (edtProcess.text.isNullOrBlank()){
+            appBarLayout.setExpanded(false, true)
+            scrollToTop(edtProcess)
+            edtProcess.error = getString(R.string.error_msg_process_step_empty)
+            edtProcess.postDelayed({
+                edtProcess.requestFocus()
+            }, 500)
             return false
         }
 
         if(edtTags.tags.isNullOrEmpty()){
+            appBarLayout.setExpanded(false, true)
+            scrollToTop(edtTags)
             edtTags.error = getString(R.string.error_msg_tags_empty)
+            edtTags.postDelayed({
+                edtTags.requestFocus()
+            }, 500)
             return false
         }
 
         if(listCatsChecked.isNullOrEmpty()){
             toast(getString(R.string.error_msg_categories_un_selected))
-            return false
-        }
-
-        if (edtProcess.text.isNullOrBlank()){
-            edtProcess.error = getString(R.string.error_msg_process_step_empty)
+            appBarLayout.setExpanded(false, true)
+            scrollToTop(llChips)
             return false
         }
 
@@ -526,6 +547,18 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         edtProcess.setText("")
         edtNotes.setText("")
         edtTags.setTags(null)
+        imgHeaderImage.setImageResource(0)
+        resetChips()
+    }
+
+    private fun resetChips(){
+        for (i in 0 until llChips.childCount){
+            val chipGroup = llChips.getChildAt(i) as ChipGroup
+            for (j in 0 until chipGroup.childCount){
+                val chip = chipGroup.getChildAt(j) as Chip
+                if (chip.isCheckable) chip.isCheckable = false
+            }
+        }
     }
 
     //#endregion inner methods
