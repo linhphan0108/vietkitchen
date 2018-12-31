@@ -18,7 +18,6 @@
         >
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/tilRecipeTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <EditText
@@ -73,42 +72,37 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <FrameLayout
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputLayout
+            <EditText
+                android:id="@+id/edtPreparation"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/edtPreparation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top|start"
-                    android:inputType="text|textMultiLine"
-                    android:minLines="6"
-                    android:maxLines="14"
-                    android:hint="@string/hint_preparation" />
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:inputType="text|textMultiLine"
+                android:minLines="6"
+                android:maxLines="14"
+                android:hint="@string/hint_preparation" />
 
-            </android.support.design.widget.TextInputLayout>
-        </FrameLayout>
+        </android.support.design.widget.TextInputLayout>
 
-        <FrameLayout
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputLayout
+            <EditText
+                android:id="@+id/edtProcess"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/edtProcess"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top|start"
-                    android:inputType="text|textMultiLine"
-                    android:minLines="6"
-                    android:maxLines="14"
-                    android:hint="@string/hint_process" />
-            </android.support.design.widget.TextInputLayout>
-        </FrameLayout>
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:inputType="text|textMultiLine"
+                android:minLines="6"
+                android:maxLines="14"
+                android:hint="@string/hint_process" />
+        </android.support.design.widget.TextInputLayout>
+
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -138,5 +132,11 @@
                 android:hint="@string/hint_tags" />
 
         </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/llChips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

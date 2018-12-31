@@ -230,7 +230,8 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     }
 
     override fun onPutRecipeSuccess() {
-        showSnackBar(coordinatorLayout, "recipe saved successfully")
+        progressDialog.updateMessage(getString(R.string.msg_store_recipe_finished))
+        progressDialog.progressFinish()
     }
 
     override fun onPutRecipeFailed(message: String?) {
@@ -280,7 +281,7 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     }
 
     private fun setStyleableEditableViews(){
-        tilRecipeTitle.onFocusChangeListener = this
+        edtRecipeTitle.onFocusChangeListener = this
         edtShortIntro.onFocusChangeListener = this
         edtIngredients.onFocusChangeListener = this
         edtSpices.onFocusChangeListener = this
@@ -549,14 +550,22 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         edtTags.setTags(null)
         imgHeaderImage.setImageResource(0)
         resetChips()
+        currentFocus?.clearFocus()
+        scrollToTop(edtRecipeTitle)
+        appBarLayout.setExpanded(true, true)
     }
 
     private fun resetChips(){
         for (i in 0 until llChips.childCount){
-            val chipGroup = llChips.getChildAt(i) as ChipGroup
-            for (j in 0 until chipGroup.childCount){
-                val chip = chipGroup.getChildAt(j) as Chip
-                if (chip.isCheckable) chip.isCheckable = false
+            val llChipGroup = llChips.getChildAt(i) as ViewGroup
+            for (j in 0 until  llChipGroup.childCount) {
+                if (llChipGroup.getChildAt(j) is ChipGroup) {
+                    val chipGroup = llChipGroup.getChildAt(j) as ChipGroup
+                    for (k in 0 until chipGroup.childCount) {
+                        val chip = chipGroup.getChildAt(k) as Chip
+                        if (chip.isChecked) chip.isChecked = false
+                    }
+                }
             }
         }
     }

@@ -17,10 +17,8 @@ import android.os.*
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.filterFirst
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
-import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.service.PutRecipeService.Companion.MSG_UPDATE_NEW_CATEGORIES
 import com.example.linh.vietkitchen.util.RecipeUtil
 import com.example.linh.vietkitchen.util.TimberUtils
 
@@ -162,10 +160,10 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
         mConnection.listImagesUri = listImagesUri
         mConnection.newTags = newTags
         mConnection.newDrawerNav = newDrawerNav
-        if (context?.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)!!) {
-            isBounded = true
-        } else {
-            Timber.e("Error: The requested service doesn't exist, or this client isn't allowed access to it.")
+        when {
+            isBounded -> sendUploadCommandToService(recipe, listImagesUri, newTags, newDrawerNav)
+            context?.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)!! -> isBounded = true
+            else -> Timber.e("Error: The requested service doesn't exist, or this client isn't allowed access to it.")
         }
     }
 
@@ -189,6 +187,35 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
         }
     }
 
+    private fun sendUploadCommandToService(recipe: Recipe, listImagesUri: List<Uri>, newTags: List<String>?, newDrawerNav: List<DrawerNavGroupItem>) {
+        // We want to monitor the service for as long as we are
+        // connected to it.
+        try {
+            var msg = Message.obtain(null, PutRecipeService.MSG_REGISTER_CLIENT)
+            msg.replyTo = clientMessage
+            serviceMessenger?.send(msg)
+
+            // Give it some value as an example.
+            msg = Message.obtain(null, PutRecipeService.MSG_UPLOAD_RECIPE)
+            val bundle = Bundle()
+            bundle.putParcelable(PutRecipeService.BK_RECIPE_TO_UPLOAD, recipe)
+            bundle.putParcelableArrayList(PutRecipeService.BK_LIST_IMAGES_URI, ArrayList(listImagesUri))
+            newTags?.also {
+                bundle.putStringArrayList(PutRecipeService.BK_LIST_NEW_TAGS, ArrayList(it))
+            }
+            bundle.putParcelableArrayList(PutRecipeService.BK_NEW_CATEGORIES, ArrayList(newDrawerNav))
+
+            msg.data = bundle
+            serviceMessenger?.send(msg)
+//
+        } catch (e: RemoteException) {
+            // In this case the service has crashed before we could even
+            // do anything with it; we can count on soon being
+            // disconnected (and then reconnected if it can be restarted)
+            // so there is no need to do anything here.
+        }
+    }
+
     private val mConnection = object : ServiceConnection {
         lateinit var recipe: Recipe
         lateinit var listImagesUri: List<Uri>
@@ -201,35 +228,7 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
             // service through an IDL interface, so get a client-side
             // representation of that from the raw service object.
             serviceMessenger = Messenger(service)
-
-            // We want to monitor the service for as long as we are
-            // connected to it.
-            try {
-                var msg = Message.obtain(null, PutRecipeService.MSG_REGISTER_CLIENT)
-                msg.replyTo = clientMessage
-                serviceMessenger?.send(msg)
-
-                // Give it some value as an example.
-                msg = Message.obtain(null, PutRecipeService.MSG_UPLOAD_RECIPE)
-                val bundle = Bundle()
-                bundle.putParcelable(PutRecipeService.BK_RECIPE_TO_UPLOAD, recipe)
-                bundle.putParcelableArrayList(PutRecipeService.BK_LIST_IMAGES_URI, ArrayList(listImagesUri))
-                newTags?.also {
-                    bundle.putStringArrayList(PutRecipeService.BK_LIST_NEW_TAGS, ArrayList(it))
-                }
-                bundle.putParcelableArrayList(PutRecipeService.BK_NEW_CATEGORIES, ArrayList(newDrawerNav))
-
-                msg.data = bundle
-                serviceMessenger?.send(msg)
-//
-            } catch (e: RemoteException) {
-                // In this case the service has crashed before we could even
-                // do anything with it; we can count on soon being
-                // disconnected (and then reconnected if it can be restarted)
-                // so there is no need to do anything here.
-            }
-
-
+            sendUploadCommandToService(recipe, listImagesUri, newTags, newDrawerNav)
             // Tell the user about this for our demo.
             Timber.d("service has connected")
         }
@@ -286,7 +285,7 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
                     viewContract?.updateMessage(getStringRes(R.string.msg_put_new_tags))
                 }
                 PutRecipeService.MSG_STORE_RECIPE_TOTALLY_FINISHED ->{
-                    viewContract?.updateMessage(getStringRes(R.string.msg_store_recipe_finished))
+                    viewContract?.onPutRecipeSuccess()
                 }
                 else -> super.handleMessage(msg)
             }

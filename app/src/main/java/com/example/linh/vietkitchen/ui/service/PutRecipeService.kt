@@ -86,7 +86,7 @@ class PutRecipeService : BaseService() {
 
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
-    private val binder = LocalBinder()
+//    private val binder = LocalBinder()
     private val nn by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     /** Keeps track of all current registered clients.  */
     private var clients = ArrayList<Messenger>()
@@ -148,6 +148,9 @@ class PutRecipeService : BaseService() {
                     val listImages: List<Uri>  = bundle.getParcelableArrayList(BK_LIST_IMAGES_URI)!!
                     val listNewTags: List<String>? = bundle.getStringArrayList(BK_LIST_NEW_TAGS)
                     val drawerNav: List<DrawerNavGroupItem> = bundle.getParcelableArrayList(BK_NEW_CATEGORIES)!!
+                    shouldShowNotification = false
+                    uploadingCounter = 1
+                    totalImageFiles = 0
                     putRecipe(recipe, listImages, drawerNav, listNewTags)
                 }
                 MSG_SHOW_PROGRESS_NOTIFICATION -> {

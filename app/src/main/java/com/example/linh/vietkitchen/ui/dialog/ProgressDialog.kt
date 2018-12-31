@@ -60,6 +60,7 @@ class ProgressDialog : DialogFragment() {
         txtProgress.visibility = View.VISIBLE
         txtCounter.visibility = View.VISIBLE
         progressBar.visibility = View.VISIBLE
+        btnNewRecipe.visibility = View.INVISIBLE
         txtTitle.text = getString(R.string.uploading_image)
         txtProgress.text = getString(R.string.progress, progress)
         txtCounter.text = getString(R.string.progress_counter, counter, totalFiles)
@@ -70,7 +71,12 @@ class ProgressDialog : DialogFragment() {
         txtProgress.visibility = View.GONE
         txtCounter.visibility = View.GONE
         progressBar.visibility = View.GONE
+        btnNewRecipe.visibility = View.INVISIBLE
         txtTitle.text = msg
+    }
+
+    fun progressFinish(){
+        btnNewRecipe.visibility = View.VISIBLE
     }
 
     interface Listener{
