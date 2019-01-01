@@ -4,11 +4,8 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.text.*
-import android.text.Annotation
-import android.text.style.AlignmentSpan
 import android.util.AttributeSet
 import android.widget.TextView
-import com.example.linh.vietkitchen.R.anim.delay
 import com.example.linh.vietkitchen.extension.attractAnnotationSpan
 import timber.log.Timber
 
@@ -78,30 +75,13 @@ class ImageSpanTextView : TextView{
         val ssb = SpannableStringBuilder(txt.trim())
         ssb.attractAnnotationSpan()?.forEach { annotation ->
             when(annotation.key){
-                "p" -> replaceAnnotationByAlignmentSpan(ssb, annotation)
-                "src" -> ImageSpanUtil.replaceAnnotationByImageSpan(this, ssb, annotation)
+                "p" -> SpannableUtil.replaceAnnotationByAlignmentSpan(ssb, annotation)
+                "style" -> SpannableUtil.replaceAnnotationByStyle(ssb, annotation)
+                "src" -> SpannableUtil.replaceAnnotationByImageSpan(this, ssb, annotation)
             }
         }
         Timber.d(ssb.toString())
         return ssb
-//        (Regex.fromLiteral("\\n\\n"), "\n")
-//                .(Pattern.compile("[\\r\\n]+")), "\n")
-    }
-
-    private fun replaceAnnotationByAlignmentSpan(ssb: SpannableStringBuilder, annotation: Annotation){
-        val alignment = when (annotation.value){
-            "start" -> Layout.Alignment.ALIGN_NORMAL
-            "center" -> Layout.Alignment.ALIGN_CENTER
-            "end" -> Layout.Alignment.ALIGN_OPPOSITE
-            else -> Layout.Alignment.ALIGN_NORMAL
-        }
-        val start = ssb.getSpanStart(annotation)
-        val end = ssb.getSpanEnd(annotation)
-        val flag = ssb.getSpanFlags(annotation)
-        val alignmentSpan = AlignmentSpan.Standard(alignment)
-        ssb.removeSpan(annotation)
-        ssb.insert(end, System.getProperty("line.separator"))
-        ssb.setSpan(alignmentSpan, start, end, flag)
     }
 
 //    private fun generateHtml(textView: TextView, htmlString: String, w: Int, h: Int): Spannable {

@@ -3,7 +3,8 @@ package com.example.linh.vietkitchen.extension
 import android.text.Annotation
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import timber.log.Timber
+import android.text.Spanned
+import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.AnnotationKey
 import java.util.regex.Pattern
 
 /**
@@ -32,25 +33,69 @@ fun CharSequence.attractUrlFromAnnotation(): List<String>? {
 
 fun CharSequence.generateAnnotationSpan(): CharSequence{
     if (isBlank()) return ""
-    val source = this
-    val ssb = SpannableStringBuilder(source)
-    val imgAnnotationPattern: Pattern = Pattern.compile("(<annotation src=\"(.*?)\"/>)")
-    val srcPattern = Pattern.compile("(?<=src=\")(.*?)(?=\")")
-    val matcher = imgAnnotationPattern.matcher(source)
-    while (matcher.find()){
-        val startAnnotation = matcher.start()
-        val endAnnotation = matcher.end()
-        Timber.d("$startAnnotation - $endAnnotation")
 
-        //add image'url into the annotation
-        val imgAnnotation = source.substring(startAnnotation, endAnnotation)
-        val srcMatcher = srcPattern.matcher(imgAnnotation)
-        if (srcMatcher.find()){
-            System.out.println("src = " + srcMatcher.start().toString() + " - " + srcMatcher.end().toString())
-            val url = imgAnnotation.substring(srcMatcher.start(), srcMatcher.end())
-            ssb.setSpan(Annotation("src", url), startAnnotation, endAnnotation, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+    val source = this
+    val sb = StringBuffer()
+    val ssb = SpannableStringBuilder()
+    var body: String
+    var key: String
+    var value: String
+
+    val annotationPattern: Pattern = Pattern.compile("<annotation\\s*\\w+=\".+?\"\\s*((/>)|(>.*?</annotation>))")
+    val annotationMatcher = annotationPattern.matcher(source)
+    val annotationTypePattern = Pattern.compile("(?<=<annotation\\s)(\\w+)(?==\")")
+//    Timber.d("**********************************************")
+    var counter = 0
+    while (annotationMatcher.find()){
+        //clear the string buffer
+        sb.setLength(0)
+        key = ""
+        value = ""
+        body = ""
+
+        val annotationText = annotationMatcher.group()// get the match
+        val annotationKeyMatcher = annotationTypePattern.matcher(annotationText)
+//        Timber.d("annotationText ${++counter} = $annotationText")
+        if (annotationKeyMatcher.find(0)){
+            key = annotationKeyMatcher.group().trim()
+//            Timber.d("annotation type = $key")
+            val annotationValuePattern = Pattern.compile("(?<=$key=\")(.*?)(?=\")")
+            val annotationValueMatcher = annotationValuePattern.matcher(annotationText)
+            if (annotationValueMatcher.find(0)){
+                value = annotationValueMatcher.group()
+//                Timber.d("annotation value = $value")
+                body = when(key){
+                    AnnotationKey.STYLE.key -> {
+                        val annotationBodyPattern = Pattern.compile("(?<=<annotation $key=\"$value\">).*?(?=</annotation>)")
+                        val annotationBodyMatcher = annotationBodyPattern.matcher(annotationText)
+                        if (annotationBodyMatcher.find(0)){
+                            annotationBodyMatcher.group()
+                        }else{
+                            ""
+                        }
+                    }
+                    AnnotationKey.IMAGE.key -> {
+                        "image"
+                    }else -> {
+                        ""
+                    }
+                }
+            }
         }
+
+        // appendReplacement handles replacing within the current match's bounds
+        annotationMatcher.appendReplacement(sb, body)
+        ssb.append(sb)
+        ssb.setSpan(Annotation(key, value), ssb.length - body.length, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+//        Timber.d("key = $key - value = $value")
     }
+//    Timber.d("**********************************************")
+
+    // clear the string buffer
+    sb.setLength(0)
+    //add any text left over after the final match
+    annotationMatcher.appendTail(sb)
+    ssb.append(sb)
     return ssb
 }
 

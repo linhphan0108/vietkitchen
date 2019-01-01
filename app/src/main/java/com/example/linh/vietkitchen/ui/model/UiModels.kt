@@ -39,19 +39,19 @@ class Ingredient(val name: String? = null, val notes: String?, val quantity: Int
     }
 }
 
-class Recipe(val id: String? = "", val name: String, val intro: String?, val ingredient: String, val spice: String,
-             var preparation: CharSequence, var processing: CharSequence, val notes: String?, val categories: List<String>,
+class Recipe(val id: String? = "", val name: String, val intro: CharSequence?, val ingredient: CharSequence, val spice: CharSequence,
+             var preparation: CharSequence, var processing: CharSequence, val notes: CharSequence?, val categories: List<String>,
              var tags: List<String>?, var thumbUrl: String, var imageUrl: String,
              var hasLiked: Boolean = false) : Entity(), Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),//id
             parcel.readString()!!,//name
-            parcel.readString(),//intro
-            parcel.readString()!!,//ingredient
-            parcel.readString()!!,//spice
+            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//intro
+            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel)!!,//ingredient
+            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel)!!,//spice
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//preparation
             TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//processing
-            parcel.readString(),//notes
+            TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel),//notes
             readListString(parcel),//categories
             readListString(parcel),//tags
             parcel.readString()!!,//thumbUrl
@@ -61,13 +61,13 @@ class Recipe(val id: String? = "", val name: String, val intro: String?, val ing
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)//id
-        parcel.writeString(name)//notes
-        parcel.writeString(intro)//intro
-        parcel.writeString(ingredient)//ingredient
-        parcel.writeString(spice)////spice
+        parcel.writeString(name)
+        TextUtils.writeToParcel(intro, parcel, flags)//intro
+        TextUtils.writeToParcel(ingredient, parcel, flags)//ingredient
+        TextUtils.writeToParcel(spice, parcel, flags)////spice
         TextUtils.writeToParcel(preparation, parcel, flags)//preparation
         TextUtils.writeToParcel(processing, parcel, flags)//processing
-        parcel.writeString(notes)
+        TextUtils.writeToParcel(notes, parcel, flags)//notes
         parcel.writeStringList(tags)//categories
         parcel.writeStringList(tags)//tags
         parcel.writeString(thumbUrl)

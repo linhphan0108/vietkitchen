@@ -40,7 +40,7 @@ class ImageSpanEditText : EditText{
         ssb.append(holder)
         val annotation = Annotation("src", uri.toString())
         ssb.setSpan(annotation, position, endOffset, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        ImageSpanUtil.replaceAnnotationByImageSpan(this, ssb, annotation)
+        SpannableUtil.replaceAnnotationByImageSpan(this, ssb, annotation)
         setText(ssb, BufferType.SPANNABLE)
     }
 }
