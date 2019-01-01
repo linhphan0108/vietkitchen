@@ -21,18 +21,19 @@ class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.userI
     fun  toDomain(recipe: Recipe): RecipeDomain{
         with(recipe) {
             val mapTags = tags?.toMapOfStringBoolean() ?: mapOf<String, Boolean>()
-            return RecipeDomain(id, name, intro, ingredient, spice, preparation.toString()
-                    , processing.toString(), notes, categories, mapTags, thumbUrl, imageUrl)
+            return RecipeDomain(id, name, intro.toString(), ingredient.toString(), spice.toString(),
+                    preparation.toString(), processing.toString(), notes.toString(), categories,
+                    mapTags, thumbUrl, imageUrl)
         }
     }
 
 
 
     private fun convertToUi(domain: RecipeDomain): Recipe {
-        val pre = domain.preparation.generateAnnotationSpan()
-        val processSteps = domain.processing.generateAnnotationSpan()
-        return Recipe(domain.id, domain.name, domain.intro, domain.ingredient,
-                domain.spice, pre, processSteps, domain.notes, domain.categories,
+        return Recipe(domain.id, domain.name, domain.intro?.generateAnnotationSpan(),
+                domain.ingredient.generateAnnotationSpan(), domain.spice.generateAnnotationSpan(),
+                domain.preparation.generateAnnotationSpan(), domain.processing.generateAnnotationSpan(),
+                domain.notes?.generateAnnotationSpan(), domain.categories,
                 domain.tags.toListOfStringOfKey(), domain.thumbUrl, domain.imageUrl,false
         )
     }

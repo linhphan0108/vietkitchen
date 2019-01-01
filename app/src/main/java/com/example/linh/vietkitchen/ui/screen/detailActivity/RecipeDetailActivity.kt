@@ -164,25 +164,25 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract>(),
 
         with(recipe) {
 //            txtTitle.text = name.capWords()
-            txtDescription.text = intro
-            txtIngredients.text = ingredient
+            intro?.let { txtDescription.setTextAsSpannable(it)}
+            txtIngredients.setTextAsSpannable(ingredient)
 
             (txtSpices.parent as ViewGroup).visibility = if (spice.isNotBlank()){
-                txtSpices.text = spice
+                txtSpices.setTextAsSpannable(spice)
                 View.VISIBLE
-            } else View.INVISIBLE
+            } else View.GONE
 
             llStepsToPreProcess.visibility = if (preparation.isNotBlank()){
                 txtStepsToPreparation.setTextAsSpannable(preparation)
                 View.VISIBLE
-            } else View.INVISIBLE
+            } else View.GONE
 
             txtStepsToProcess.setTextAsSpannable(processing)
 
             (txtNotes.parent as ViewGroup).visibility = if(notes.isNotNullAndNotBlank()){
-                txtNotes.text = notes
+                txtNotes.setTextAsSpannable(notes!!)
                 View.VISIBLE
-            } else View.INVISIBLE
+            } else View.GONE
         }
     }
 
