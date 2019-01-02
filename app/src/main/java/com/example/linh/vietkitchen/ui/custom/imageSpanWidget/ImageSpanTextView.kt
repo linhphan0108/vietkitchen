@@ -6,6 +6,7 @@ import android.support.annotation.RequiresApi
 import android.text.*
 import android.util.AttributeSet
 import android.widget.TextView
+import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.attractAnnotationSpan
 import timber.log.Timber
 
@@ -15,6 +16,13 @@ private const val TIME_BETWEEN_EACH_INVALIDATION = 16 // milliseconds
 class ImageSpanTextView : TextView{
     private var lastTimeInvalidate = 0L //milliseconds
     private var hasQueueValidationCAll = false
+    private var spaceBetweenParagraph = 0
+    private var spaceBetweenParagraphMultiplier = 1.1f
+
+    override fun setTextSize(size: Float) {
+        super.setTextSize(size)
+        onTextSizeChanged()
+    }
 
     constructor(context: Context): super(context) {
         this.onConstructor(context, null, 0, 0)
@@ -35,7 +43,11 @@ class ImageSpanTextView : TextView{
     }
 
     private fun onConstructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int){
-
+        val typedArray = context.theme.obtainStyledAttributes(attrs,
+                R.styleable.ImageSpanTextView,0, 0)
+        spaceBetweenParagraphMultiplier = typedArray.getFloat(R.styleable.ImageSpanTextView_paragraphSpace, spaceBetweenParagraphMultiplier)
+        onTextSizeChanged()
+        typedArray.recycle()
     }
 
     /**
@@ -66,6 +78,9 @@ class ImageSpanTextView : TextView{
     }
 
     //========= inner methods ======================================================================
+    private fun onTextSizeChanged(){
+        spaceBetweenParagraph = (spaceBetweenParagraphMultiplier * textSize).toInt()
+    }
     fun setTextAsSpannable(text: CharSequence){
         setText(replaceSpan(text), TextView.BufferType.SPANNABLE)
     }
@@ -76,8 +91,9 @@ class ImageSpanTextView : TextView{
         ssb.attractAnnotationSpan()?.forEach { annotation ->
             when(annotation.key){
                 "p" -> SpannableUtil.replaceAnnotationByAlignmentSpan(ssb, annotation)
-                "style" -> SpannableUtil.replaceAnnotationByStyle(ssb, annotation)
-                "src" -> SpannableUtil.replaceAnnotationByImageSpan(this, ssb, annotation)
+                AnnotationKey.STYLE.key -> SpannableUtil.replaceAnnotationByStyle(ssb, annotation)
+                AnnotationKey.IMAGE.key -> SpannableUtil.replaceAnnotationByImageSpan(this, ssb, annotation)
+                AnnotationKey.PARAGRAPH_SPACE.key -> SpannableUtil.replaceAnnotationByParagraphSpace(ssb, annotation, spaceBetweenParagraph)
             }
         }
         Timber.d(ssb.toString())

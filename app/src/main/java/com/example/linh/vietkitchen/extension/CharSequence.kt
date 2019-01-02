@@ -41,53 +41,61 @@ fun CharSequence.generateAnnotationSpan(): CharSequence{
     var key: String
     var value: String
 
-    val annotationPattern: Pattern = Pattern.compile("<annotation\\s*\\w+=\".+?\"\\s*((/>)|(>.*?</annotation>))")
+    val annotationPattern: Pattern = Pattern.compile("(<annotation\\s*\\w+=\".+?\"\\s*((/>)|(>.*?</annotation>)))|(\\n+)")
     val annotationMatcher = annotationPattern.matcher(source)
     val annotationTypePattern = Pattern.compile("(?<=<annotation\\s)(\\w+)(?==\")")
 //    Timber.d("**********************************************")
-    var counter = 0
     while (annotationMatcher.find()){
         //clear the string buffer
         sb.setLength(0)
         key = ""
         value = ""
         body = ""
-
         val annotationText = annotationMatcher.group()// get the match
-        val annotationKeyMatcher = annotationTypePattern.matcher(annotationText)
+
+        if (annotationText.isBlank()){
+            //add annotation onto space between paragraphs
+            body = "\n\n"
+            annotationMatcher.appendReplacement(sb, body)
+            ssb.append(sb)
+            ssb.setSpan(Annotation(AnnotationKey.PARAGRAPH_SPACE.key, AnnotationKey.PARAGRAPH_SPACE.value)
+                    , ssb.length - body.length +1, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }else {
+            val annotationKeyMatcher = annotationTypePattern.matcher(annotationText)
 //        Timber.d("annotationText ${++counter} = $annotationText")
-        if (annotationKeyMatcher.find(0)){
-            key = annotationKeyMatcher.group().trim()
+            if (annotationKeyMatcher.find(0)) {
+                key = annotationKeyMatcher.group().trim()
 //            Timber.d("annotation type = $key")
-            val annotationValuePattern = Pattern.compile("(?<=$key=\")(.*?)(?=\")")
-            val annotationValueMatcher = annotationValuePattern.matcher(annotationText)
-            if (annotationValueMatcher.find(0)){
-                value = annotationValueMatcher.group()
+                val annotationValuePattern = Pattern.compile("(?<=$key=\")(.*?)(?=\")")
+                val annotationValueMatcher = annotationValuePattern.matcher(annotationText)
+                if (annotationValueMatcher.find(0)) {
+                    value = annotationValueMatcher.group()
 //                Timber.d("annotation value = $value")
-                body = when(key){
-                    AnnotationKey.STYLE.key -> {
-                        val annotationBodyPattern = Pattern.compile("(?<=<annotation $key=\"$value\">).*?(?=</annotation>)")
-                        val annotationBodyMatcher = annotationBodyPattern.matcher(annotationText)
-                        if (annotationBodyMatcher.find(0)){
-                            annotationBodyMatcher.group()
-                        }else{
+                    body = when (key) {
+                        AnnotationKey.STYLE.key -> {
+                            val annotationBodyPattern = Pattern.compile("(?<=<annotation $key=\"$value\">).*?(?=</annotation>)")
+                            val annotationBodyMatcher = annotationBodyPattern.matcher(annotationText)
+                            if (annotationBodyMatcher.find(0)) {
+                                annotationBodyMatcher.group()
+                            } else {
+                                ""
+                            }
+                        }
+                        AnnotationKey.IMAGE.key -> {
+                            "image"
+                        }
+                        else -> {
                             ""
                         }
                     }
-                    AnnotationKey.IMAGE.key -> {
-                        "image"
-                    }else -> {
-                        ""
-                    }
                 }
             }
-        }
-
-        // appendReplacement handles replacing within the current match's bounds
-        annotationMatcher.appendReplacement(sb, body)
-        ssb.append(sb)
-        ssb.setSpan(Annotation(key, value), ssb.length - body.length, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            // appendReplacement handles replacing within the current match's bounds
+            annotationMatcher.appendReplacement(sb, body)
+            ssb.append(sb)
+            ssb.setSpan(Annotation(key, value), ssb.length - body.length, ssb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 //        Timber.d("key = $key - value = $value")
+        }
     }
 //    Timber.d("**********************************************")
 
@@ -96,6 +104,7 @@ fun CharSequence.generateAnnotationSpan(): CharSequence{
     //add any text left over after the final match
     annotationMatcher.appendTail(sb)
     ssb.append(sb)
+
     return ssb
 }
 
