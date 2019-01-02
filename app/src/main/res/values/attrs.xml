@@ -34,4 +34,8 @@
         <attr name="dot_active"        format="boolean"/>
         <attr name="circle_active"     format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="ImageSpanTextView">
+        <attr name="paragraphSpace" format="float" />
+    </declare-styleable>
 </resources>

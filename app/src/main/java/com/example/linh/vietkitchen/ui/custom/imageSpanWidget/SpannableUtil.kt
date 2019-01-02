@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.text.Annotation
 import android.text.Layout
 import android.text.SpannableStringBuilder
+import android.text.style.AbsoluteSizeSpan
 import android.text.style.AlignmentSpan
 import android.text.style.ImageSpan
 import android.text.style.StyleSpan
@@ -29,8 +30,6 @@ object SpannableUtil{
         val flag = ssb.getSpanFlags(annotation)
         ssb.removeSpan(annotation)
         ssb.setSpan(imageSpan, start, end, flag)
-        ssb.insert(start, System.getProperty("line.separator"))
-        ssb.insert(end+1, System.getProperty("line.separator"))
     }
 
     fun replaceAnnotationByAlignmentSpan(ssb: SpannableStringBuilder, annotation: Annotation){
@@ -62,25 +61,10 @@ object SpannableUtil{
         ssb.setSpan(span, start, end, flag)
     }
 
-    enum class Style{
-        NORMAL {
-            override fun toString(): String {
-                return "normal"
-            }
-        }
-
-        , BOLD {
-            override fun toString(): String {
-                return "bold"
-            }
-        }
-        , ITALIC {
-            override fun toString(): String {
-                return "italic"
-            }
-        }, BOLD_ITALIC;
-
-        override fun toString(): String {
-            return "bold_italic"
-        }}
+    fun replaceAnnotationByParagraphSpace(ssb: SpannableStringBuilder, annotation: Annotation, paragraphSpace: Int){
+        val start = ssb.getSpanStart(annotation)
+        val end = ssb.getSpanEnd(annotation)
+        val flag = ssb.getSpanFlags(annotation)
+        ssb.setSpan(AbsoluteSizeSpan(paragraphSpace, false), start, end, flag)
+    }
 }

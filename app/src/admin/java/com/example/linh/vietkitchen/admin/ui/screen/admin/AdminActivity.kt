@@ -22,7 +22,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.extension.*
-import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.SpannableUtil
+import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.AnnotationKey
+import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.Style
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
@@ -321,7 +322,7 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         val currentSelectionStart = currentFocusedEdt.selectionStart
         val currentSelectionEnd = currentFocusedEdt.selectionEnd
         val selectionText = editable.subSequence(currentSelectionStart, currentSelectionEnd)
-        val annotation = "<annotation style=\"${SpannableUtil.Style.BOLD}\">$selectionText</annotation>"
+        val annotation = "<annotation ${AnnotationKey.STYLE.key}=\"${Style.BOLD}\">$selectionText</annotation>"
         editable.replace(currentSelectionStart, currentSelectionEnd, annotation)
         val newSelection = currentSelectionStart + annotation.length - 13
         currentFocusedEdt.setSelection(newSelection)
