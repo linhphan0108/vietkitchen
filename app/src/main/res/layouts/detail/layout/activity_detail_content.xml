@@ -42,7 +42,7 @@
                 android:id="@+id/txtDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/body1"
+                android:textAppearance="?attr/textAppearanceBody1"
                 style="@style/styleBody1"
                 tools:text="@string/demo_desc"/>
         </LinearLayout>
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_small"
                     android:text="@string/label_ingredients"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold"/>
 
@@ -81,8 +81,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:gravity="start"
-                    android:textAppearance="@style/body2"
+                    android:textAppearance="?attr/textAppearanceBody2"
                     style="@style/styleBody2"
+                    android:textStyle="italic"
                     app:paragraphSpace="0.1"
                     tools:text="xương\nbí"/>
 
@@ -107,7 +108,7 @@
                     android:layout_marginBottom="@dimen/margin_small"
                     android:layout_gravity="start"
                     android:text="@string/label_spices"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold"/>
 
@@ -116,8 +117,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
-                    android:textAppearance="@style/body2"
+                    android:textAppearance="?attr/textAppearanceBody2"
                     style="@style/styleBody2"
+                    android:textStyle="italic"
                     app:paragraphSpace="0.1"
                     tools:text="salt\nsugar"/>
 
@@ -135,7 +137,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_pre_process"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/colorAccent"
                 android:textStyle="bold"/>
 
@@ -145,7 +147,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/padding_8dp"
                 android:paddingTop="@dimen/padding_medium"
-                android:textAppearance="@style/body1"
+                android:textAppearance="?attr/textAppearanceBody1"
                 style="@style/styleBody1"
                 tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
         </LinearLayout>
@@ -162,7 +164,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_process"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/colorAccent"
                 android:textStyle="bold"/>
 
@@ -172,7 +174,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/padding_8dp"
                 android:paddingTop="@dimen/padding_medium"
-                android:textAppearance="@style/body1"
+                android:textAppearance="?attr/textAppearanceBody1"
                 style="@style/styleBody1"
                 tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
         </LinearLayout>
@@ -191,7 +193,7 @@
                 android:layout_marginBottom="@dimen/margin_small"
                 android:layout_gravity="start"
                 android:text="@string/label_notes"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/colorAccent"
                 android:textStyle="bold"/>
 
@@ -200,7 +202,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="start"
-                android:textAppearance="@style/body1"
+                android:textAppearance="?attr/textAppearanceBody1"
                 style="@style/styleBody1"
                 tools:text="@string/hint_short_intro"/>
 
