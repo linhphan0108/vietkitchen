@@ -40,7 +40,7 @@ abstract class BaseHomePresenter<T: BaseHomeContractView>(
             Timber.d("on likeRecipe success")
         }, onError = {e->
             Timber.e(e)
-        })
+        }, shouldShowProgress = false)
 
     }
 
@@ -59,7 +59,7 @@ abstract class BaseHomePresenter<T: BaseHomeContractView>(
             Timber.d("on unLikeRecipe success")
         }, {
             Timber.e(it)
-        })
+        }, shouldShowProgress = false)
     }
 
     override fun emitLike(recipe: Recipe) {

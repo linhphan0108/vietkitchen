@@ -45,7 +45,7 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
 
     private var title: String = ""
 
-    lateinit var rcvLoadMoreListener: EndlessScrollListener
+    private lateinit var rcvLoadMoreListener: EndlessScrollListener
     private val bottomSheetOptions: BottomSheetOptions by lazy {BottomSheetOptions()}
     private var loadingDialog: LoadingDialog? = null
 
