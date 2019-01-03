@@ -172,16 +172,16 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
         bottomNav.setOnNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.action_home ->{
-                    viewPager.currentItem = 0
+                    viewPager.setCurrentItem(0, false)
                 }
                 R.id.action_favorite -> {
-                    viewPager.currentItem = 1
+                    viewPager.setCurrentItem(1, false)
                 }
 //                R.id.action_calendar -> {
 //                    viewPager.currentItem = 2
 //                }
                 R.id.action_profile -> {
-                    viewPager.currentItem = 3
+                    viewPager.setCurrentItem(3, false)
                 }
                 else -> {
                 }
