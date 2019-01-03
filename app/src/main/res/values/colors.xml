@@ -47,8 +47,11 @@
     <color name="divider">#fafafa</color>
     <color name="divider_white_theme">#bcbbbb</color>
     <color name="divider_dark">#757575</color>
-    <color name="state_icon_unselected">#323232</color>
     <color name="state_icon_disable">#949494</color>
+
+    <!--bottom navigation-->
+    <color name="state_icon_unselected">#868686</color>
+    <color name="state_icon_selected">#1e1e1e</color>
 
     <!--swipe to refresh-->
     <color name="color_wave_refresh">#f44336</color>
