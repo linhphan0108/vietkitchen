@@ -42,8 +42,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imgCover"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 tools:text="@tools:sample/full_names"
                 />
 
@@ -57,24 +56,35 @@
                 app:layout_constraintTop_toBottomOf="@id/txtFoodName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:maxLines="3"
+                android:maxLines="5"
                 android:ellipsize="end"
-                android:textSize="14sp"
+                android:textAppearance="?attr/textAppearanceBody2"
                 android:textColor="@color/textSecondary"
                 tools:text="@tools:sample/lorem/random"/>
 
-            <com.example.linh.vietkitchen.ui.custom.likeButton.AndroidLikeButton
-                android:id="@+id/btnFavorite"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="@dimen/margin_8dp"
-                app:like_icon="@drawable/heart_on"
-                app:unlike_icon="@drawable/heart_off"
-                app:circle_startColor="#fcd229"
-                app:circle_endColor="#f4ac1b"
-                app:dot_color_1="#f5ce31"
-                app:dot_color_2="#ed8128"
-                />
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_2dp"
+                android:layout_marginTop="@dimen/margin_2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:contentPadding="@dimen/padding_2dp"
+                android:background="@color/colorBackground"
+                app:cardCornerRadius="16dp">
+                <com.example.linh.vietkitchen.ui.custom.likeButton.AndroidLikeButton
+                    android:id="@+id/btnFavorite"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    app:like_icon="@drawable/heart_on"
+                    app:unlike_icon="@drawable/heart_off"
+                    app:circle_startColor="#fcd229"
+                    app:circle_endColor="#f4ac1b"
+                    app:dot_color_1="#f5ce31"
+                    app:dot_color_2="#ed8128"
+                    />
+            </android.support.v7.widget.CardView>
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 </android.support.constraint.ConstraintLayout>

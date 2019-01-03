@@ -78,6 +78,7 @@
     </style>
     <style name="subtitle1" parent="@style/TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:letterSpacing" tools:targetApi="lollipop">0.029375</item>
+        <item name="android:textStyle">bold</item>
     </style>
     <style name="subtitle2" parent="@style/TextAppearance.MaterialComponents.Subtitle2" />
     <style name="body1" parent="@style/TextAppearance.MaterialComponents.Body1">

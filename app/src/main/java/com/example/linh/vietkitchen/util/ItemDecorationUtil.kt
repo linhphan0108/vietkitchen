@@ -63,6 +63,7 @@ class VerticalStaggeredSpaceItemDecoration(private val verticalSpace: Int = 0,
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
                                 state: RecyclerView.State) {
         val count = parent.adapter!!.itemCount
+        if(count == 0) return
         val lastPos = count - 1
         val lastSecondPos = count - 2
         outRect.bottom = verticalSpace
