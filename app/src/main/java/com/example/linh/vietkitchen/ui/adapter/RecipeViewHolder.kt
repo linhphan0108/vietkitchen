@@ -48,12 +48,12 @@ class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : Rec
             }
         }
         itemView.btnFavorite.setOnLikeEventListener(object: AndroidLikeButton.OnLikeEventListener {
-            override fun onUnlikeClicked(androidLikeButton: AndroidLikeButton?) {
+            override fun onUnlikeClicked(androidLikeButton: AndroidLikeButton) {
                 itemView.btnFavorite.lookTemporary()
                 listener?.onUnLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
             }
 
-            override fun onLikeClicked(androidLikeButton: AndroidLikeButton?) {
+            override fun onLikeClicked(androidLikeButton: AndroidLikeButton) {
                 itemView.btnFavorite.lookTemporary()
                 listener?.onLike(itemView.btnFavorite, layoutPosition, adapterPosition, recipe)
             }

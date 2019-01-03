@@ -13,16 +13,16 @@ abstract class BaseCustomView : View{
         this.onConstructor(context, null, 0, 0)
     }
 
-    constructor(context: Context, attrs: AttributeSet): super(context, attrs){
+    constructor(context: Context, attrs: AttributeSet?): super(context, attrs){
         this.onConstructor(context, attrs, 0, 0)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int): super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int): super(context, attrs, defStyleAttr) {
         this.onConstructor(context, attrs, defStyleAttr, 0)
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int)
     : super(context, attrs, defStyleAttr, defStyleRes){
         this.onConstructor(context, attrs, defStyleAttr, defStyleRes)
     }

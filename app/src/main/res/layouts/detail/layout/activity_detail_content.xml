@@ -72,8 +72,7 @@
                     android:layout_marginBottom="@dimen/margin_small"
                     android:text="@string/label_ingredients"
                     android:textAppearance="?attr/textAppearanceSubtitle1"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="bold"/>
+                    android:textColor="@color/colorAccent"/>
 
                 <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
                     android:id="@+id/txtIngredients"
@@ -109,8 +108,7 @@
                     android:layout_gravity="start"
                     android:text="@string/label_spices"
                     android:textAppearance="?attr/textAppearanceSubtitle1"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="bold"/>
+                    android:textColor="@color/colorAccent"/>
 
                 <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
                     android:id="@+id/txtSpices"
@@ -138,8 +136,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/label_pre_process"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textColor="@color/colorAccent"
-                android:textStyle="bold"/>
+                android:textColor="@color/colorAccent"/>
 
             <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
                 android:id="@+id/txtStepsToPreparation"
@@ -165,8 +162,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/label_process"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textColor="@color/colorAccent"
-                android:textStyle="bold"/>
+                android:textColor="@color/colorAccent"/>
 
             <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
                 android:id="@+id/txtStepsToProcess"
@@ -194,8 +190,7 @@
                 android:layout_gravity="start"
                 android:text="@string/label_notes"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textColor="@color/colorAccent"
-                android:textStyle="bold"/>
+                android:textColor="@color/colorAccent"/>
 
             <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
                 android:id="@+id/txtNotes"
