@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="@android:color/transparent"
-            app:expandedTitleTextAppearance="@style/CollapsingToolbarLayout.TextTitle"
+            app:collapsedTitleTextAppearance="@style/toolbarTitleTextAppearance"
             >
 
             <com.example.linh.vietkitchen.ui.custom.SquareImageView
@@ -39,6 +39,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_marginTop="@dimen/margin_24dp"
+                app:titleTextAppearance="@style/toolbarTitleTextAppearance"
+                app:subtitleTextAppearance="@style/toolbarSubTitleTextAppearance"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:layout_collapseMode="pin"
                 tools:title="canh xương hầm khoai tây"

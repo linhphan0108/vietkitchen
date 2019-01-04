@@ -97,4 +97,12 @@
     <style name="drawerNavigationGroupTitleTextAppearance" parent="@style/subtitle1">
         <item name="android:textSize">14sp</item>
     </style>
+    <style name="toolbarTitleTextAppearance" parent="headLine5">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:letterSpacing" tools:targetApi="lollipop">0.07125</item>
+    </style>
+    <style name="toolbarSubTitleTextAppearance" parent="headLine5">
+        <item name="android:textSize">17sp</item>
+    </style>
 </resources>
