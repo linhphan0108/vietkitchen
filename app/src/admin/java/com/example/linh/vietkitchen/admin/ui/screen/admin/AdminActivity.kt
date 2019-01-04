@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -148,6 +149,11 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
 
             R.id.action_style_bold -> {
                 onActionStyleBoldSelected()
+                true
+            }
+
+            R.id.action_paste -> {
+                onActionPasteSelected()
                 true
             }
             else -> false
@@ -322,10 +328,43 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         val currentSelectionStart = currentFocusedEdt.selectionStart
         val currentSelectionEnd = currentFocusedEdt.selectionEnd
         val selectionText = editable.subSequence(currentSelectionStart, currentSelectionEnd)
-        val annotation = "<annotation ${AnnotationKey.STYLE.key}=\"${Style.BOLD}\">$selectionText</annotation>"
+        val annotation = "<annotation ${AnnotationKey.STYLE.key}=\"${Style.BOLD}\">$selectionText</annotation> "
         editable.replace(currentSelectionStart, currentSelectionEnd, annotation)
         val newSelection = currentSelectionStart + annotation.length - 13
         currentFocusedEdt.setSelection(newSelection)
+    }
+
+    private fun onActionPasteSelected(){
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        // If the clipboard doesn't contain data, disable the paste menu item.
+        // If it does contain data, decide if you can handle the data.
+//        mPasteItem.isEnabled = when {
+//            !clipboard.hasPrimaryClip() -> {
+//                false
+//            }
+//            !(clipboard.primaryClipDescription.hasMimeType(MIMETYPE_TEXT_PLAIN)) -> {
+//                // This disables the paste menu item, since the clipboard has data but it is not plain text
+//                false
+//            }
+//            else -> {
+//                // This enables the paste menu item, since the clipboard contains plain text.
+//                true
+//            }
+//        }
+
+        // Examines the item on the clipboard. If getText() does not return null, the clip item
+        // contains the text. Assumes that this application can only handle one item at a time.
+        val item = clipboard.primaryClip?.getItemAt(0)
+        // Gets the clipboard as text.
+        val pasteData = item?.text
+        if (pasteData != null){
+            val currentFocusedEdt = getCurrentFocusedStyleableEdt()
+            val editable = currentFocusedEdt.editableText
+            val currentSelectionEnd = currentFocusedEdt.selectionEnd
+            editable.insert(currentSelectionEnd, pasteData.toString().toLowerCase())
+        }else{
+            toast("no data from clipboard")
+        }
     }
 
     private fun setupCategoryChip(categories: List<DrawerNavGroupItem>) {
@@ -462,18 +501,18 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         val imageUrl = imageUri.toString()
         val thumbUrl = imageUrl
         val title = edtRecipeTitle.text.toString().trim().capWords()
-        val shortIntro = edtShortIntro.text.toString().trim().capitalize()
-        val ingredients = edtIngredients.text.toString().trim().capitalize()
-        val spices = edtSpices.text.toString().trim().capitalize()
+        val shortIntro = edtShortIntro.text.toString().trim().capParagraph()
+        val ingredients = edtIngredients.text.toString().trim().capParagraph()
+        val spices = edtSpices.text.toString().trim().capParagraph()
         val tags = edtTags.tags
 
         val categories = listCatsChecked.map {childItem ->
             childItem.itemTitle
         }
 
-        val preparation = edtPreparation.text.trim()
-        val process = edtProcess.text.trim()
-        val notes = edtNotes.text.toString().trim()
+        val preparation = edtPreparation.text.trim().capParagraph()
+        val process = edtProcess.text.trim().capParagraph()
+        val notes = edtNotes.text.trim().capParagraph()
         return Recipe("", title, shortIntro, ingredients, spices, preparation, process, notes,
                 categories, tags, thumbUrl, imageUrl)
     }

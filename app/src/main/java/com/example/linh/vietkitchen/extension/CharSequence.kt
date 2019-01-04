@@ -134,3 +134,26 @@ fun CharSequence.breakLineFirst(): CharSequence {
 fun CharSequence.breakLineLast(): CharSequence {
     return "$this${System.getProperty("line.separator")}"
 }
+
+fun CharSequence.capParagraph(): CharSequence{
+    val capitalized = this.toString().capitalize()
+    val pattern = Pattern.compile("\\n+\\w")
+    val matcher = pattern.matcher(capitalized)
+    val ssb = SpannableStringBuilder()
+    val sb = StringBuffer()
+    while (matcher.find()){
+        sb.setLength(0)
+        val text = matcher.group()
+        val upperCase = text.substring(text.length -2, text.length -1).toUpperCase()
+        text.replaceRange(text.length -2, text.length -1, upperCase)
+        matcher.appendReplacement(sb, text)
+        ssb.append(sb)
+    }
+// clear the string buffer
+    sb.setLength(0)
+    //add any text left over after the final match
+    matcher.appendTail(sb)
+    ssb.append(sb)
+
+    return ssb
+}
