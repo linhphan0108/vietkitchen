@@ -74,7 +74,7 @@ class ProfileFragment : BaseFragment<ProfileContractView, ProfileContractPresent
                     .placeholder(R.mipmap.ic_launcher_round)
                     .error(R.mipmap.ic_launcher_round)
                     .apply(RequestOptions.circleCropTransform())
-                    .into(imgAvatar)
+                    .into(img)
             txtDisplayName.text = displayName
             txtEmail.text = email
             txtFavorite.text = getString(R.string.label_favorite_recipes, numberFavoriteRecipes).capitalize()
