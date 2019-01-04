@@ -34,7 +34,6 @@
         <item name="textAppearanceButton">@style/TextAppearance.MaterialComponents.Button</item>
         <item name="textAppearanceOverline">@style/TextAppearance.MaterialComponents.Overline</item>
 
-
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -93,5 +92,9 @@
     <style name="styleBody2" parent="@android:style/Widget.TextView">
         <item name="android:lineSpacingMultiplier">1</item>
         <item name="android:lineSpacingExtra">1sp</item>
+    </style>
+
+    <style name="drawerNavigationGroupTitleTextAppearance" parent="@style/subtitle1">
+        <item name="android:textSize">14sp</item>
     </style>
 </resources>
