@@ -71,8 +71,12 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
         with(recipe){
             val charPreparation = preparation.generateAnnotationSpan()
             val charProcess = processing.generateAnnotationSpan()
-            val data = Recipe(id, name, intro, ingredient, spice, charPreparation, charProcess,
-                    notes, categories, tags,thumbUrl, imageUrl, false)
+            val charIntro = intro?.generateAnnotationSpan()
+            val charIngredient = ingredient.generateAnnotationSpan()
+            val charSpice = spice.generateAnnotationSpan()
+            val charNotes = notes?.generateAnnotationSpan()
+            val data = Recipe(id, name, charIntro, charIngredient, charSpice, charPreparation,
+                    charProcess, charNotes, categories, tags,thumbUrl, imageUrl, false)
             val intent = RecipeDetailActivity.createIntent(context, "", data)
             context?.startActivity(intent)
         }
