@@ -244,5 +244,10 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
     }
 
+    fun scrollToTop(){
+        rcvRecipes.stopScroll()
+        rcvRecipes.smoothScrollToPosition(0)
+    }
+
     //endregion inner classes
 }

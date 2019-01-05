@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.NavigationView
+import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
@@ -19,12 +20,14 @@ import android.view.MenuItem
 import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
+import com.example.linh.vietkitchen.ui.screen.home.homeFragment.HomeFragment
 import com.example.linh.vietkitchen.ui.screen.searchScreen.SearchScreenActivity
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.ScreenUtil
@@ -48,6 +51,8 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
     private lateinit var navItems: List<DrawerNavGroupItem>
+
+    private var halfDoubleTabOnHomeBottomNav = false
 
 
     //region lifecycle =============================================================================
@@ -172,16 +177,30 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
         bottomNav.setOnNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.action_home ->{
-                    viewPager.setCurrentItem(0, false)
+                    if (viewPager.currentItem == 0){
+                        if (halfDoubleTabOnHomeBottomNav) {
+                            halfDoubleTabOnHomeBottomNav = false
+                            val fragment = (viewPager.adapter as FragmentStatePagerAdapter).getItem(0)
+                            (fragment as HomeFragment).scrollToTop()
+                        }else {
+                            toast(getString(R.string.msg_double_tab_to_scroll_to_top))
+                            halfDoubleTabOnHomeBottomNav = true
+                            viewPager.postDelayed({
+                                halfDoubleTabOnHomeBottomNav = false
+                            }, 2000)
+                        }
+                    }else {
+                        viewPager.setCurrentItem(HomePagerAdapter.HOME, false)
+                    }
                 }
                 R.id.action_favorite -> {
-                    viewPager.setCurrentItem(1, false)
+                    viewPager.setCurrentItem(HomePagerAdapter.FAVORITE, false)
                 }
 //                R.id.action_calendar -> {
 //                    viewPager.currentItem = 2
 //                }
                 R.id.action_profile -> {
-                    viewPager.setCurrentItem(3, false)
+                    viewPager.setCurrentItem(HomePagerAdapter.PROFILE, false)
                 }
                 else -> {
                 }

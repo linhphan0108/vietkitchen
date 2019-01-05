@@ -78,4 +78,7 @@
     <string name="label_option_style_bold">bold</string>
     <string name="label_option_insert_image">insert image</string>
     <string name="label_option_paste">paste</string>
+
+    <!--home activity-->
+    <string name="msg_double_tab_to_scroll_to_top">double tab to scroll to top</string>
 </resources>
