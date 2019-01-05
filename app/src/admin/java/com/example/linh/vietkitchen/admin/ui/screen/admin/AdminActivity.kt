@@ -171,7 +171,6 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
             styleableEditableHasFocused = false
             styleableEditableImageHasFocused = false
             currentFocus?.clearFocus()
-            invalidateOptionsMenu()
         }else {
             super.onBackPressed()
         }
