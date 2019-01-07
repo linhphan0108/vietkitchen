@@ -8,7 +8,7 @@ import com.example.linh.vietkitchen.domain.provider.RecipeProvider
 class PutRecipeCommand(private val provider: RecipeProvider = RecipeProvider()) : CommandCoroutines<Response<String>>{
     lateinit var recipe: Recipe
 
-    override suspend fun executeOnTheInternet(context: Context): Response<String> {
+    override suspend fun execute(context: Context): Response<String> {
         isInternetOn(context)
         return execute()
     }

@@ -1,6 +1,8 @@
 package com.example.linh.vietkitchen.ui.screen.detailActivity
 
 import android.app.Activity
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -15,27 +17,24 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
-import kotlinx.android.synthetic.main.activity_detail.*
 import android.view.MenuItem
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.extension.*
-import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.model.UserInfo
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.util.GlideUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
+import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.activity_detail_content.*
 
 
-private const val BK_THUMB_IMAGE_TRANSITION_NAME = "BK_THUMB_IMAGE_TRANSITION_NAME"
-private const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
-private const val BK_RECIPE = "BK_RECIPE"
+internal const val BK_THUMB_IMAGE_TRANSITION_NAME = "BK_THUMB_IMAGE_TRANSITION_NAME"
+internal const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
+internal const val BK_RECIPE = "BK_RECIPE"
 const val BK_LIKE_STATE_JUST_CHANGED = "BK_LIKE_STATE_JUST_CHANGED"
 
-class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract>(),
-        RecipeDetailViewContract, View.OnClickListener {
-    private val presenter: RecipeDetailPresenterContract by lazy { RecipeDetailPresenter() }
+class RecipeDetailActivity : BaseActivity(), View.OnClickListener {
+    private lateinit var viewModel: RecipeDetailViewModel
     companion object {
         fun createIntent(context: Context?, thumbImageTransitionName: String, recipe: Recipe): Intent{
             val intent = Intent(context, RecipeDetailActivity::class.java)
@@ -46,23 +45,19 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract>(),
             return intent
         }
     }
-    private lateinit var userInfo: UserInfo
-    private lateinit var recipe: Recipe
-    private var likeState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        userInfo = VietKitchenApp.userInfo
-        intent.getBundleExtra(EXTRA_BUNDLE).let {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                appBarLayout.transitionName = it.getString(BK_THUMB_IMAGE_TRANSITION_NAME)
-//            }
-            recipe = it.getParcelable(BK_RECIPE)!!
-            likeState = recipe.hasLiked
-            setupToolbar(recipe.name)
-            populateUI(recipe)
-            onFabStateChanged(recipe.hasLiked)
-        }
+        viewModel.onCreate(intent)
+        viewModel.recipe.observe(this, Observer<Recipe> { recipe ->
+            recipe?.let {
+                setupToolbar(recipe.name)
+                populateUI(recipe)
+            }
+        })
+        viewModel.likeState.observe(this, Observer {hasLiked ->
+            onFabStateChanged(hasLiked!!)
+        })
         fab.setOnClickListener(this)
     }
 
@@ -79,49 +74,30 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract>(),
     }
 
     override fun onBackPressed() {
-        if (recipe.hasLiked != likeState){
-            intent.putExtra(BK_LIKE_STATE_JUST_CHANGED, likeState)
+        if (viewModel.stateHasChanged()){
+            intent.putExtra(BK_LIKE_STATE_JUST_CHANGED, viewModel.likeState.value)
             setResult(Activity.RESULT_OK, intent)
         }
         super.onBackPressed()
     }
 
-    //region MVP callbacks =========r================================================================
-    override val viewContext: Context?
-        get() = this
-
-    override fun showProgress() {
-    }
-
-    override fun hideProgress() {
-    }
-
-    override fun getPresenter(): BasePresenterContract<RecipeDetailViewContract> {
-        return presenter
-    }
-
-    override fun getViewContract() = this
-
     override fun getActivityLayoutRes() = R.layout.activity_detail
 
-    override fun onNoInternetException() {
+    override fun getViewModel(): BaseViewModel {
+        val factory = DetailViewModelFactory(application)
+        viewModel = ViewModelProviders.of(this, factory).get(RecipeDetailViewModel::class.java)
+        return viewModel
     }
 
-    override fun onLikeChangedSuccess(state: Boolean) {
-        likeState = state
-        onFabStateChanged(state)
+    override fun observeViewModel() {
     }
-
-    override fun onLikeChangedFailed() {
-    }
-    //endregion MVP callbacks
 
     //==
     override fun onClick(v: View) {
         v.lookTemporary()
         when(v.id){
             R.id.fab -> {
-                if (likeState){
+                if (viewModel.likeState.value!!){
                     confirmUnlike()
                 }else {
                     doLikeActions()
@@ -201,7 +177,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract>(),
 
 
     private fun confirmUnlike(){
-        val message = getString(R.string.message_confirm_unlike, recipe.name)
+        val message = getString(R.string.message_confirm_unlike, viewModel.recipe.value!!.name)
         val action = getString(R.string.label_ok)
         showSnackBar(coordinatorLayout, message, action = action, listener = View.OnClickListener {
             doLikeActions()
@@ -209,7 +185,7 @@ class RecipeDetailActivity : BaseActivity<RecipeDetailViewContract>(),
     }
 
     private fun doLikeActions(){
-        presenter.onLikeChanged(userInfo.uid, recipe.id!!, !likeState)
+        viewModel.onLikeChanged()
     }
     //endregion inner methods
 }

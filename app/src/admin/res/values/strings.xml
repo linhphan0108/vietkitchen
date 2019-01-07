@@ -27,4 +27,5 @@
     <string name="error_msg_tags_empty">tag must be not empty</string>
     <string name="error_msg_categories_un_selected">must check at least 1 category</string>
     <string name="error_msg_process_step_empty">step to process must be not empty</string>
+    <string name="error_msg">Opps some things went wrong!</string>
 </resources>

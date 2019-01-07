@@ -13,13 +13,6 @@
         android:layout_height="wrap_content"
         tools:listitem="@layout/item_recipe"/>
 
-    <ViewStub
-        android:id="@+id/stub_search_suggestion"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout="@layout/layout_search_view_suggestion"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
     <TextView
         android:id="@+id/txtNoData"
         android:layout_width="match_parent"
@@ -30,5 +23,12 @@
         android:background="@color/divider"
         android:text="@string/no_favorite_recipe"
         android:visibility="gone"/>
+
+    <ViewStub
+        android:id="@+id/stub_search_suggestion"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/layout_search_view_suggestion"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 </FrameLayout>

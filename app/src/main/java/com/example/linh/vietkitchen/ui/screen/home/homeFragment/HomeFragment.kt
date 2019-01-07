@@ -1,30 +1,32 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
 import com.example.linh.vietkitchen.ui.dialog.BottomSheetOptions
-import com.example.linh.vietkitchen.ui.dialog.LoadingDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnDrawerNavItemChangedListener
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
+import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.Constants.VISIBLE_THRESHOLD_TO_LOAD_MORE
-import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
-class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentContractPresenter>(),
-        HomeFragmentContractView, OnDrawerNavItemChangedListener {
-
+class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -43,15 +45,14 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         fun newInstance() = HomeFragment()
     }
 
+    private lateinit var viewModel: HomeFragmentViewModel
+
     private var title: String = ""
 
     private lateinit var rcvLoadMoreListener: EndlessScrollListener
     private val bottomSheetOptions: BottomSheetOptions by lazy {BottomSheetOptions()}
-    private var loadingDialog: LoadingDialog? = null
 
     //region lifecycle =============================================================================
-    override fun getFragmentLayoutRes() = R.layout.fragment_home
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -59,16 +60,13 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         Timber.e("on create")
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         Timber.e("on activity created")
         setupSwipeRefreshLayout()
         setupRecyclerView()
-        presenter.refreshRecipes()
+        observeViewModel()
+        viewModel.refreshRecipes()
     }
 
     override fun onStart() {
@@ -117,46 +115,34 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     //endregion lifecycle
 
     //region MVP callbacks =========================================================================
-    override fun initPresenter(): HomeFragmentContractPresenter {
-        return HomeFragmentPresenter()
+    override fun getFragmentLayoutRes() = R.layout.fragment_home
+    override fun getViewModel(): BaseHomeViewModel {
+        val factory = HomeFragmentViewModelFactory(activity!!.application)
+        viewModel = ViewModelProviders.of(this, factory).get(HomeFragmentViewModel::class.java)
+        return viewModel
     }
 
-    override val viewContext: Context?
-        get() = context
-
-    override fun getViewContract(): HomeFragmentContractView {
-        return this
-    }
-
-    override fun onNoInternetException() {
-    }
-
-    override fun onFoodsRequestSuccess(recipes: List<Recipe>) {
+    private fun onFoodsRequestSuccess(recipes: List<Entity>) {
         recipeAdapter.items = recipes.toMutableList()
         swipeRefresh.isRefreshing = false
     }
 
-    override fun onFoodsRequestFailed(msg: String) {
+    private fun onRequestRecipesFailed(msg: String) {
         toast(msg)
     }
 
-    override fun onRefreshRecipe() {
-//        onStartLoadMore()
-    }
 
-    override fun onLoadMoreSuccess(recipes: List<Recipe>) {
-        recipeAdapter.stopLoadMore()
-        recipeAdapter.setMoreItems(recipes.toMutableList())
-        Timber.d("onLoadMoreSuccess ${recipes.size}")
-    }
-
-    override fun onLoadMoreFailed() {
+    private fun onLoadMoreFailed() {
         recipeAdapter.stopLoadMore()
     }
 
-    override fun onLoadMoreReachEndRecord() {
-        recipeAdapter.stopLoadMore()
-        Timber.d("onLoadMoreReachEndRecord")
+    private fun onStartRefresh(){
+        swipeRefresh.isRefreshing = true
+        recipeAdapter.refresh()
+    }
+
+    private fun onStopRefresh(){
+        swipeRefresh.isRefreshing = false
     }
 
     override fun onLikeEventObserve(recipe: Recipe) {
@@ -167,30 +153,17 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         recipeAdapter.onUnLike(recipe)
     }
 
-    override fun onDeleteRecipeSuccess(adapterPosition: Int) {
+    private fun onDeleteRecipeSuccess(adapterPosition: Int) {
         recipeAdapter.removeItem(adapterPosition)
         toast("recipe deleted successfully")
     }
 
-    override fun onDeleteRecipeFailed(msg: String) {
+    private fun onDeleteRecipeFailed(msg: String) {
         toast(msg)
     }
 
-    override fun onStartLoadMore() {
+    fun onStartLoadMore() {
         recipeAdapter.startLoadMore()
-    }
-
-    override fun showProgress() {
-        if (loadingDialog == null) {
-            loadingDialog = LoadingDialog.newInstance("delete")
-        }
-        loadingDialog!!.show(childFragmentManager, LoadingDialog::class.java.name)
-    }
-
-    override fun hideProgress() {
-        loadingDialog?.let { loadingDialog ->
-            if(loadingDialog.isVisible) loadingDialog.dismiss()
-        }
     }
     //endregion MVP callbacks
 
@@ -198,13 +171,13 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
     override fun onDrawerNavChanged(category: String) {
         if (title == category) return
         title = category
-        presenter.refreshRecipes(category)
+        viewModel.refreshRecipes(category)
     }
 
     override fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean {
         bottomSheetOptions.listeners = object: BottomSheetOptions.BottomSheetOptionsListeners {
             override fun onDelete() {
-                presenter.deleteRecipe(data, adapterPosition)
+                viewModel.deleteRecipe(data, adapterPosition)
             }
         }
         bottomSheetOptions.show(childFragmentManager, BottomSheetOptions::class.java.name)
@@ -221,24 +194,48 @@ class HomeFragment : BaseHomeFragment<HomeFragmentContractView, HomeFragmentCont
         swipeRefresh.isRefreshing = true
         swipeRefresh.setOnRefreshListener {
             rcvLoadMoreListener.onRefresh()
-            presenter.refreshRecipes()
+            viewModel.refreshRecipes()
         }
     }
 
-    private fun setupRecyclerView() {
-//        recyclerView.itemAnimator = DefaultItemAnimator()
-        rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
-        rcvRecipes.addItemDecoration(getRecyclerViewItemDecoration())
-        rcvRecipes.adapter = recipeAdapter
+    override fun observeViewModel(){
+        viewModel.requestRecipesStatus.observe(this, Observer { box ->
+            box?.let {
+                when(box.code){
+                    Status.ERROR -> {onRequestRecipesFailed(box.message ?: getString(R.string.error_msg))}
+                    Status.LOAD_MORE_ERROR -> {onLoadMoreFailed()}
+                    Status.REFRESH -> {onStartRefresh()}
+                    Status.LOAD_MORE,
+                    Status.SUCCESS -> {
+                        onFoodsRequestSuccess(box.data!!)
+                        onStopRefresh()
+                    }
+                }
+            }
+        })
+        viewModel.deleteRecipeStatus.observe(this, Observer {statusBox ->
+            statusBox?.let {
+                when(it.code){
+                    Status.SUCCESS -> {onDeleteRecipeSuccess(it.data!!)}
+                    Status.ERROR -> {onDeleteRecipeFailed(it.message!!)}
+                }
+            }
+        })
+    }
+
+    override fun setupRecyclerView() {
+        super.setupRecyclerView()
         rcvLoadMoreListener = object : EndlessScrollListener(VISIBLE_THRESHOLD_TO_LOAD_MORE) {
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
-                rcvRecipes.post { presenter.loadMoreRecipe() }
+                rcvRecipes.post { viewModel.loadMoreRecipe() }
                 Timber.d("rcvLoadMoreListener")
                 return true
             }
         }
         rcvRecipes.addOnScrollListener(rcvLoadMoreListener)
     }
+
+    override fun getRecyclerView(): RecyclerView = rcvRecipes
 
     override fun requestRecyclerViewLayoutChange() {
         rcvRecipes.layoutManager = getRecyclerViewLayoutManager()

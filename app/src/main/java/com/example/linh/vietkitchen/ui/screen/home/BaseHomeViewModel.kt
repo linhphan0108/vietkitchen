@@ -1,42 +1,45 @@
 package com.example.linh.vietkitchen.ui.screen.home
 
+import android.app.Application
+import android.arch.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
 
-abstract class BaseHomePresenter<T: BaseHomeContractView>(
-        private val putLikeCommand: PutLikeCommand = PutLikeCommand(),
-        private val putUnlikeCommand: PutUnlikeCommand = PutUnlikeCommand()
-): BasePresenter<T>(), BaseHomeContractPresenter<T> {
+abstract class BaseHomeViewModel(application: Application,
+     private val putLikeCommand: PutLikeCommand = PutLikeCommand(),
+     private val putUnlikeCommand: PutUnlikeCommand = PutUnlikeCommand()
+): BaseViewModel(application) {
 
-    override fun attachView(view: T) {
-        super.attachView(view)
+    internal val likeOrUnlikeAction: MutableLiveData<Recipe> = MutableLiveData()
+
+    init {
         EventBus.getDefault().register(this)
     }
 
-    override fun detachView() {
+    override fun onCleared() {
         EventBus.getDefault().unregister(this)
-        super.detachView()
+        super.onCleared()
     }
 
-    override fun likeRecipe(recipe: Recipe) {
+    fun likeRecipe(recipe: Recipe) {
         launchDataLoad(ioBlock = {
             withIoContext {
                 val recipeId = recipe.id!!
                 putLikeCommand.uid = userInfo.uid
                 putLikeCommand.recipeId = recipeId
-                putLikeCommand.executeOnTheInternet(context!!)
+                putLikeCommand.execute(getApplication())
                 recipe.hasLiked = true
                 userInfo.likedRecipesIds!!.add(recipeId)
                 null
             }
-            emitLike(recipe)
+            emitLikeOrUnlikeAction(recipe)
             Timber.d("on likeRecipe success")
         }, onError = {e->
             Timber.e(e)
@@ -44,38 +47,30 @@ abstract class BaseHomePresenter<T: BaseHomeContractView>(
 
     }
 
-    override fun unLikeRecipe(recipe: Recipe) {
+    fun unLikeRecipe(recipe: Recipe) {
         launchDataLoad({
             withIoContext {
                 val recipeId = recipe.id!!
                 putUnlikeCommand.uid = userInfo.uid
                 putUnlikeCommand.recipeId = recipeId
-                putUnlikeCommand.executeOnTheInternet(context!!)
+                putUnlikeCommand.execute(getApplication())
                 recipe.hasLiked = false
                 userInfo.likedRecipesIds!!.remove(recipeId)
                 null
             }
-            emitUnLike(recipe)
+            emitLikeOrUnlikeAction(recipe)
             Timber.d("on unLikeRecipe success")
         }, {
             Timber.e(it)
         }, shouldShowProgress = false)
     }
 
-    override fun emitLike(recipe: Recipe) {
-        EventBus.getDefault().post(recipe)
-    }
-
-    override fun emitUnLike(recipe: Recipe) {
+    internal fun emitLikeOrUnlikeAction(recipe: Recipe) {
         EventBus.getDefault().post(recipe)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onMessageEventBus(event: Recipe) {
-        if (event.hasLiked){
-            viewContract?.onLikeEventObserve(event)
-        }else{
-            viewContract?.onUnlikeEventObserve(event)
-        }
+    internal fun onMessageEventBus(event: Recipe) {
+        likeOrUnlikeAction.value = event
     }
 }

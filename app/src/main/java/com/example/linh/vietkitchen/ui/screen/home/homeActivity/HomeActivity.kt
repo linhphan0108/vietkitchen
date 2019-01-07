@@ -2,6 +2,8 @@ package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -22,11 +24,12 @@ import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.ui.baseMVVM.ToolbarActions
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
-import com.example.linh.vietkitchen.ui.mvpBase.ToolbarActions
 import com.example.linh.vietkitchen.ui.screen.home.homeFragment.HomeFragment
 import com.example.linh.vietkitchen.ui.screen.searchScreen.SearchScreenActivity
 import com.example.linh.vietkitchen.util.Constants
@@ -37,16 +40,14 @@ import kotlinx.android.synthetic.main.activity_home_content.*
 import timber.log.Timber
 
 
-class HomeActivity : BaseActivity<HomeActivityContractView>(),
-        NavigationView.OnNavigationItemSelectedListener, HomeActivityContractView,
-        OnItemClickListener, ToolbarActions{
-
+class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener,
+        OnItemClickListener, ToolbarActions {
     companion object {
         fun createIntent(context: Context): Intent{
             return Intent(context, HomeActivity::class.java)
         }
     }
-    private val presenter: HomeActivityPresenter by lazy { HomeActivityPresenter() }
+    private lateinit var viewModel: HomeActivityViewModel
     private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
@@ -63,7 +64,8 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
         setupBottomTabBar()
         setupViewPager()
         setupAdminFab()
-        presenter.requestCategory()
+        observeViewModel()
+        viewModel.requestCategory()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -93,31 +95,18 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
 
     //region MVP callbacks==========================================================================
     override fun getActivityLayoutRes() = R.layout.activity_home
-    override fun getViewContract(): HomeActivityContractView = this
-
-    override val viewContext: Context?
-        get() = this
-
-    override fun getPresenter(): BasePresenterContract<HomeActivityContractView> {
-        return presenter
+    override fun getViewModel(): BaseViewModel {
+        val factory = HomeActivityModelViewFactory(application)
+        viewModel = ViewModelProviders.of(this, factory).get(HomeActivityViewModel::class.java)
+        return viewModel
     }
 
-    override fun showProgress() {
-    }
-
-    override fun hideProgress() {
-    }
-
-    override fun onNoInternetException() {
-
-    }
-
-    override fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
+    private fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
         drawerNavAdapter.updateItemThenNotify(items)
         navItems = items
     }
 
-    override fun onRequestCategoriesFailed(message: String) {
+    private fun onRequestCategoriesFailed(message: String) {
     }
     //endregion MVP callbacks
 
@@ -151,6 +140,17 @@ class HomeActivity : BaseActivity<HomeActivityContractView>(),
     //endregion callbacks
 
     //region inner methods =========================================================================
+    override fun observeViewModel(){
+        viewModel.listNav.observe(this, Observer { listNav ->
+            listNav?.let { onRequestCategoriesSuccess(it) }
+        })
+        viewModel.requestNavStatus.observe(this, Observer {
+            when(it){
+                Status.ERROR -> {onRequestCategoriesFailed(getString(R.string.message_error))}
+            }
+        })
+    }
+
     private fun setupViewPager(){
         homePagerAdapter = HomePagerAdapter(supportFragmentManager)
         viewPager.adapter = homePagerAdapter

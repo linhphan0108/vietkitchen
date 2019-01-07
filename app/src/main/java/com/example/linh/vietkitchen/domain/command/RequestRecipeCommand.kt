@@ -14,7 +14,7 @@ class RequestRecipeCommand(var limit: Int = Constants.PAGINATION_LENGTH,
                            private val provider: RecipeProvider = RecipeProvider())
     : CommandCoroutines<PagingResponse<List<Recipe>>>{
 
-    override suspend fun executeOnTheInternet(context: Context): PagingResponse<List<Recipe>> {
+    override suspend fun execute(context: Context): PagingResponse<List<Recipe>> {
         isInternetOn(context)
         return execute()
     }

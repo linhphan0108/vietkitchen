@@ -1,5 +1,7 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
@@ -12,7 +14,6 @@ import android.support.v7.graphics.Palette
 import android.view.*
 import android.widget.*
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
 import com.example.linh.vietkitchen.util.SDKUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.admin.activity_admin.*
@@ -23,13 +24,17 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.extension.*
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.AnnotationKey
 import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.Style
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
+import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity.Companion.createIntent
+import com.example.linh.vietkitchen.ui.service.PutRecipeService
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.GlideUtil
 
@@ -38,7 +43,7 @@ private const val REQUEST_IMAGE = 98
 private const val REQUEST_IMAGE_PREPARATION = 97
 private const val REQUEST_IMAGE_PROCESS = 96
 
-class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
+class AdminActivity : BaseActivity(),
         View.OnClickListener, ProgressDialog.Listener, View.OnFocusChangeListener {
 
     companion object {
@@ -51,7 +56,7 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
         }
     }
 
-    private val presenter: AdminContractPresenter by lazy { AdminPresenter() }
+    private lateinit var viewModel: AdminViewModel
     private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
 
     private var imageUri: Uri? = null
@@ -64,14 +69,14 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val categories = intent.extras!!.getParcelableArrayList<DrawerNavGroupItem>(Constants.BK_CATEGORIES)!!.toList()
-        presenter.setCategoriesList(categories)
+        viewModel.setCategoriesList(categories)
         setupToolbar()
         setupCategoryChip(categories)
         iBtnUpdateImage.setOnClickListener(this)
         setStyleableEditableViews()
         listImagesUri = mutableListOf()
         listCatsChecked = mutableListOf()
-        presenter.getTags()
+        viewModel.getTags()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -179,44 +184,31 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     //#endregion life circle
 
     //#region MVP callbacks ========================================================================
-    override val viewContext: Context?
-        get() = this
-
-    override fun showProgress() {
-    }
-
-    override fun hideProgress() {
-    }
-
-    override fun getPresenter(): BasePresenterContract<AdminContractView> {
-        return presenter
-    }
-
-    override fun getViewContract() = this
-
     override fun getActivityLayoutRes() = R.layout.activity_admin
 
-    override fun onNoInternetException() {
-
+    override fun getViewModel(): BaseViewModel {
+        val factory = AdminViewModelFactory(application)
+        viewModel = ViewModelProviders.of(this, factory).get(AdminViewModel::class.java)
+        return viewModel
     }
 
-    override fun updateProgress(totalFiles: Int, counter: Int, progress: Int) {
+    private fun updateProgress(totalFiles: Int, counter: Int, progress: Int) {
         if (progressDialog.isVisible) {
             progressDialog.updateProgress(totalFiles, counter, progress)
         }
     }
 
-    override fun updateMessage(msg: String) {
+    private fun updateMessage(msg: String) {
         progressDialog.updateMessage(msg)
     }
 
-    override fun showProgressDialog() {
+    private fun showProgressDialog() {
         if (!progressDialog.isVisible)
             progressDialog.show(supportFragmentManager, ProgressDialog::class.java.name)
     }
 
 
-    override fun onGetTagsSuccess(tags: List<String>) {
+    private fun onGetTagsSuccess(tags: List<String>) {
         if (tags.isEmpty()) return
         val arrAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, tags)
         edtTags.threshold = 1
@@ -224,24 +216,24 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
 
     }
 
-    override fun onGetTagsFailed(message: String?) {
+    private fun onGetTagsFailed(message: String?) {
         message?.let { toast(it) }
     }
 
-    override fun onPutNewTagsSuccess() {
+    fun onPutNewTagsSuccess() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun onPutNewTagsFailed(message: String?) {
+    fun onPutNewTagsFailed(message: String?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun onPutRecipeSuccess() {
+    private fun onPutRecipeSuccess() {
         progressDialog.updateMessage(getString(R.string.msg_store_recipe_finished))
         progressDialog.progressFinish()
     }
 
-    override fun onPutRecipeFailed(message: String?) {
+    fun onPutRecipeFailed(message: String?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
     //#endregion MVP callbacks
@@ -277,7 +269,60 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
     }
     //#ednregion callbacks
 
-    //#region inner methods ========================================================================
+    override fun observeViewModel() {
+        viewModel.serviceUploadingStatus.observe(this, Observer {box ->
+            box?.let {
+                when(it.code){
+                    PutRecipeService.MSG_PREPARING_FOR_UPLOADING -> {
+                        updateMessage(getString(R.string.msg_prepare_uploading))
+                    }
+                    PutRecipeService.MSG_UPLOAD_IMAGE_PROGRESS -> {
+                        val data = box.data!!
+                        updateProgress(data.totalFiles, data.uploadedFiles, data.progress)
+                    }
+                    PutRecipeService.MSG_START_STORING_RECIPE_TO_DB -> {
+                        updateMessage(getString(R.string.msg_start_storing_recipe))
+                    }
+                    PutRecipeService.MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT -> {
+                        updateMessage(getString(R.string.msg_extract_images))
+                    }
+                    PutRecipeService.MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING -> {
+                        updateMessage(getString(R.string.msg_optimizing_images))
+                    }
+
+                    PutRecipeService.MSG_START_UPLOADING_IMAGES ->{
+                        updateMessage(getString(R.string.msg_start_uploading_images))
+                    }
+
+                    PutRecipeService.MSG_STORE_RECIPE_TO_DB_SUCCESS -> {
+                        updateMessage(getString(R.string.msg_store_recipe_success))
+                    }
+                    PutRecipeService.MSG_STORE_RECIPE_TO_DB_FAILED -> {
+                        updateMessage(getString(R.string.msg_store_recipe_failed))
+                    }
+                    PutRecipeService.MSG_UPDATE_NEW_CATEGORIES ->{
+                        updateMessage(getString(R.string.msg_update_category))
+                    }
+                    PutRecipeService.MSG_PUT_NEW_TAGS -> {
+                        updateMessage(getString(R.string.msg_put_new_tags))
+                    }
+                    PutRecipeService.MSG_STORE_RECIPE_TOTALLY_FINISHED ->{
+                        onPutRecipeSuccess()
+                    }
+                }
+            }
+        })
+
+        viewModel.listTagsOnServerStatus.observe(this, Observer {box ->
+            box?.let {
+                when(it.code){
+                    Status.SUCCESS -> {onGetTagsSuccess(it.data!!)}
+                    Status.ERROR -> {onGetTagsFailed(it.message)}
+                }
+            }
+        })
+    }
+
     private fun setupToolbar(){
         appBarLayout.layoutParams.height = ScreenUtil.screenWidth()
         setSupportActionBar(toolbar)
@@ -428,12 +473,25 @@ class AdminActivity : BaseActivity<AdminContractView>(), AdminContractView,
 //    }
 
     private fun onSaveAction(){
-        if(invalidateRecipe())
-            presenter.putARecipe(combineRecipe(), listImagesUri)
+        if(invalidateRecipe()) {
+            showProgressDialog()
+            viewModel.putARecipe(combineRecipe(), listImagesUri)
+        }
     }
 
     private fun onPreviewAction(){
-        presenter.preview(combineRecipe())
+        with(combineRecipe()){
+            val charPreparation = preparation.generateAnnotationSpan()
+            val charProcess = processing.generateAnnotationSpan()
+            val charIntro = intro?.generateAnnotationSpan()
+            val charIngredient = ingredient.generateAnnotationSpan()
+            val charSpice = spice.generateAnnotationSpan()
+            val charNotes = notes?.generateAnnotationSpan()
+            val data = com.example.linh.vietkitchen.ui.model.Recipe(id, name, charIntro, charIngredient, charSpice, charPreparation,
+                    charProcess, charNotes, categories, tags, thumbUrl, imageUrl, false)
+            val intent = createIntent(this@AdminActivity, "", data)
+            startActivity(intent)
+        }
     }
 
     /**

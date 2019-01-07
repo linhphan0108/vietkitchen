@@ -11,7 +11,7 @@ class RequestRecipesIdCommand(private val userProvider: UserProvider = UserProvi
         return userProvider.requestLikedRecipesId(uid)
     }
 
-    override suspend fun executeOnTheInternet(context: Context): List<String> {
+    override suspend fun execute(context: Context): List<String> {
         isInternetOn(context)
         return execute()
     }

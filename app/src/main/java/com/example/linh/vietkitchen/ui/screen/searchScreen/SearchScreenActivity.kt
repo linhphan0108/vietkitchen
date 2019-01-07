@@ -3,6 +3,8 @@ package com.example.linh.vietkitchen.ui.screen.searchScreen
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
 import android.app.SearchManager
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -21,11 +23,13 @@ import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionAdapter
 import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionViewHolder
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.model.SearchItem
-import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
 import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
 import com.example.linh.vietkitchen.util.ScreenUtil
 import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
@@ -34,7 +38,9 @@ import kotlinx.android.synthetic.main.activity_search_screen_content.*
 import kotlinx.android.synthetic.main.layout_search_view_suggestion.*
 import timber.log.Timber
 
-class SearchScreenActivity : BaseActivity<SearchContractView>(), SearchContractView, OnItemClickListener,
+const val ARG_IS_SEARCH_VIEW_FOCUSED = "ARG_IS_SEARCH_VIEW_FOCUSED"
+const val ARG_CURRENT_QUERY = "ARG_CURRENT_QUERY"
+class SearchScreenActivity : BaseActivity(), OnItemClickListener,
         SearchView.OnQueryTextListener, SearchSuggestionViewHolder.OnItemListeners, MenuItem.OnActionExpandListener {
     companion object {
         fun createIntent(context: Context): Intent {
@@ -44,30 +50,46 @@ class SearchScreenActivity : BaseActivity<SearchContractView>(), SearchContractV
 
     private lateinit var optionsMenu: Menu
     private lateinit var searchMenuItem: MenuItem
-    private val presenter: SearchScreenContractPresenter by lazy {SearchScreenActivityPresenter()}
+    private lateinit var viewModel: SearchScreenViewModel
     private val searchSuggestionAdapter: SearchSuggestionAdapter by lazy { SearchSuggestionAdapter(mutableListOf(), this) }
     private lateinit var recipeAdapter: RecipeAdapter
-    private var isSearchSuggestionAdapterAttached = false
-    private var isMenuOptionsCreateFirstTime = true
+    private var isSearchViewFocused = true
+    private var currentQuery: String? = null
+    private var isActivityJustRestore = false
 
     //region activity cycle callbacks
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate")
+        isActivityJustRestore = savedInstanceState != null
+        savedInstanceState?.let {
+            isSearchViewFocused = savedInstanceState.getBoolean(ARG_IS_SEARCH_VIEW_FOCUSED)
+            currentQuery = savedInstanceState.getString(ARG_CURRENT_QUERY)
+        }
+
         setupToolbar()
         setupAppbar()
         setupAdapter()
         setupRecyclerView()
         handleIntent(intent)
-        presenter.requestTags()
-        presenter.requestCategory()
+
+        observeViewModel()
+        viewModel.requestTags()
+        viewModel.requestCategory()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(ARG_IS_SEARCH_VIEW_FOCUSED, isSearchViewFocused)
+        outState.putString(ARG_CURRENT_QUERY, currentQuery)
+        super.onSaveInstanceState(outState)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.search_screen_options, menu)
@@ -76,20 +98,23 @@ class SearchScreenActivity : BaseActivity<SearchContractView>(), SearchContractV
         // Associate searchable configuration with the SearchView
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         searchMenuItem = menu.findItem(R.id.action_search)
-        (searchMenuItem.actionView as SearchView).apply {
-            //            setSearchableInfo(searchManager.getSearchableInfo(ComponentName(this@HomeActivity, SearchScreenActivity::class.java)))
+        val searchView = (searchMenuItem.actionView as SearchView).apply {
+            //setSearchableInfo(searchManager.getSearchableInfo(ComponentName(this@HomeActivity, SearchScreenActivity::class.java)))
             setSearchableInfo(searchManager.getSearchableInfo(componentName))
             queryHint = getString(R.string.hint_search)
             setIconifiedByDefault(true) // Do not iconify the widget; expand it by default
             imeOptions = EditorInfo.IME_ACTION_SEARCH
             setOnQueryTextListener(this@SearchScreenActivity)
-
             Timber.d("SearchView created")
+            setOnQueryTextFocusChangeListener {_, hasFocus ->
+                isSearchViewFocused = hasFocus
+            }
+
         }
         searchMenuItem.setOnActionExpandListener(this)
-        if (isMenuOptionsCreateFirstTime) {
+        if (isSearchViewFocused) {
             forceSearchViewExpand()
-            isMenuOptionsCreateFirstTime = false
+            currentQuery?.let { searchView.setQuery(it, false) }
         }
         return true
     }
@@ -106,61 +131,53 @@ class SearchScreenActivity : BaseActivity<SearchContractView>(), SearchContractV
         }
     }
 
+    override fun getActivityLayoutRes(): Int = R.layout.activity_search_screen_app_bar
+
+    override fun getViewModel(): BaseViewModel {
+        val factory = SearchScreenViewModelFactory(application)
+        viewModel = ViewModelProviders.of(this, factory).get(SearchScreenViewModel::class.java)
+        return viewModel
+    }
     //region end activity cycle callbacks
 
     //region MVP implements ======================================================================
-    override fun getPresenter(): BasePresenterContract<SearchContractView> {
-        return presenter
-    }
-
-    override fun getViewContract(): SearchContractView = this
-
-    override fun getActivityLayoutRes(): Int = R.layout.activity_search_screen_app_bar
-
-    override fun onNoInternetException() {
-    }
-
-    override fun onStartLoadMore() {
-
-    }
-
-    override fun onRecipesRequestSuccess(recipes: List<Recipe>) {
+    private fun onRecipesRequestSuccess(recipes: MutableList<Entity>) {
         recipeAdapter.items = recipes.toMutableList()
         checkNoData()
         hideProgress()
     }
 
-    override fun onRecipesRequestFailed(msg: String) {
+    private fun onRecipesRequestFailed(msg: String) {
         hideProgress()
     }
 
-    override fun onRefreshRecipe() {
+    fun onRefreshRecipe() {
         showProgress()
     }
 
-    override fun onLoadMoreSuccess(recipes: List<Recipe>) {
+    fun onLoadMoreSuccess(recipes: List<Recipe>) {
     }
 
-    override fun onLoadMoreFailed() {
+    private fun onLoadMoreFailed() {
     }
 
-    override fun onLoadMoreReachEndRecord() {
+    fun onLoadMoreReachEndRecord() {
     }
-    override fun onGetTagsSuccess(tags: List<SearchItem>) {
+    fun onGetTagsSuccess(tags: List<SearchItem>) {
     }
 
-    override fun onGetTagsFailed(message: String?) {
+    private fun onGetTagsFailed(message: String?) {
         message?.let { toast(it)}
     }
 
-    override fun onFilterListTag(filteredTags: List<SearchItem>) {
-        searchSuggestionAdapter.items = filteredTags.toMutableList()
+    private fun onFilteredSuggestion(filteredList: List<SearchItem>) {
+        searchSuggestionAdapter.items = filteredList.toMutableList()
     }
 
-    override fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
+    fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
     }
 
-    override fun onRequestCategoriesFailed(message: String) {
+    private fun onRequestCategoriesFailed(message: String) {
     }
     //region end MVP implements
 
@@ -191,7 +208,17 @@ class SearchScreenActivity : BaseActivity<SearchContractView>(), SearchContractV
     }
 
     override fun onQueryTextChange(query: String?): Boolean {
-        presenter.filterSearchSuggestions(query)
+        //since after activity restored due to configuration changed
+        //the SearchView will set the search box to be blank
+        if(isActivityJustRestore && query.isNullOrBlank()){
+            isActivityJustRestore = false
+            return true
+        }
+        if (query == currentQuery){
+            return true
+        }
+        currentQuery = query
+        viewModel.filterSearchSuggestions(query)
         return true
     }
 
@@ -221,9 +248,42 @@ class SearchScreenActivity : BaseActivity<SearchContractView>(), SearchContractV
             //use the query to search your data somehow
             Timber.d("handle intent -> query = $query")
             title = query.query
-            presenter.searchRecipesBy(query)
+            viewModel.refreshRecipes(query)
             recipeAdapter.items = mutableListOf()
         }
+    }
+
+    override fun observeViewModel(){
+        viewModel.filteredSuggestion.observe(this, Observer { listSearchItem ->
+            listSearchItem?.let { onFilteredSuggestion(it) }
+        })
+        viewModel.listRecipes.observe(this, Observer {listRecipes ->
+            listRecipes?.let { onRecipesRequestSuccess(it) }
+        })
+        viewModel.requestRecipesStatus.observe(this, Observer {
+            when(it){
+                Status.LOADING -> {}
+                Status.LOAD_MORE -> {}
+                Status.ERROR -> onRecipesRequestFailed("")
+                Status.LOAD_MORE_ERROR -> onLoadMoreFailed()
+            }
+        })
+        viewModel.requestCategoriesStatus.observe(this, Observer {
+            when(it){
+                Status.LOADING -> {}
+                Status.LOAD_MORE -> {}
+                Status.ERROR -> onRequestCategoriesFailed("")
+                Status.LOAD_MORE_ERROR -> {}
+            }
+        })
+        viewModel.requestTagsStatus.observe(this, Observer {
+            when(it){
+                Status.LOADING -> {}
+                Status.LOAD_MORE -> {}
+                Status.ERROR -> onGetTagsFailed("")
+                Status.LOAD_MORE_ERROR -> {}
+            }
+        })
     }
 
     private fun setupToolbar(){
@@ -272,20 +332,19 @@ class SearchScreenActivity : BaseActivity<SearchContractView>(), SearchContractV
     }
 
     private fun onSearchViewSubmit(item: SearchItem){
-        presenter.searchRecipesBy(item)
+        viewModel.refreshRecipes(item)
         searchMenuItem.collapseActionView()
         title = item.query
         onMenuItemActionCollapse(searchMenuItem)
     }
 
     private fun setSearchSuggestionVisibility(isVisible: Boolean){
-        if(!isSearchSuggestionAdapterAttached && isVisible){
+        if(rcvSearchSuggestion == null){
             stub_search_suggestion.visibility = View.VISIBLE
             rcvSearchSuggestion.adapter = searchSuggestionAdapter
             rcvSearchSuggestion.layoutManager = LinearLayoutManager(this)
-            isSearchSuggestionAdapterAttached = true
         }
-        rcvSearchSuggestion.visibility = if (isVisible) View.VISIBLE else View.GONE
+        rcvSearchSuggestion.visibility =  if (isVisible) View.VISIBLE else View.GONE
         Timber.d("setSearchSuggestionVisibility $isVisible")
     }
 

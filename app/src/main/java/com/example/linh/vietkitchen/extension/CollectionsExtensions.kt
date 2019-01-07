@@ -55,6 +55,11 @@ fun List<String>.toMapOfStringBoolean(): MutableMap<String, Boolean> {
     return result
 }
 
+fun <T> MutableList<T>.removeLast(): Boolean{
+    if (isNullOrEmpty()) throw KotlinNullPointerException("list must be not null or empty")
+    return removeAt(size -1) != null
+}
+
 fun <K, V> Map<K, V>.toListOfStringOfKey(): List<K> {
     val result = mutableListOf<K>()
     forEach {

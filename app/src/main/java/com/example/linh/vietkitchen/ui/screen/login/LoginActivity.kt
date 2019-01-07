@@ -1,41 +1,31 @@
 package com.example.linh.vietkitchen.ui.screen.login
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.ui.mvpBase.BaseActivity
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenterContract
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 
 
-class LoginActivity : BaseActivity<LoginContractView>(),
-        LoginContractView{
-    private val presenter: LoginContractPresenter by lazy{ LoginPresenter() }
+class LoginActivity : BaseActivity(){
     companion object {
         fun createIntent(context: Context): Intent {
             return Intent(context, LoginActivity::class.java)
         }
     }
 
+    private lateinit var viewModel: LoginViewModel
+
     //region MVP callbacks =========================================================================
-    override val viewContext: Context?
-        get() = this
-
-    override fun showProgress() {
-    }
-
-    override fun hideProgress() {
-    }
-
-    override fun getPresenter(): BasePresenterContract<LoginContractView> {
-        return presenter
-    }
-
-    override fun getViewContract() = this
-
     override fun getActivityLayoutRes() = R.layout.activity_login
+    override fun getViewModel(): BaseViewModel {
+        val factory = LogInViewModelFactory(application)
+        viewModel = ViewModelProviders.of(this, factory).get(LoginViewModel::class.java)
+        return viewModel
+    }
 
-    override fun onNoInternetException() {
-
+    override fun observeViewModel() {
     }
     //endregion MVP callbacks
 }

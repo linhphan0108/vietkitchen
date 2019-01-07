@@ -8,7 +8,7 @@ class PutUnlikeCommand(private val userProvider: UserProvider = UserProvider()) 
     lateinit var uid: String
     lateinit var recipeId: String
 
-    override suspend fun executeOnTheInternet(context: Context): Response<Boolean> {
+    override suspend fun execute(context: Context): Response<Boolean> {
         isInternetOn(context)
         return execute()
     }

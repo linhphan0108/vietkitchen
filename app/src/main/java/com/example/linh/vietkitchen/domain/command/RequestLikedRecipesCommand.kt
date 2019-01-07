@@ -9,7 +9,7 @@ class RequestLikedRecipesCommand(private val provider: RecipeProvider = RecipePr
     : CommandCoroutines<Response<List<Recipe>>> {
     var ids: List<String>? = null
 
-    override suspend fun executeOnTheInternet(context: Context): Response<List<Recipe>> {
+    override suspend fun execute(context: Context): Response<List<Recipe>> {
         isInternetOn(context)
         return execute()
     }
