@@ -8,7 +8,7 @@ import com.example.linh.vietkitchen.domain.provider.RecipeProvider
 class UploadImageCommand(private val provider: RecipeProvider = RecipeProvider()) : CommandCoroutines<Response<List<ImageUpload>>> {
     lateinit var multiPartFileMap: List<ImageUpload>
 
-    override suspend fun executeOnTheInternet(context: Context): Response<List<ImageUpload>> {
+    override suspend fun execute(context: Context): Response<List<ImageUpload>> {
         isInternetOn(context)
         return execute()
     }

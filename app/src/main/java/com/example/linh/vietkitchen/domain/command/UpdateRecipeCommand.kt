@@ -9,7 +9,7 @@ class UpdateRecipeCommand(private val provider: RecipeProvider = RecipeProvider(
     lateinit var recipe: Recipe
     override suspend fun execute() = provider.updateRecipe(recipe)
 
-    override suspend fun executeOnTheInternet(context: Context): Response<Boolean> {
+    override suspend fun execute(context: Context): Response<Boolean> {
         isInternetOn(context)
         return execute()
     }

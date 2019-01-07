@@ -8,7 +8,7 @@ interface CommandCoroutines<out T>{
 
     suspend fun execute(): T
 
-    suspend fun executeOnTheInternet(context: Context): T
+    suspend fun execute(context: Context): T
 
     suspend fun isInternetOn(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

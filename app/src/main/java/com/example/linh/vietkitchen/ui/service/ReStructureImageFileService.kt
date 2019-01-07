@@ -86,7 +86,7 @@ class ReStructureImageFileService : BaseService() {
         startInForeground("retrieve all recipes")
         launchDataLoad{
             val listRecipes = withIoContext {
-                requestRecipeCommand.executeOnTheInternet(this).data
+                requestRecipeCommand.execute(this).data
 
             }
             listRecipes?.let {
@@ -128,7 +128,7 @@ class ReStructureImageFileService : BaseService() {
                             this
                         }
                         updateRecipeCommand.recipe = newRecipe
-                        updateRecipeCommand.executeOnTheInternet(this)
+                        updateRecipeCommand.execute(this)
                         Timber.d("re-uploaded ${recipe.name}")
                     }
                 }

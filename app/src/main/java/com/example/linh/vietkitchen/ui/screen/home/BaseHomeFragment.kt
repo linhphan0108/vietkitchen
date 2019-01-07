@@ -1,6 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home
 
 import android.app.Activity
+import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -12,18 +13,19 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.mvpBase.ToolbarFragment
 import com.example.linh.vietkitchen.ui.screen.detailActivity.BK_LIKE_STATE_JUST_CHANGED
 import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
 import com.example.linh.vietkitchen.util.RecyclerViewLayoutMode
 import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
 import android.view.MenuItem
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseToolbarFragment
+import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
 
 private const val REQUEST_DETAIL_RECIPE = 2
-abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPresenter<V>> : ToolbarFragment<V, P>(),
+abstract class BaseHomeFragment : BaseToolbarFragment(),
         OnItemClickListener {
 
     private var recyclerViewLayoutMode = RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL
@@ -34,11 +36,20 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        getViewModel().likeOrUnlikeAction.observe(this, Observer {recipe ->
+            recipe?.let {
+                if (it.hasLiked){
+                    onLikeEventObserve(it)
+                }else{
+                    onUnlikeEventObserve(it)
+                }
+            }
+        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setupAdapter()
+        setupRecyclerView()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -48,11 +59,7 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
                 val likeState: Boolean = data?.getBooleanExtra(BK_LIKE_STATE_JUST_CHANGED, recipe.hasLiked) ?: recipe.hasLiked
                 if (likeState != recipe.hasLiked){
                     recipe.hasLiked = likeState
-                    if (likeState){
-                        presenter.emitLike(recipe)
-                    }else{
-                        presenter.emitUnLike(recipe)
-                    }
+                    getViewModel().emitLikeOrUnlikeAction(recipe)
                 }
             }
         }
@@ -73,6 +80,10 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
         }
     }
 
+    abstract override fun getViewModel(): BaseHomeViewModel
+    internal abstract fun onLikeEventObserve(recipe: Recipe)
+    internal abstract fun onUnlikeEventObserve(recipe: Recipe)
+
     //recycler view callback
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe) {
         val intent = RecipeDetailActivity.createIntent(context, layoutPosition.toString(), data)
@@ -87,20 +98,26 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
     }
 
     override fun onLike(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe){
-        presenter.likeRecipe(data)
+        getViewModel().likeRecipe(data)
     }
 
     override fun onUnLike(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe){
-        presenter.unLikeRecipe(data)
+        getViewModel().unLikeRecipe(data)
     }
 
     override fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean {
         return false
     }
     //region inner methods =========================================================================
-    protected open fun setupAdapter() {
+    protected open fun setupRecyclerView() {
         recipeAdapter = RecipeAdapter(listener = this)
+        val recyclerView = getRecyclerView()
+        recyclerView.layoutManager = getRecyclerViewLayoutManager()
+        recyclerView.addItemDecoration(getRecyclerViewItemDecoration())
+        recyclerView.adapter = recipeAdapter
     }
+
+    abstract fun getRecyclerView(): RecyclerView
 
     protected fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager{
         return when(recyclerViewLayoutMode){
@@ -121,7 +138,7 @@ abstract class BaseHomeFragment<V: BaseHomeContractView, P: BaseHomeContractPres
         return StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
     }
 
-    protected fun getRecyclerViewItemDecoration(): RecyclerView.ItemDecoration{
+    private fun getRecyclerViewItemDecoration(): RecyclerView.ItemDecoration{
         return when(recyclerViewLayoutMode){
             RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL -> {
                 val margin = resources.getDimensionPixelSize(R.dimen.padding_16)

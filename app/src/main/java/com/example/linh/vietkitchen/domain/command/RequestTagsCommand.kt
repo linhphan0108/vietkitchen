@@ -6,7 +6,7 @@ import com.example.linh.vietkitchen.domain.provider.TagsProvider
 
 class RequestTagsCommand(private val provider: TagsProvider = TagsProvider()) : CommandCoroutines<Response<Map<String, Boolean>>> {
 
-    override suspend fun executeOnTheInternet(context: Context): Response<Map<String, Boolean>> {
+    override suspend fun execute(context: Context): Response<Map<String, Boolean>> {
         isInternetOn(context)
         return execute()
     }

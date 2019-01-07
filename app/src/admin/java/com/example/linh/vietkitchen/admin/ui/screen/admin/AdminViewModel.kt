@@ -1,32 +1,34 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.arch.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.domain.command.RequestTagsCommand
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
-import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
 import timber.log.Timber
-import com.example.linh.vietkitchen.extension.generateAnnotationSpan
 import com.example.linh.vietkitchen.ui.service.PutRecipeService
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
 import android.net.Uri
 import android.os.*
-import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.filterFirst
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
-import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.util.RecipeUtil
 import com.example.linh.vietkitchen.util.TimberUtils
 
 
-class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand())
-    : BasePresenter<AdminContractView>(), AdminContractPresenter {
+class AdminViewModel(application: Application,
+        private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand())
+    : BaseViewModel(application) {
 
-    private lateinit var listTagsOnServer: List<String>
+    internal val listTagsOnServerStatus: MutableLiveData<StatusBox<List<String>>> =  MutableLiveData()
+    internal val serviceUploadingStatus: MutableLiveData<StatusBox<UploadProgress>> = MutableLiveData()
     private lateinit var categories: List<DrawerNavGroupItem>
 
     // Don't attempt to unbind from the service unless the client has received some
@@ -40,50 +42,18 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
     /**
      * Target we publish for clients to send messages to IncomingHandler.
      */
-    val clientMessage = Messenger(IncomingHandler())
+    private val clientMessage = Messenger(IncomingHandler())
 
-
-    override fun attachView(view: AdminContractView) {
-        super.attachView(view)
-    }
-
-    override fun detachView() {
-        super.detachView()
+    override fun onCleared() {
         doUnbindService()
+        super.onCleared()
     }
-
     //==============================================================================================
-    override fun setCategoriesList(categories: List<DrawerNavGroupItem>) {
+    fun setCategoriesList(categories: List<DrawerNavGroupItem>) {
         this.categories = categories
     }
 
-    override fun openCategoryDialogChecker() {
-        val dialog = CategoryChecker.newInstance(categories)
-        dialog.callback = object: CategoryChecker.OnDismissCallback {
-            override fun onDismiss(listCatsChecked: MutableList<DrawerNavChildItem>) {
-
-            }
-        }
-        dialog.show(activity!!.supportFragmentManager, CategoryChecker::class.java.name)
-    }
-
-    override fun preview(recipe: Recipe) {
-        with(recipe){
-            val charPreparation = preparation.generateAnnotationSpan()
-            val charProcess = processing.generateAnnotationSpan()
-            val charIntro = intro?.generateAnnotationSpan()
-            val charIngredient = ingredient.generateAnnotationSpan()
-            val charSpice = spice.generateAnnotationSpan()
-            val charNotes = notes?.generateAnnotationSpan()
-            val data = Recipe(id, name, charIntro, charIngredient, charSpice, charPreparation,
-                    charProcess, charNotes, categories, tags,thumbUrl, imageUrl, false)
-            val intent = RecipeDetailActivity.createIntent(context, "", data)
-            context?.startActivity(intent)
-        }
-    }
-
-    override fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>) {
-        viewContract?.showProgressDialog()
+    fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>) {
         launchDataLoad({
             val message = Message.obtain(null, PutRecipeService.MSG_PREPARING_FOR_UPLOADING)
             clientMessage.send(message)
@@ -93,8 +63,8 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
             }
             val newTags = withComputationContext {
                 TimberUtils.checkNotMainThread()
-                recipe.tags?.filterNot {
-                    listTagsOnServer.contains(it)
+                recipe.tags?.filterNot {tag ->
+                    listTagsOnServerStatus.value?.data?.contains(tag) ?: false
                 }
             }
 
@@ -104,21 +74,21 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
             }
             doBindService(recipe, extractedListImageUris, newTags, updatedCategory)
         }, {
-
-        })
+            Timber.e(it)
+        }, false)
     }
 
 
-    override fun getTags() {
+    fun getTags() {
         launchDataLoad({
-            listTagsOnServer = withIoContext {
-                val map = requestTagsCommand.executeOnTheInternet(context!!)
+            val listTags = withIoContext {
+                val map = requestTagsCommand.execute(getApplication())
                 map.data!!.toListOfStringOfKey()
             }
-            viewContract?.onGetTagsSuccess(listTagsOnServer)
+            listTagsOnServerStatus.value = StatusBox(Status.SUCCESS, data = listTags)
         }, {
-            viewContract?.onGetTagsFailed(it.message)
-        })
+            listTagsOnServerStatus.value = StatusBox(Status.ERROR, it.message)
+        }, false)
     }
 
     private fun extractContentImagePaths(recipe: Recipe, listImages: List<Uri>): List<Uri> {
@@ -158,15 +128,14 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
         // implementation that we know will be running in our own process
         // (and thus won't be supporting component replacement by other
         // applications).
-        if (context == null) return
-        val intent = PutRecipeService.createIntent(context!!)
+        val intent = PutRecipeService.createIntent(getApplication())
         mConnection.recipe = recipe
         mConnection.listImagesUri = listImagesUri
         mConnection.newTags = newTags
         mConnection.newDrawerNav = newDrawerNav
         when {
             isBounded -> sendUploadCommandToService(recipe, listImagesUri, newTags, newDrawerNav)
-            context?.bindService(intent, mConnection, Context.BIND_AUTO_CREATE)!! -> isBounded = true
+            getApplication<Application>().bindService(intent, mConnection, Context.BIND_AUTO_CREATE) -> isBounded = true
             else -> Timber.e("Error: The requested service doesn't exist, or this client isn't allowed access to it.")
         }
     }
@@ -186,7 +155,7 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
                 }
             }
             //Detach our existing connection.
-            context?.unbindService(mConnection)
+            getApplication<Application>().unbindService(mConnection)
             isBounded = false
         }
     }
@@ -257,39 +226,40 @@ class AdminPresenter(private val requestTagsCommand: RequestTagsCommand = Reques
                     val progress = bundle.getInt(PutRecipeService.BK_UPLOAD_PROGRESS)
                     val counter = bundle.getInt(PutRecipeService.BK_UPLOAD_COUNTER)
                     val total = bundle.getInt(PutRecipeService.BK_UPLOAD_TOTAL)
-                    viewContract?.updateProgress(total, counter, progress)
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_UPLOAD_IMAGE_PROGRESS,
+                            data = UploadProgress(progress, counter, total))
                 }
                 PutRecipeService.MSG_PREPARING_FOR_UPLOADING -> {
-                    viewContract?.updateMessage(getStringRes(R.string.msg_prepare_uploading))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_PREPARING_FOR_UPLOADING)
                 }
                 PutRecipeService.MSG_START_STORING_RECIPE_TO_DB -> {
-                    viewContract?.updateMessage(getStringRes(R.string.msg_start_storing_recipe))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_START_STORING_RECIPE_TO_DB)
                 }
                 PutRecipeService.MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT -> {
-                    viewContract?.updateMessage(getStringRes(R.string.msg_extract_images))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_EXTRACT_IMAGES_FROM_RECIPE_CONTENT)
                 }
                 PutRecipeService.MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING -> {
-                    viewContract?.updateMessage(getStringRes(R.string.msg_optimizing_images))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_OPTIMIZING_IMAGES_BEFORE_UPLOADING)
                 }
 
                 PutRecipeService.MSG_START_UPLOADING_IMAGES ->{
-                    viewContract?.updateMessage(getStringRes(R.string.msg_start_uploading_images))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_START_UPLOADING_IMAGES)
                 }
 
                 PutRecipeService.MSG_STORE_RECIPE_TO_DB_SUCCESS -> {
-                    viewContract?.updateMessage(getStringRes(R.string.msg_store_recipe_success))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_STORE_RECIPE_TO_DB_SUCCESS)
                 }
                 PutRecipeService.MSG_STORE_RECIPE_TO_DB_FAILED -> {
-                    viewContract?.updateMessage(getStringRes(R.string.msg_store_recipe_failed))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_STORE_RECIPE_TO_DB_FAILED)
                 }
                 PutRecipeService.MSG_UPDATE_NEW_CATEGORIES ->{
-                    viewContract?.updateMessage(getStringRes(R.string.msg_update_category))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_UPDATE_NEW_CATEGORIES)
                 }
                 PutRecipeService.MSG_PUT_NEW_TAGS -> {
-                    viewContract?.updateMessage(getStringRes(R.string.msg_put_new_tags))
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_PUT_NEW_TAGS)
                 }
                 PutRecipeService.MSG_STORE_RECIPE_TOTALLY_FINISHED ->{
-                    viewContract?.onPutRecipeSuccess()
+                    serviceUploadingStatus.value = StatusBox(PutRecipeService.MSG_STORE_RECIPE_TOTALLY_FINISHED)
                 }
                 else -> super.handleMessage(msg)
             }

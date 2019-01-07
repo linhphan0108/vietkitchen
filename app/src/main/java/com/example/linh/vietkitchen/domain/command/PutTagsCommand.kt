@@ -7,7 +7,7 @@ import com.example.linh.vietkitchen.domain.provider.TagsProvider
 class PutTagsCommand(private val provider: TagsProvider = TagsProvider()) : CommandCoroutines<Response<Boolean>> {
     lateinit var tags: Map<String, Boolean>
 
-    override suspend fun executeOnTheInternet(context: Context): Response<Boolean> {
+    override suspend fun execute(context: Context): Response<Boolean> {
         isInternetOn(context)
         return execute()
     }

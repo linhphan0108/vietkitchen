@@ -7,7 +7,7 @@ import com.example.linh.vietkitchen.domain.provider.CategoryProvider
 
 class RequestCategoryCommand(private val provider: CategoryProvider = CategoryProvider()) : CommandCoroutines<Response<List<CategoryGroup>>> {
 
-    override suspend fun executeOnTheInternet(context: Context): Response<List<CategoryGroup>> {
+    override suspend fun execute(context: Context): Response<List<CategoryGroup>> {
         isInternetOn(context)
         return execute()
     }

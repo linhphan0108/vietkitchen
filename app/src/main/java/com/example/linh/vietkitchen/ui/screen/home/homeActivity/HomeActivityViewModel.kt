@@ -1,35 +1,38 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
+import android.app.Application
+import android.arch.lifecycle.MutableLiveData
 import android.os.Looper
-import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.command.RequestCategoryCommand
-import com.example.linh.vietkitchen.domain.command.RequestTagsCommand
-import com.example.linh.vietkitchen.extension.toListOfStringOfKey
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
-import com.example.linh.vietkitchen.ui.mapper.TagMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.model.SearchItem
-import com.example.linh.vietkitchen.ui.mvpBase.BasePresenter
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
 
-class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryCommand = RequestCategoryCommand(),
+class HomeActivityViewModel(application: Application,
+                            private val requestCategoryCommand: RequestCategoryCommand = RequestCategoryCommand(),
                             private val categoryMapper: CategoryMapper = CategoryMapper())
-    : BasePresenter<HomeActivityContractView>() , HomeActivityContractPresenter {
+    : BaseViewModel(application) {
 
-    override fun attachView(view: HomeActivityContractView) {
-        super.attachView(view)
+    internal val listNav: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()
+    internal var requestNavStatus: MutableLiveData<Int> = MutableLiveData()
+
+    init {
+        requestNavStatus.value = Status.NORMAL
         EventBus.getDefault().register(this)
     }
 
-    override fun detachView() {
+    override fun onCleared() {
         EventBus.getDefault().unregister(this)
-        super.detachView()
+        super.onCleared()
     }
 
-    override fun requestCategory() {
+
+    fun requestCategory() {
         launchDataLoad({
             val categories = withIoContext {
                 Timber.d("on launchDataLoad: ${Looper.myLooper() == Looper.getMainLooper()}")
@@ -43,13 +46,13 @@ class HomeActivityPresenter(private val requestCategoryCommand: RequestCategoryC
             }
         },{e->
             Timber.e(e)
-            viewContract?.onRequestCategoriesFailed(getStringRes(R.string.message_error))
+            requestNavStatus.value = Status.ERROR
         }, false)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onMessageEventBus(event: List<DrawerNavGroupItem>) {
-        viewContract?.onRequestCategoriesSuccess(event)
+        listNav.value = event
         Timber.d("onMessageEventBus(): DrawerNavGroupItem received")
     }
 }

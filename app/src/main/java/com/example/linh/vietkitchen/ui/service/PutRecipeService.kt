@@ -251,7 +251,7 @@ class PutRecipeService : BaseService() {
         Timber.d("store the recipe into remote db")
         val recipeDomain = recipeMapper.toDomain(recipe)
         putRecipeCommand.recipe = recipeDomain
-        val id = putRecipeCommand.executeOnTheInternet(this)
+        val id = putRecipeCommand.execute(this)
         sendMessageToClients(MSG_STORE_RECIPE_TO_DB_SUCCESS)
         if (shouldShowNotification) {
             updateUploadNotification("the recipe was put into remote server success")
@@ -270,7 +270,7 @@ class PutRecipeService : BaseService() {
             updateRemoteUriToRecipe(newRecipe, it.originalPath, it.remotePath!!)
         }
         updateRecipeCommand.recipe = recipeMapper.toDomain(newRecipe)
-        return updateRecipeCommand.executeOnTheInternet(this)
+        return updateRecipeCommand.execute(this)
     }
 
     private suspend fun putNewTags(tags: List<String>) {
@@ -278,7 +278,7 @@ class PutRecipeService : BaseService() {
         Timber.d("put new tags into db")
         sendMessageToClients(MSG_PUT_NEW_TAGS)
         putTagsCommand.tags = tags.toMapOfStringBoolean()
-        putTagsCommand.executeOnTheInternet(this)
+        putTagsCommand.execute(this)
         Timber.d("just put ${tags.size} tags successfully")
     }
 
@@ -286,7 +286,7 @@ class PutRecipeService : BaseService() {
         Timber.d("update categories")
         sendMessageToClients(MSG_UPDATE_NEW_CATEGORIES)
         updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(categories)
-        return updateCategoriesCommand.executeOnTheInternet(this)
+        return updateCategoriesCommand.execute(this)
     }
 
     private fun optimizeImages(extractImageUris: List<Uri>): List<ImageUpload>{
@@ -316,7 +316,7 @@ class PutRecipeService : BaseService() {
         sendMessageToClients(MSG_START_UPLOADING_IMAGES)
         totalImageFiles = multipartFiles.count()
         uploadImageCommand.multiPartFileMap = multipartFiles
-        return uploadImageCommand.executeOnTheInternet(this)
+        return uploadImageCommand.execute(this)
     }
 
     private fun addMultipartFileUri(multiPartFileMap: MutableMap<String, String>, path: String){
@@ -358,7 +358,8 @@ class PutRecipeService : BaseService() {
         Timber.d("uploading ${uploadingStatus.progress}")
         Timber.d("****************************")
         val bundle = Bundle()
-        if(uploadingStatus.progress == 100 && !uploadingStatus.remotePath.isNullOrBlank()){
+        if(uploadingStatus.progress == 100 && !uploadingStatus.remotePath.isNullOrBlank() &&
+                uploadingCounter < totalImageFiles){
             uploadingCounter++
         }
         bundle.putInt(BK_UPLOAD_PROGRESS, uploadingStatus.progress)

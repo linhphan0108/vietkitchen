@@ -1,7 +1,7 @@
-package com.example.linh.vietkitchen.ui.mvpBase
+package com.example.linh.vietkitchen.ui.baseMVVM
 
 import android.app.ActivityOptions
-import android.content.Context
+import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.CollapsingToolbarLayout
@@ -11,35 +11,27 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.ui.dialog.LoadingDialog
 
-abstract class BaseActivity<T : BaseViewContract> : AppCompatActivity(), BaseViewContract {
+abstract class BaseActivity : AppCompatActivity() {
     private val loadingDialog: LoadingDialog by lazy { LoadingDialog.newInstance(getString(R.string.label_loading)) }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(getActivityLayoutRes())
-        getPresenter().attachView(getViewContract())
+        getViewModel()
+        observeLoadingDialogState()
+        observeViewModel()
     }
-
-    override fun onDestroy() {
-        getPresenter().detachView()
-        super.onDestroy()
-    }
-
-    override val viewContext: Context?
-        get() = this
-
-    protected abstract fun getPresenter() : BasePresenterContract<T>
-
-    abstract fun getViewContract() : T
 
     abstract fun getActivityLayoutRes(): Int
 
-    override fun showProgress() {
+    abstract fun  getViewModel(): BaseViewModel
+    abstract fun observeViewModel()
+
+    internal fun showProgress() {
         loadingDialog.show(supportFragmentManager, LoadingDialog::class.java.name)
     }
 
-    override fun hideProgress() {
+    internal fun hideProgress() {
         if(loadingDialog.isVisible) loadingDialog.dismiss()
     }
 
@@ -66,5 +58,15 @@ abstract class BaseActivity<T : BaseViewContract> : AppCompatActivity(), BaseVie
         collapsingToolbarLayout.setStatusBarScrimColor(mutedPrimaryDark)
         collapsingToolbarLayout.setCollapsedTitleTextColor(collapsedTitleTextColor)
         collapsingToolbarLayout.setExpandedTitleColor(expandedTitleTextColor)
+    }
+
+    private fun observeLoadingDialogState(){
+        getViewModel().loadingDialogState.observe(this, Observer { loadingDialogVisibility ->
+            if (loadingDialogVisibility!!){
+                showProgress()
+            }else{
+                hideProgress()
+            }
+        })
     }
 }

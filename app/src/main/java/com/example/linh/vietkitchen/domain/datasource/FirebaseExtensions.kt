@@ -118,8 +118,8 @@ suspend fun StorageReference.putBytesAwait(resource: ByteArray): Response<String
         putBytes(resource)
 //                .addOnProgressListener { taskSnapshot ->
 //                    val progress: Int = (100 * taskSnapshot.bytesTransferred.toFloat() / taskSnapshot.totalByteCount).toInt()
-//                    val message = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, progress)
-//                    emitter.onNext(message)
+//                    val data = ImageUpload(image.fileName, image.originalPath, image.optimizedPath, progress)
+//                    emitter.onNext(data)
 //                }
                 .continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
                     if (!task.isSuccessful) {

@@ -16,6 +16,11 @@ class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
         notifyDataSetChanged()
     }
 
+    fun refresh(){
+        items.clear()
+        notifyDataSetChanged()
+    }
+
     fun onLike(recipe: Recipe){
         val id = recipe.id
         val index = items.findIndex {

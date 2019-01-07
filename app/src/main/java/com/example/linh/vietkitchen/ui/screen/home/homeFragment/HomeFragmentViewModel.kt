@@ -1,18 +1,25 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
+import android.app.Application
+import android.arch.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.command.DeleteImagesCommand
 import com.example.linh.vietkitchen.domain.command.DeleteRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
 import com.example.linh.vietkitchen.domain.command.UpdateCategoriesCommand
+import com.example.linh.vietkitchen.extension.removeLast
 import com.example.linh.vietkitchen.util.TimberUtils
 import com.example.linh.vietkitchen.ui.VietKitchenApp
+import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.model.UserInfo
-import com.example.linh.vietkitchen.ui.screen.home.BaseHomePresenter
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 import com.example.linh.vietkitchen.util.RecipeUtil
 import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
@@ -20,14 +27,15 @@ import org.greenrobot.eventbus.ThreadMode
 import org.greenrobot.eventbus.Subscribe
 
 
-class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.userInfo,
+class HomeFragmentViewModel(application: Application,
+                            private val userInfo: UserInfo = VietKitchenApp.userInfo,
                             private val recipeMapper: RecipeMapper = RecipeMapper(),
                             private val categoryMapper: CategoryMapper = CategoryMapper(),
                             private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),
                             private val deleteRecipeCommand: DeleteRecipeCommand = DeleteRecipeCommand(),
                             private val deleteImagesCommand: DeleteImagesCommand = DeleteImagesCommand(),
                             private val updateCategoriesCommand: UpdateCategoriesCommand = UpdateCategoriesCommand())
-    : BaseHomePresenter<HomeFragmentContractView>(), HomeFragmentContractPresenter {
+    : BaseHomeViewModel(application) {
 
     private var category: String? = null
     private var lastRecipeId: String? = null
@@ -36,75 +44,72 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
     private var hasReachLastRecord = false
 
     lateinit var categories: List<DrawerNavGroupItem>
+    internal var requestRecipesStatus: MutableLiveData<StatusBox<List<Entity>>> = MutableLiveData()
+    internal var deleteRecipeStatus: MutableLiveData<StatusBox<Int>> = MutableLiveData()
+    private var listRecipes: MutableList<Entity> = mutableListOf()
 
-    override fun requestRecipes(){
-        if (isLoadMoreRecipe){
-            viewContract?.onStartLoadMore()
-        }else {
-            viewContract?.onRefreshRecipe()
-        }
-
+    private fun fetchRecipes(){
         launchDataLoad({
             val pagingResponse = withIoContext {
                 requestRecipeCommand.category = category
                 requestRecipeCommand.startAtId = lastRecipeId
-                requestRecipeCommand.executeOnTheInternet(context!!)
+                requestRecipeCommand.execute(getApplication())
             }
 
-            val listRecipes = withComputationContext{
+            val recipes = withComputationContext{
                 TimberUtils.checkNotMainThread()
                 pagingResponse.data?.let {data ->
                     recipeMapper.convertToUi(data)
                 }
-            }
-            if (listRecipes.isNullOrEmpty()) {
-                viewContract?.onFoodsRequestFailed("Oops! something went wrong, no data found")
-            }else{
-                if(isLoadMoreRecipe){
-                    viewContract?.onLoadMoreSuccess(listRecipes)
+            } ?: listOf()
 
-                }else {
-                    viewContract?.onFoodsRequestSuccess(listRecipes)
-
-                }
+            if(isLoadMoreRecipe) {
+                removeLoadMoreItem()
             }
+            listRecipes.addAll(recipes)
+
             lastRecipeId = pagingResponse.lastId
             hasReachLastRecord = pagingResponse.isEnd
             isFreshRecipe = false
             isLoadMoreRecipe = false
-            if(hasReachLastRecord) viewContract?.onLoadMoreReachEndRecord()
 
+            requestRecipesStatus.value = StatusBox(Status.SUCCESS, data = listRecipes.toList())
         }, { e ->
             Timber.e(e)
             when{
                 isLoadMoreRecipe -> {
-                    viewContract?.onLoadMoreFailed()
+                    requestRecipesStatus.value = StatusBox(Status.LOAD_MORE_ERROR)
                     isLoadMoreRecipe = false
                 }
                 else -> {
-                    viewContract?.onFoodsRequestFailed("Opps some things went wrong. ${e.message}")
+                    requestRecipesStatus.value = StatusBox(Status.ERROR)
                     isFreshRecipe = false
                 }
             }
         }, false)
     }
 
-    override fun loadMoreRecipe() {
+    fun loadMoreRecipe() {
         if(isLoadMoreRecipe || isFreshRecipe || hasReachLastRecord) return
         isLoadMoreRecipe = true
-        requestRecipes()
+        if(addLoadMoreItem(listRecipes)){
+            requestRecipesStatus.value = StatusBox(Status.LOAD_MORE, data = listRecipes)
+        }
+        fetchRecipes()
     }
 
-    override fun refreshRecipes(category: String?) {
+    fun refreshRecipes(category: String? = null) {
         isFreshRecipe = true
         isLoadMoreRecipe = false
         hasReachLastRecord = false
         lastRecipeId = null
-        category?.let { this.category = it}
-        requestRecipes()
+        listRecipes.clear()
+        category?.let { this.category = it }
+        requestRecipesStatus.value = StatusBox(Status.REFRESH, data = listRecipes)
+        fetchRecipes()
     }
 
-    override fun deleteRecipe(recipe: Recipe, adapterPosition: Int) {
+    fun deleteRecipe(recipe: Recipe, adapterPosition: Int) {
         launchDataLoad({
             val wasDeleteImagesSuccess =  withIoContext {
                 TimberUtils.checkNotMainThread()
@@ -126,22 +131,22 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
             if(wasUpdateCategorySuccess) {Timber.d("updated category successfully")}
             if(wasDeleteRecipeSuccess) {Timber.d("deleted Recipe successfully")}
 //            if (wasDeleteImagesSuccess && wasUpdateCategorySuccess && wasDeleteRecipeSuccess) {
-            viewContract?.onDeleteRecipeSuccess(adapterPosition)
+            deleteRecipeStatus.value = StatusBox(Status.SUCCESS, data = adapterPosition)
 //            }
         },{e ->
             Timber.e(e)
-            viewContract?.onDeleteRecipeFailed(e.message ?: "")
+            deleteRecipeStatus.value = StatusBox(Status.ERROR, e.message)
         })
     }
 
     private suspend fun deleteImages(recipe: Recipe): Response<Boolean> {
         deleteImagesCommand.fileUrls = RecipeUtil.extractAllImagePaths(recipe)
-        return deleteImagesCommand.executeOnTheInternet(context!!)
+        return deleteImagesCommand.execute(getApplication())
     }
 
     private suspend fun updateCategoryToServer(cat: List<DrawerNavGroupItem>): Response<Boolean> {
         updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(cat)
-        return updateCategoriesCommand.executeOnTheInternet(context!!)
+        return updateCategoriesCommand.execute(getApplication())
     }
 
     private suspend fun updateCategory(recipe: Recipe): List<DrawerNavGroupItem> {
@@ -166,7 +171,15 @@ class HomeFragmentPresenter(private val userInfo: UserInfo = VietKitchenApp.user
 
     private suspend fun deleteRecipeInDb(recipe: Recipe): Response<Boolean> {
         deleteRecipeCommand.recipe = recipeMapper.toDomain(recipe)
-        return deleteRecipeCommand.executeOnTheInternet(context!!)
+        return deleteRecipeCommand.execute(getApplication())
+    }
+
+    private fun removeLoadMoreItem(){
+        if (listRecipes.size > 1) {
+            listRecipes.apply {
+                this.removeLast()
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -8,7 +8,7 @@ import com.example.linh.vietkitchen.domain.provider.RecipeProvider
 class DeleteRecipeCommand(private val recipeProvider: RecipeProvider = RecipeProvider()): CommandCoroutines<Response<Boolean>> {
     lateinit var recipe: Recipe
 
-    override suspend fun executeOnTheInternet(context: Context): Response<Boolean> {
+    override suspend fun execute(context: Context): Response<Boolean> {
         isInternetOn(context)
         return execute()
     }

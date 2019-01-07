@@ -1,8 +1,8 @@
-package com.example.linh.vietkitchen.ui.mvpBase
+package com.example.linh.vietkitchen.ui.baseMVVM
 
 import android.content.Context
 
-abstract class ToolbarFragment<T : BaseViewContract, V : BasePresenterContract<T>> : BaseFragment<T, V>() {
+abstract class BaseToolbarFragment : BaseFragment() {
     protected var toolbarActions: ToolbarActions? = null
 
     override fun onAttach(context: Context) {
@@ -10,7 +10,7 @@ abstract class ToolbarFragment<T : BaseViewContract, V : BasePresenterContract<T
         if(context is ToolbarActions){
             toolbarActions = context
         }else{
-            throw RuntimeException("$context must implement ToolbarActions")
+            throw RuntimeException("$context must implement ${ToolbarActions::class.java}")
         }
     }
 

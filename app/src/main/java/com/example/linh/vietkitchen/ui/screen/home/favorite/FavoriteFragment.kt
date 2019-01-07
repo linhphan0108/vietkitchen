@@ -1,64 +1,51 @@
 package com.example.linh.vietkitchen.ui.screen.home.favorite
 
-import android.content.Context
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
+import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
-import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
+import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 import kotlinx.android.synthetic.main.fragment_favorite.*
-import kotlinx.android.synthetic.main.fragment_home.*
 
-class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContractPresenter>(), FavoriteContractView {
+class FavoriteFragment : BaseHomeFragment() {
     companion object {
         @JvmStatic
         fun newInstance() = FavoriteFragment()
     }
 
+    private lateinit var viewModel: FavoriteFragmentViewModel
     private val userInfo by lazy { VietKitchenApp.userInfo }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupRecyclerView()
-        presenter.requestLikedRecipes(userInfo.likedRecipesIds)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
+        observeViewModel()
+        viewModel.requestLikedRecipes(userInfo.likedRecipesIds)
     }
 
     //region MVP callbacks =========================================================================
-    override fun initPresenter() = FavoritePresenter()
-
-    override fun getViewContract() = this
-
     override fun getFragmentLayoutRes() = R.layout.fragment_favorite
-
-    override fun onNoInternetException() {
+    override fun getViewModel(): BaseHomeViewModel {
+        val factory = FavoriteFragmentViewModelFactory(activity!!.application)
+        viewModel = ViewModelProviders.of(this, factory).get(FavoriteFragmentViewModel::class.java)
+        return viewModel
     }
 
-    override fun onRequestLikedRecipesNoData() {
+    private fun onRequestLikedRecipesNoData() {
     }
 
-    override fun onRequestLikedRecipesSuccess(recipes: List<Recipe>) {
+    private fun onRequestLikedRecipesSuccess(recipes: List<Recipe>) {
         recipeAdapter.items = recipes.toMutableList()
         checkNoData()
     }
 
-    override fun onRequestLikedRecipesFailed() {
+    private fun onRequestLikedRecipesFailed() {
     }
 
     override fun onLikeEventObserve(recipe: Recipe) {
@@ -70,18 +57,21 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
         recipeAdapter.onUnLike(recipe, true)
         checkNoData()
     }
-
-    override val viewContext: Context?
-        get() = context
-
-    override fun showProgress() {
-    }
-
-    override fun hideProgress() {
-    }
     //endregion MVP callbacks
 
     //region inner methods =========================================================================
+    override fun observeViewModel(){
+        viewModel.requestLikeRecipesStatus.observe(this, Observer { box ->
+            box?.let {
+                when(it.code){
+                    Status.SUCCESS -> {onRequestLikedRecipesSuccess(it.data!!)}
+                    Status.ERROR_EMPTY -> {onRequestLikedRecipesNoData()}
+                    Status.ERROR -> {onRequestLikedRecipesFailed()}
+                }
+            }
+        })
+    }
+
     private fun checkNoData(){
         if (recipeAdapter.itemCount <= 0){
             txtNoData.visibility = View.VISIBLE
@@ -89,17 +79,11 @@ class FavoriteFragment : BaseHomeFragment<FavoriteContractView, FavoriteContract
             txtNoData.visibility = View.GONE
         }
     }
-    //endregion inner methods
 
-    //region inner classes =========================================================================
-    private fun setupRecyclerView() {
-        rcvLikedRecipes.layoutManager = getRecyclerViewLayoutManager()
-        rcvLikedRecipes.addItemDecoration(getRecyclerViewItemDecoration())
-        rcvLikedRecipes.adapter = recipeAdapter
-    }
+    override fun getRecyclerView(): RecyclerView = rcvLikedRecipes
 
     override fun requestRecyclerViewLayoutChange() {
-        rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
+        rcvLikedRecipes.layoutManager = getRecyclerViewLayoutManager()
     }
     //endregion inner classes
 }

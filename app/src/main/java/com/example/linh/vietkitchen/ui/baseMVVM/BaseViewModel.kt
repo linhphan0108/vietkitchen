@@ -1,15 +1,18 @@
-package com.example.linh.vietkitchen.ui.mvpBase
+package com.example.linh.vietkitchen.ui.baseMVVM
 
-import android.content.Context
-import android.support.v7.app.AppCompatActivity
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
+import android.arch.lifecycle.MutableLiveData
+import com.example.linh.vietkitchen.extension.removeLast
+import com.example.linh.vietkitchen.ui.model.Entity
+import com.example.linh.vietkitchen.ui.model.LoadMoreItem
 import kotlinx.coroutines.*
 import java.lang.Exception
 
+abstract class  BaseViewModel(application: Application) : AndroidViewModel(application) {
 
-abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
-    protected var viewContract: T? = null
-    protected var context: Context? = null
-    protected var activity: AppCompatActivity? = null
+    val loadingDialogState: MutableLiveData<Boolean> = MutableLiveData()
+
     /**
      * This is the job for all coroutines started by this ViewModel.
      *
@@ -25,32 +28,10 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
      */
     private val uiScope: CoroutineScope by lazy { CoroutineScope(Dispatchers.Main + viewModelJob) }
 
-    private val isViewAttached: Boolean
-        get() = viewContract != null
-
-//    private val mCompositeSubscription = CompositeSubscription()
-//    private var subscribeScheduler: Scheduler? = null
-//
-//    internal val schedulersTransformer: Observable.Transformer = object : Observable.Transformer() {
-//        fun call(o: Any): Observable {
-//            return (o as Observable).subscribeOn(defaultSubscribeScheduler())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .unsubscribeOn(defaultSubscribeScheduler())
-//        }
-//    }
-
-    override fun attachView(view: T) {
-        this.viewContract = view
-        this.context = view.viewContext
-        activity = view.viewContext as AppCompatActivity
-    }
-
-    override fun detachView() {
-        viewContract = null
+    override fun onCleared() {
         viewModelJob.cancel()
+        super.onCleared()
     }
-
-    fun getStringRes(intRes: Int) = this.context?.getString(intRes) ?: ""
 
     /**
      * Helper function to call a data load function with a loading spinner, errors will trigger a
@@ -67,12 +48,12 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
                        , shouldShowProgress: Boolean = true): Job {
         return uiScope.launch {
             try {
-                if (shouldShowProgress)viewContract?.showProgress()
+                if (shouldShowProgress) loadingDialogState.value = true
                 ioBlock()
             } catch (e: Exception) {
                 onError?.invoke(e)
             } finally {
-                if (shouldShowProgress)viewContract?.hideProgress()
+                if (shouldShowProgress) loadingDialogState.value = false
             }
         }
     }
@@ -91,5 +72,19 @@ abstract class BasePresenter<T : BaseViewContract> : BasePresenterContract<T> {
         return withContext(Dispatchers.Default){
             block()
         }
+    }
+
+    protected fun addLoadMoreItem(list: MutableList<Entity>): Boolean {
+        return list.add(LoadMoreItem())
+    }
+
+    protected fun removeLoadMoreItem(list: MutableList<Entity>): Boolean{
+        val lastPosition = list.size - 1
+        val lastItem = list[lastPosition]
+        if (lastItem is LoadMoreItem){
+            list.removeAt(lastPosition)
+            return true
+        }
+        return false
     }
 }
