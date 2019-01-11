@@ -1,6 +1,6 @@
 package com.example.linh.vietkitchen.ui
 
-import android.support.multidex.MultiDexApplication
+import androidx.multidex.MultiDexApplication
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.util.NotLoggingTree

@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.splashScreen
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.domain.command.RequestRecipesIdCommand
 import com.example.linh.vietkitchen.exception.NoInternetConnection
 import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo

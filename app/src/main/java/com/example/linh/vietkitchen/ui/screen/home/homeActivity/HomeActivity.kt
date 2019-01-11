@@ -2,21 +2,21 @@ package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.design.widget.CoordinatorLayout
-import android.support.design.widget.NavigationView
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.support.v4.view.GravityCompat
-import android.support.v4.view.ViewPager
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
+import com.google.android.material.appbar.AppBarLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.material.navigation.NavigationView
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.core.view.GravityCompat
+import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -155,7 +155,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         homePagerAdapter = HomePagerAdapter(supportFragmentManager)
         viewPager.adapter = homePagerAdapter
         viewPager.offscreenPageLimit = 2
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+        viewPager.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.OnPageChangeListener{
             override fun onPageScrollStateChanged(state: Int) {}
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
@@ -180,7 +180,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     if (viewPager.currentItem == 0){
                         if (halfDoubleTabOnHomeBottomNav) {
                             halfDoubleTabOnHomeBottomNav = false
-                            val fragment = (viewPager.adapter as FragmentStatePagerAdapter).getItem(0)
+                            val fragment = (viewPager.adapter as androidx.fragment.app.FragmentStatePagerAdapter).getItem(0)
                             (fragment as HomeFragment).scrollToTop()
                         }else {
                             toast(getString(R.string.msg_double_tab_to_scroll_to_top))
@@ -246,8 +246,8 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        drawerNavView.addHeaderView(headerView)
 //        drawerNavView.getHeaderView(0).visibility = View.GONE
         drawerNavAdapter = DrawerNavRcAdapter(drawerNavExpandableRc, childItemClickListener= this)
-        drawerNavExpandableRc.layoutManager = LinearLayoutManager(this)
-        drawerNavExpandableRc.itemAnimator = DefaultItemAnimator()
+        drawerNavExpandableRc.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        drawerNavExpandableRc.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
         drawerNavExpandableRc.adapter = drawerNavAdapter
     }
 
@@ -272,7 +272,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private fun changeToolbarScrollable(scrollable: Boolean){
         // Show toolbar when we are in maps mode
         val params = toolbar.layoutParams as AppBarLayout.LayoutParams
-        val appBarLayoutParams = appBarLayout.layoutParams as CoordinatorLayout.LayoutParams
+        val appBarLayoutParams = appBarLayout.layoutParams as androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
         if (scrollable) {
             params.scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
             appBarLayoutParams.behavior = AppBarLayout.Behavior()

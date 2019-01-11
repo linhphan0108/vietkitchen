@@ -1,8 +1,8 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
 import android.app.Application
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.linh.vietkitchen.domain.command.DeleteImagesCommand
 import com.example.linh.vietkitchen.domain.command.DeleteRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand

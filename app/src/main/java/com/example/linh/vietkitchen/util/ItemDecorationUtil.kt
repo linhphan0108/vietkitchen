@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.util
 
 import android.graphics.Rect
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 
 
@@ -11,12 +11,12 @@ import android.view.View
 class VerticalSpaceItemDecoration(private val verticalSpace: Int = 0,
                                   private val firstItem: Int = 0,
                                   private val lastItem: Int = 0)
-    : RecyclerView.ItemDecoration() {
+    : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
 
 //    private val divider: Drawable? = null
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
-                                state: RecyclerView.State) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: androidx.recyclerview.widget.RecyclerView,
+                                state: androidx.recyclerview.widget.RecyclerView.State) {
         val lastPos = parent.adapter!!.itemCount - 1
         outRect.bottom = verticalSpace
         val position = parent.getChildAdapterPosition(view)
@@ -56,12 +56,12 @@ class VerticalSpaceItemDecoration(private val verticalSpace: Int = 0,
 class VerticalStaggeredSpaceItemDecoration(private val verticalSpace: Int = 0,
                                   private val firstItem: Int = 0,
                                   private val lastItem: Int = 0)
-    : RecyclerView.ItemDecoration() {
+    : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
 
 //    private val divider: Drawable? = null
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
-                                state: RecyclerView.State) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: androidx.recyclerview.widget.RecyclerView,
+                                state: androidx.recyclerview.widget.RecyclerView.State) {
         val count = parent.adapter!!.itemCount
         if(count == 0) return
         val lastPos = count - 1

@@ -2,7 +2,7 @@ package com.example.linh.vietkitchen.admin.ui.screen.admin
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.domain.command.RequestTagsCommand
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain

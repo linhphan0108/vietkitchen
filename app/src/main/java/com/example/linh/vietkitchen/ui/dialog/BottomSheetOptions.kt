@@ -3,7 +3,7 @@ package com.example.linh.vietkitchen.ui.dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +14,7 @@ class BottomSheetOptions: BottomSheetDialogFragment() {
     var listeners: BottomSheetOptionsListeners? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return inflater.inflate(R.layout.bottom_sheet_options, container)
     }
 

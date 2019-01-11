@@ -3,7 +3,7 @@ package com.example.linh.vietkitchen.ui.adapter
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.SearchItem
-import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
+import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
 
 class SearchSuggestionDelegate(val listener: SearchSuggestionViewHolder.OnItemListeners): AbsListItemAdapterDelegate<SearchItem, Entity, SearchSuggestionViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup): SearchSuggestionViewHolder {

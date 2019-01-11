@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.dialog
 
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
+import androidx.fragment.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.dialog_loading.*
 
 const val ARG_MESSAGE = "ARG_MESSAGE"
 
-class LoadingDialog : DialogFragment() {
+class LoadingDialog : androidx.fragment.app.DialogFragment() {
     companion object {
         fun newInstance(message: String): LoadingDialog{
             val dialog = LoadingDialog()

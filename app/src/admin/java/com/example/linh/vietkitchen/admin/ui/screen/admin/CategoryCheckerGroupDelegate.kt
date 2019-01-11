@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
+import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
 
 class CategoryCheckerGroupDelegate : AbsListItemAdapterDelegate<DrawerNavGroupItem,
         Entity, CategoryCheckerGroupHolder>(){

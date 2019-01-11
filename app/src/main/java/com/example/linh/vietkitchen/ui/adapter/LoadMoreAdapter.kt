@@ -2,7 +2,7 @@ package com.example.linh.vietkitchen.ui.adapter
 
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.LoadMoreItem
-import com.hannesdorfmann.adapterdelegates3.ListDelegationAdapter
+import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 
 abstract class LoadMoreAdapter: ListDelegationAdapter<MutableList<Entity>>() {
     init {

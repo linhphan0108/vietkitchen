@@ -1,8 +1,8 @@
 package com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 abstract class EndlessScrollListener(
         // The minimum number of items to have below your current scroll position
@@ -12,14 +12,14 @@ abstract class EndlessScrollListener(
         private val startingPageIndex: Int = 0,
         // The current offset index of data you have loaded
         private var currentPage: Int = startingPageIndex
-        ) : RecyclerView.OnScrollListener() {
+        ) : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
 
     // The total number of items in the dataset after the last load
     private var previousTotalItemCount = 0
     // True if we are still waiting for the last set of data to load.
     private var loading = true
 
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+    override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
         // If the total item count is zero and the previous isn't, assume the
         // list is invalidated and should be reset back to initial state
         val totalItemCount = recyclerView.adapter?.itemCount ?: 0
@@ -42,8 +42,8 @@ abstract class EndlessScrollListener(
         // If we do need to reload some more data, we execute onLoadMore to fetch the data.
         val layoutManager = recyclerView.layoutManager
         val lastVisibleItem = when (layoutManager) {
-            is LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
-            is StaggeredGridLayoutManager ->
+            is androidx.recyclerview.widget.LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
+            is androidx.recyclerview.widget.StaggeredGridLayoutManager ->
                 layoutManager.findLastVisibleItemPositions(null).min() ?: 0
             else -> 0
         }

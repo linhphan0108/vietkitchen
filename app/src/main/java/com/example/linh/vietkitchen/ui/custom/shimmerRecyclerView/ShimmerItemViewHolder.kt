@@ -1,12 +1,12 @@
 package com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 
 class ShimmerItemViewHolder(itemView: View
 //                            private val shimmerItemView: ShimmerFrameLayout
 //                                = itemView as ShimmerFrameLayout
-                            ) : RecyclerView.ViewHolder(itemView) {
+                            ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
 
     fun startShimmerAnimation(){

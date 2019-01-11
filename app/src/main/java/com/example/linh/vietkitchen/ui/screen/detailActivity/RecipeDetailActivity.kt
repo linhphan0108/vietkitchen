@@ -1,15 +1,14 @@
 package com.example.linh.vietkitchen.ui.screen.detailActivity
 
 import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.v7.graphics.Palette
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.view.View
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -125,7 +124,7 @@ class RecipeDetailActivity : BaseActivity(), View.OnClickListener {
             override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                 if (resource != null){
                     try {
-                        Palette.from(resource.toBitmap()).generate { palette ->
+                        androidx.palette.graphics.Palette.from(resource.toBitmap()).generate { palette ->
                             palette?.also {applyPalette(it, collapsingToolbarLayout)}
                         }}catch (e: Exception){
                         toast("exception thrown when generate palette")
@@ -167,7 +166,7 @@ class RecipeDetailActivity : BaseActivity(), View.OnClickListener {
         fab.setImageResource(fabIcon)
     }
 
-    private fun updateBackground(fab: FloatingActionButton, palette: Palette) {
+    private fun updateBackground(fab: FloatingActionButton, palette: androidx.palette.graphics.Palette) {
         val lightVibrantColor = palette.getLightVibrantColor(color(android.R.color.white))
         val vibrantColor = palette.getVibrantColor(color(R.color.colorAccent))
 

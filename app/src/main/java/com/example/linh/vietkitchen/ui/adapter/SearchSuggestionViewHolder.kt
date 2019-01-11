@@ -1,6 +1,6 @@
 package com.example.linh.vietkitchen.ui.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
@@ -8,7 +8,7 @@ import com.example.linh.vietkitchen.ui.model.SearchItem
 import kotlinx.android.synthetic.main.item_search_suggestion.view.*
 
 class SearchSuggestionViewHolder(val parent: ViewGroup, val listener: OnItemListeners)
-    : RecyclerView.ViewHolder(
+    : androidx.recyclerview.widget.RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_search_suggestion, parent, false)) {
 
     fun bindView(item: SearchItem){

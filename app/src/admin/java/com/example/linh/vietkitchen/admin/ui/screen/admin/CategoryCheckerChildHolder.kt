@@ -1,12 +1,12 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import kotlinx.android.synthetic.admin.item_category_checker_child.view.*
 
 class CategoryCheckerChildHolder(itemView: View, private val listener: OnItemClickListener)
-    : RecyclerView.ViewHolder(itemView) {
+    : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
     fun bindView(item: DrawerNavChildItem, payloads: MutableList<Any>) {
         itemView.cTxt.text = item.itemTitle
         itemView.setOnClickListener{

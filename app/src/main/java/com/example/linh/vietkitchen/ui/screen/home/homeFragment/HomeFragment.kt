@@ -1,13 +1,10 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
@@ -235,7 +232,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
         rcvRecipes.addOnScrollListener(rcvLoadMoreListener)
     }
 
-    override fun getRecyclerView(): RecyclerView = rcvRecipes
+    override fun getRecyclerView(): androidx.recyclerview.widget.RecyclerView = rcvRecipes
 
     override fun requestRecyclerViewLayoutChange() {
         rcvRecipes.layoutManager = getRecyclerViewLayoutManager()

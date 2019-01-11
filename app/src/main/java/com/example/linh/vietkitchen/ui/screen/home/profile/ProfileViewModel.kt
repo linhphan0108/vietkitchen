@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home.profile
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox

@@ -1,7 +1,7 @@
-package com.example.linh.vietkitchen.ui.dialog
+package com.example.linh.vietkitchen.admin.ui.screen.admin
 
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,7 +28,7 @@ class IngredientInputDialog : BottomSheetDialogFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        dialog.window.attributes.windowAnimations = R.style.DialogAnimation
+        dialog?.window?.attributes?.windowAnimations = R.style.DialogAnimation
         btnCancel.setOnClickListener { dismiss() }
         btnOk.setOnClickListener {
             if (listener != null && invalidateField()) {

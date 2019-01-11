@@ -3,16 +3,16 @@ package com.example.linh.vietkitchen.ui.screen.searchScreen
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
 import android.app.SearchManager
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.SearchView
-import android.support.v7.widget.StaggeredGridLayoutManager
+import com.google.android.material.appbar.AppBarLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -318,7 +318,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
 
     private fun setupRecyclerView() {
         val margin = resources.getDimensionPixelSize(R.dimen.padding_16)
-        rcvLikedRecipes.layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+        rcvLikedRecipes.layoutManager = androidx.recyclerview.widget.StaggeredGridLayoutManager(2, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL)
         rcvLikedRecipes.addItemDecoration(VerticalStaggeredSpaceItemDecoration(margin, margin, margin))
         rcvLikedRecipes.adapter = recipeAdapter
     }
@@ -342,7 +342,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
         if(rcvSearchSuggestion == null){
             stub_search_suggestion.visibility = View.VISIBLE
             rcvSearchSuggestion.adapter = searchSuggestionAdapter
-            rcvSearchSuggestion.layoutManager = LinearLayoutManager(this)
+            rcvSearchSuggestion.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         }
         rcvSearchSuggestion.visibility =  if (isVisible) View.VISIBLE else View.GONE
         Timber.d("setSearchSuggestionVisibility $isVisible")

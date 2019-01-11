@@ -1,6 +1,6 @@
 package com.example.linh.vietkitchen.ui.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import com.example.linh.vietkitchen.BuildConfig
@@ -10,7 +10,7 @@ import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.GlideUtil
 import kotlinx.android.synthetic.main.item_recipe.view.*
 
-class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : RecyclerView.ViewHolder(itemView) {
+class RecipeViewHolder(itemView: View, val listener: OnItemClickListener?) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
     fun bindView(recipe: Recipe, payloads: MutableList<Any>) {
         if (payloads.size > 0){

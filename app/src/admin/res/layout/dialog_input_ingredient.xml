@@ -20,7 +20,7 @@
         android:textSize="18sp"
         tools:targetApi="lollipop"/>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -32,13 +32,13 @@
             android:maxLines="2"
             android:hint="@string/hint_input_ingredient_name" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             app:layout_constraintWidth_default="percent"
             app:layout_constraintWidth_percent="0.5"
@@ -58,9 +58,9 @@
                 android:maxLength="100"
                 android:hint="@string/hint_input_ingredient_quantity" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             app:layout_constraintWidth_default="percent"
             app:layout_constraintWidth_percent="0.5"
@@ -80,10 +80,10 @@
                 android:paddingRight="@dimen/padding_8dp"
                 android:text="@string/hint_input_ingredient_unit_default"/>
 
-        </android.support.design.widget.TextInputLayout>
-    </android.support.constraint.ConstraintLayout>
+        </com.google.android.material.textfield.TextInputLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -95,13 +95,13 @@
             android:maxLines="4"
             android:hint="@string/hint_input_ingredient_notes" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="end">
-        <android.support.design.button.MaterialButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancel"
             android:layout_width="96dp"
             android:layout_height="48dp"
@@ -111,7 +111,7 @@
             android:theme="@style/CancelButtonLightTheme"
             android:text="@string/label_cancel"/>
 
-        <android.support.design.button.MaterialButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

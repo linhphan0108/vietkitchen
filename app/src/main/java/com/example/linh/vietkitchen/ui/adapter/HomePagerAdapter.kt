@@ -1,8 +1,7 @@
 package com.example.linh.vietkitchen.ui.adapter
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import com.example.linh.vietkitchen.ui.screen.home.homeFragment.HomeFragment
 import com.example.linh.vietkitchen.ui.screen.home.favorite.FavoriteFragment
 import com.example.linh.vietkitchen.ui.screen.home.profile.ProfileFragment
@@ -10,7 +9,7 @@ import android.util.SparseArray
 
 
 
-class HomePagerAdapter(fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
+class HomePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
     companion object {
         const val NUMBER_TABS = 3
         const val HOME = 0
@@ -18,8 +17,8 @@ class HomePagerAdapter(fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
         const val PROFILE = 2
     }
 
-    private val sparseArrayFragments = SparseArray<Fragment>()
-    override fun getItem(position: Int): Fragment {
+    private val sparseArrayFragments = SparseArray<androidx.fragment.app.Fragment>()
+    override fun getItem(position: Int): androidx.fragment.app.Fragment {
         return when(position){
             HOME -> {
                 return if (sparseArrayFragments.get(position) != null){

@@ -1,12 +1,9 @@
 package com.example.linh.vietkitchen.ui.screen.home
 
 import android.app.Activity
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.View
 import android.widget.TextView
 import com.example.linh.vietkitchen.R
@@ -20,7 +17,6 @@ import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
 import android.view.MenuItem
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseToolbarFragment
-import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
 
@@ -117,9 +113,9 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
         recyclerView.adapter = recipeAdapter
     }
 
-    abstract fun getRecyclerView(): RecyclerView
+    abstract fun getRecyclerView(): androidx.recyclerview.widget.RecyclerView
 
-    protected fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager{
+    protected fun getRecyclerViewLayoutManager(): androidx.recyclerview.widget.RecyclerView.LayoutManager{
         return when(recyclerViewLayoutMode){
             RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL -> {
                 getStaggeredGridLayoutManager()
@@ -130,15 +126,15 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
         }
     }
 
-    private fun getLinearLayoutManager(): LinearLayoutManager {
-        return LinearLayoutManager(context)
+    private fun getLinearLayoutManager(): androidx.recyclerview.widget.LinearLayoutManager {
+        return androidx.recyclerview.widget.LinearLayoutManager(context)
     }
 
-    private fun getStaggeredGridLayoutManager(): StaggeredGridLayoutManager {
-        return StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+    private fun getStaggeredGridLayoutManager(): androidx.recyclerview.widget.StaggeredGridLayoutManager {
+        return androidx.recyclerview.widget.StaggeredGridLayoutManager(2, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL)
     }
 
-    private fun getRecyclerViewItemDecoration(): RecyclerView.ItemDecoration{
+    private fun getRecyclerViewItemDecoration(): androidx.recyclerview.widget.RecyclerView.ItemDecoration{
         return when(recyclerViewLayoutMode){
             RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL -> {
                 val margin = resources.getDimensionPixelSize(R.dimen.padding_16)

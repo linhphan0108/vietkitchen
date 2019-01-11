@@ -2,7 +2,7 @@ package com.example.linh.vietkitchen.ui.custom.imageSpanWidget
 
 import android.content.Context
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.text.*
 import android.util.AttributeSet
 import android.widget.TextView
