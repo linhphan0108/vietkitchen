@@ -63,7 +63,9 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
         setupSwipeRefreshLayout()
         setupRecyclerView()
         observeViewModel()
-        viewModel.refreshRecipes()
+        if (savedInstanceState == null) {
+            viewModel.refreshRecipes()
+        }
     }
 
     override fun onStart() {

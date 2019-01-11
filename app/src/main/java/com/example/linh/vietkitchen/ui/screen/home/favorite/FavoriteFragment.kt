@@ -25,7 +25,9 @@ class FavoriteFragment : BaseHomeFragment() {
         super.onActivityCreated(savedInstanceState)
         setupRecyclerView()
         observeViewModel()
-        viewModel.requestLikedRecipes(userInfo.likedRecipesIds)
+        if (savedInstanceState == null) {
+            viewModel.requestLikedRecipes(userInfo.likedRecipesIds)
+        }
     }
 
     //region MVP callbacks =========================================================================
