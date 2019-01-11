@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.adapter
 
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.hannesdorfmann.adapterdelegates3.ListDelegationAdapter
+import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 
 class SearchSuggestionAdapter(items: MutableList<Entity> = mutableListOf(),
                               val listener: SearchSuggestionViewHolder.OnItemListeners)

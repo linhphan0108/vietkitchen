@@ -1,12 +1,12 @@
 package com.example.linh.vietkitchen.ui.baseMVVM
 
 import android.app.ActivityOptions
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.CollapsingToolbarLayout
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.graphics.Palette
+import com.google.android.material.appbar.CollapsingToolbarLayout
+import androidx.appcompat.app.AppCompatActivity
+import androidx.palette.graphics.Palette
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.ui.dialog.LoadingDialog
@@ -40,7 +40,7 @@ abstract class BaseActivity : AppCompatActivity() {
         startActivity(intent, activityOptions.toBundle())
     }
 
-    internal fun applyPalette(palette: Palette?, collapsingToolbarLayout: CollapsingToolbarLayout) {
+    internal fun applyPalette(palette: androidx.palette.graphics.Palette?, collapsingToolbarLayout: CollapsingToolbarLayout) {
 //        val transparent = color(android.R.color.transparent)
         var mutedPrimaryDark = color(R.color.colorPrimaryDark)
         var mutedPrimary = color(R.color.colorPrimary)

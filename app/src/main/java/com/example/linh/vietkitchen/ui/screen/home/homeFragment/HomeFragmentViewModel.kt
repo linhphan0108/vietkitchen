@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.command.DeleteImagesCommand
 import com.example.linh.vietkitchen.domain.command.DeleteRecipeCommand

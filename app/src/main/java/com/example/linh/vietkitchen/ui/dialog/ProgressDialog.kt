@@ -4,11 +4,11 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.fragment.app.DialogFragment
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.dialog_progress.*
@@ -17,7 +17,7 @@ class ProgressDialog : DialogFragment() {
 
     lateinit var listener: Listener
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         if(context is Listener) {
             listener = context
@@ -27,7 +27,7 @@ class ProgressDialog : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return inflater.inflate(R.layout.dialog_progress, container)
     }
 
@@ -46,10 +46,10 @@ class ProgressDialog : DialogFragment() {
     override fun onResume() {
         super.onResume()
         val width = (ScreenUtil.screenWidth() *0.8).toInt()
-        val params = dialog.window!!.attributes
+        val params = dialog?.window!!.attributes
         params.width = width
         params.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.window!!.attributes = params as android.view.WindowManager.LayoutParams
+        dialog?.window!!.attributes = params as android.view.WindowManager.LayoutParams
 
         txtProgress.visibility = View.GONE
         txtCounter.visibility = View.GONE

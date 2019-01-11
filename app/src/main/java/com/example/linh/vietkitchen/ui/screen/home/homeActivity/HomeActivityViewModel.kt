@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import android.os.Looper
 import com.example.linh.vietkitchen.domain.command.RequestCategoryCommand
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel

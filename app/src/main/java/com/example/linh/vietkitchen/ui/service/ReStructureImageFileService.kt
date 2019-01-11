@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.*
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
 import com.example.linh.vietkitchen.domain.command.UpdateRecipeCommand

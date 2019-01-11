@@ -3,7 +3,7 @@ package com.example.linh.vietkitchen.ui.custom.imageSpanWidget
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.text.Annotation
 import android.text.Spannable
 import android.text.SpannableStringBuilder

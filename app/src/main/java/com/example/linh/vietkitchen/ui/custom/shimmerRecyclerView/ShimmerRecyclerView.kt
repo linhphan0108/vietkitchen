@@ -1,13 +1,13 @@
 package com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.MotionEvent
 
 class ShimmerRecyclerView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : RecyclerView(context, attrs, defStyleAttr) {
+) : androidx.recyclerview.widget.RecyclerView(context, attrs, defStyleAttr) {
 
     lateinit var shimmerAdapter: ShimmerAdapter
 

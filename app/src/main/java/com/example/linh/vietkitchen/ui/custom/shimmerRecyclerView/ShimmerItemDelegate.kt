@@ -1,12 +1,12 @@
 package com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.ctx
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
+import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
 
 class ShimmerItemDelegate : AbsListItemAdapterDelegate<ShimmerItem, Entity, ShimmerItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup): ShimmerItemViewHolder {
@@ -22,7 +22,7 @@ class ShimmerItemDelegate : AbsListItemAdapterDelegate<ShimmerItem, Entity, Shim
         viewHolder.startShimmerAnimation()
     }
 
-    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+    override fun onViewAttachedToWindow(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder) {
         (holder as? ShimmerItemViewHolder)?.onViewAttachedToWindow()
         super.onViewAttachedToWindow(holder)
     }

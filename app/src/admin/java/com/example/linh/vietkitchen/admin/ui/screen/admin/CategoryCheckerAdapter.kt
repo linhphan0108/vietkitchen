@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.hannesdorfmann.adapterdelegates3.ListDelegationAdapter
+import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 
 class CategoryCheckerAdapter(items: List<Entity> = listOf(),
                              listener: CategoryCheckerChildHolder.OnItemClickListener)

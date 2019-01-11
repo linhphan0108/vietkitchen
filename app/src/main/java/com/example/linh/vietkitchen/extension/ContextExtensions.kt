@@ -2,11 +2,11 @@ package com.example.linh.vietkitchen.extension
 
 import android.content.Context
 import android.content.res.Resources
-import android.support.annotation.DimenRes
-import android.support.annotation.StringRes
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
+import androidx.annotation.DimenRes
+import androidx.annotation.StringRes
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
 import android.view.View
 import android.widget.Toast
 import com.example.linh.vietkitchen.R

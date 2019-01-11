@@ -6,7 +6,7 @@ import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.ctx
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
+import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
 
 
 open class RecipeAdapterDelegate(val listener: OnItemClickListener?) : AbsListItemAdapterDelegate<Recipe, Entity, RecipeViewHolder>() {

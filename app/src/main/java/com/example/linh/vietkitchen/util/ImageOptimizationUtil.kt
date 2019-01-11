@@ -5,7 +5,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.Paint.FILTER_BITMAP_FLAG
 import android.graphics.Bitmap
-import android.support.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.provider.MediaStore
 import java.io.*
@@ -133,7 +133,7 @@ class ImageOptimizationUtil {
         //check the rotation of the image and display it properly
         try {
             val exif = getExif(context, imageUri)
-            val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0)
+            val orientation = exif?.getAttributeInt(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, 0)
             val matrix = Matrix()
             when (orientation) {
                 6 -> matrix.postRotate(90f)
@@ -157,13 +157,13 @@ class ImageOptimizationUtil {
 //        return BitmapFactory.decodeFile(imageUri, options)
     }
 
-    private fun getExif(context: Context, imageUri: Uri): ExifInterface? {
-        var exif: ExifInterface? = null
+    private fun getExif(context: Context, imageUri: Uri): androidx.exifinterface.media.ExifInterface? {
+        var exif: androidx.exifinterface.media.ExifInterface? = null
 //        if (Build.VERSION.SDK_INT >= 24){
             var input: InputStream? = null
             try {
                 input = context.contentResolver.openInputStream(imageUri)
-                exif = ExifInterface(input)
+                exif = androidx.exifinterface.media.ExifInterface(input)
             }catch (e: IOException){
                 Timber.e(e)
             }finally {

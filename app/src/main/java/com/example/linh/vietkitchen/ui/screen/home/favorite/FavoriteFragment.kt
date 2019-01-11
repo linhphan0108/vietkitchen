@@ -1,9 +1,8 @@
 package com.example.linh.vietkitchen.ui.screen.home.favorite
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.VietKitchenApp
@@ -80,7 +79,7 @@ class FavoriteFragment : BaseHomeFragment() {
         }
     }
 
-    override fun getRecyclerView(): RecyclerView = rcvLikedRecipes
+    override fun getRecyclerView(): androidx.recyclerview.widget.RecyclerView = rcvLikedRecipes
 
     override fun requestRecyclerViewLayoutChange() {
         rcvLikedRecipes.layoutManager = getRecyclerViewLayoutManager()

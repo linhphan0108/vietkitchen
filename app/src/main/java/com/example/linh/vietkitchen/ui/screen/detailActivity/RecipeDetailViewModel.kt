@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.detailActivity
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import android.content.Intent
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand

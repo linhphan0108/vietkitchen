@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
+import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
 
 class DrawerNavChildItemDelegate(private val listener: OnItemClickListener? = null) : AbsListItemAdapterDelegate<DrawerNavChildItem, Entity, DrawerNavChildViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup)

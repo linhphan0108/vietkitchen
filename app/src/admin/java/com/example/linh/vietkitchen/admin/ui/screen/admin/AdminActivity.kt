@@ -1,16 +1,16 @@
 package com.example.linh.vietkitchen.admin.ui.screen.admin
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.chip.Chip
-import android.support.design.chip.ChipGroup
-import android.support.v7.graphics.Palette
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import androidx.palette.graphics.Palette
 import android.view.*
 import android.widget.*
 import com.example.linh.vietkitchen.R
@@ -623,7 +623,7 @@ class AdminActivity : BaseActivity(),
             override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                 if (resource != null){
                     try {
-                        Palette.from(resource.toBitmap()).generate { palette ->
+                        androidx.palette.graphics.Palette.from(resource.toBitmap()).generate { palette ->
                             palette?.also {applyPalette(it, collapsingToolbarLayout)}
                         }}catch (e: Exception){
                         toast("exception thrown when generate palette")

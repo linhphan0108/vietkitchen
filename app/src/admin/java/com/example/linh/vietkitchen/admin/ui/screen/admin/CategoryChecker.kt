@@ -2,8 +2,7 @@ package com.example.linh.vietkitchen.admin.ui.screen.admin
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
-import android.support.v7.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +39,7 @@ class CategoryChecker : BottomSheetDialogFragment(), CategoryCheckerChildHolder.
         arguments?.let { bundle ->
             val cats = bundle.getParcelableArrayList<DrawerNavGroupItem>(BK_CATEGORIES)
             val flattenCats = mutableListOf<Entity>()
-            cats.forEachIndexed { index, groupItem ->
+            cats?.forEachIndexed { index, groupItem ->
                 if(index != 0 ) { //ignore the first item (all)
                     groupItem.isChildrenVisible = true
                     flattenCats.add(groupItem)
@@ -52,7 +51,7 @@ class CategoryChecker : BottomSheetDialogFragment(), CategoryCheckerChildHolder.
         }
     }
 
-    override fun onDismiss(dialog: DialogInterface?) {
+    override fun onDismiss(dialog: DialogInterface) {
         callback.onDismiss(listCatsChecked)
         super.onDismiss(dialog)
     }
@@ -60,7 +59,7 @@ class CategoryChecker : BottomSheetDialogFragment(), CategoryCheckerChildHolder.
     private fun setupRecyclerView(categories: MutableList<Entity>) {
         adapter = CategoryCheckerAdapter(categories, this)
         rcvCategoryChecker.adapter = adapter
-        rcvCategoryChecker.layoutManager = LinearLayoutManager(context)
+        rcvCategoryChecker.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         rcvCategoryChecker.addItemDecoration(VerticalSpaceItemDecoration(resources.getDimensionPixelSize(R.dimen.rcv_item_decoration_1dp), 0,
                 resources.getDimensionPixelSize(R.dimen.rcv_item_decoration)))
 

@@ -3,7 +3,7 @@ package com.example.linh.vietkitchen.ui.custom
 import android.content.Context
 import android.view.View
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.util.AttributeSet
 import timber.log.Timber
 

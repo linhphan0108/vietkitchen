@@ -7,7 +7,7 @@ import android.app.NotificationChannel
 import android.content.Context
 import android.net.Uri
 import android.os.*
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import com.example.linh.vietkitchen.R
 import android.os.Messenger
 import com.example.linh.vietkitchen.data.cloud.ImageUpload

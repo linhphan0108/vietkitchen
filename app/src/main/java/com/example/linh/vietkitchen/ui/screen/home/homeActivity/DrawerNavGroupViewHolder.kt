@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
@@ -12,7 +12,7 @@ import com.example.linh.vietkitchen.extension.getDimension
 
 
 class DrawerNavGroupViewHolder(itemView: View, private val listener: OnGroupItemClickListener? = null)
-    : RecyclerView.ViewHolder(itemView) {
+    : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
     fun bindView(item: DrawerNavGroupItem, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()){

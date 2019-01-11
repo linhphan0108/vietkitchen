@@ -1,9 +1,9 @@
 package com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.hannesdorfmann.adapterdelegates3.ListDelegationAdapter
+import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 import timber.log.Timber
 
 private const val DEFAULT_NUMBER_OF_SHIMMER_ITEMS = 5
@@ -89,12 +89,12 @@ open class ShimmerAdapter : ListDelegationAdapter<MutableList<Entity>>(){
         isLoadingMore = false
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         Timber.e("onCreateViewHolder")
         return super.onCreateViewHolder(parent, viewType)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         Timber.e("onBindViewHolder")
         super.onBindViewHolder(holder, position)
     }

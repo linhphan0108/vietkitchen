@@ -1,8 +1,8 @@
 package com.example.linh.vietkitchen.ui.screen.splashScreen
 
 import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -95,7 +95,7 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     override fun observeViewModel() {
-        viewModel.silentLoginStatus.observe(this, android.arch.lifecycle.Observer { box ->
+        viewModel.silentLoginStatus.observe(this, androidx.lifecycle.Observer { box ->
             box?.let {
                 when(box.code){
                     Status.HAS_LOGGED_IN -> {

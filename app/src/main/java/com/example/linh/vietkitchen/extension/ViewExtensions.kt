@@ -1,7 +1,7 @@
 package com.example.linh.vietkitchen.extension
 
 import android.content.Context
-import android.support.annotation.DimenRes
+import androidx.annotation.DimenRes
 import android.view.View
 import android.widget.TextView
 

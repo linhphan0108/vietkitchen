@@ -1,8 +1,8 @@
 package com.example.linh.vietkitchen.ui.custom
 
 import android.content.Context
-import android.support.design.widget.NavigationView
-import android.support.v4.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
+import androidx.drawerlayout.widget.DrawerLayout
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -11,7 +11,7 @@ import android.view.View
 class InterceptedDrawerLayout
 @JvmOverloads
 constructor(context: Context, private var attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-    : DrawerLayout(context, attrs, defStyleAttr) {
+    : androidx.drawerlayout.widget.DrawerLayout(context, attrs, defStyleAttr) {
 
 //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 //    constructor(

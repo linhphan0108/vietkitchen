@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import com.example.linh.vietkitchen.ui.model.DrawerNavHeader
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.UserInfo
-import com.hannesdorfmann.adapterdelegates3.AbsListItemAdapterDelegate
+import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
 
 class DrawerNavHeaderLayoutDelegate(private val userInfo: UserInfo) : AbsListItemAdapterDelegate<DrawerNavHeader, Entity, DrawerNavHeaderViewHolder>(){
     override fun onCreateViewHolder(parent: ViewGroup): DrawerNavHeaderViewHolder {
