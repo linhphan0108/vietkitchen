@@ -30,7 +30,21 @@
         <activity android:name=".ui.screen.detailActivity.RecipeDetailActivity"
                   android:theme="@style/TranslucentStatusBar"
                   android:launchMode="singleTop"
-                  android:screenOrientation="sensor"/>
+                  android:screenOrientation="sensor">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <!--note that the leading "/" is required for pathPrefix-->
+                <data android:scheme="http"
+                      android:host="www.example.com"
+                      android:pathPrefix="/gizmos" />
+                <!--Accepts URIs that begin with "example://gizmos”-->
+                <data android:scheme="example"
+                      android:host="gizmos" />
+            </intent-filter>
+        </activity>
 
         <activity android:name=".admin.ui.screen.admin.AdminActivity"
                   android:theme="@style/TranslucentStatusBar"/>
