@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
+import com.example.linh.vietkitchen.ui.adapter.viewholder.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.detailActivity.BK_LIKE_STATE_JUST_CHANGED
@@ -161,6 +161,11 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
             RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL -> R.drawable.outline_view_module_24
             RecyclerViewLayoutMode.MODE_LINENEAR_VERTICAL -> R.drawable.outline_view_agenda_24
         }
+    }
+
+    fun scrollToTop(){
+        getRecyclerView().stopScroll()
+        getRecyclerView().smoothScrollToPosition(0)
     }
 
     abstract fun requestRecyclerViewLayoutChange()

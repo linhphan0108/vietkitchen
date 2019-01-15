@@ -1,9 +1,10 @@
-package com.example.linh.vietkitchen.ui.adapter
+package com.example.linh.vietkitchen.ui.adapter.delegation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.ctx
+import com.example.linh.vietkitchen.ui.adapter.viewholder.LoadMoreViewHolder
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.LoadMoreItem
 import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate

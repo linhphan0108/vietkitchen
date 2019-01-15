@@ -62,7 +62,6 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
         Timber.e("on activity created")
         setupSwipeRefreshLayout()
         setupRecyclerView()
-        observeViewModel()
         if (savedInstanceState == null) {
             viewModel.refreshRecipes()
         }
@@ -121,7 +120,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
         return viewModel
     }
 
-    private fun onFoodsRequestSuccess(recipes: List<Entity>) {
+    private fun onRequestRecipesSuccess(recipes: List<Entity>) {
         recipeAdapter.items = recipes.toMutableList()
         swipeRefresh.isRefreshing = false
     }
@@ -132,7 +131,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
 
 
     private fun onLoadMoreFailed() {
-        recipeAdapter.stopLoadMore()
+//        recipeAdapter.stopLoadMore()
     }
 
     private fun onStartRefresh(){
@@ -153,7 +152,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
     }
 
     private fun onDeleteRecipeSuccess(adapterPosition: Int) {
-        recipeAdapter.removeItem(adapterPosition)
+//        recipeAdapter.removeItem(adapterPosition)
         toast("recipe deleted successfully")
     }
 
@@ -161,7 +160,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
         toast(msg)
     }
 
-    fun onStartLoadMore() {
+    private fun onStartLoadMore() {
         recipeAdapter.startLoadMore()
     }
     //endregion MVP callbacks
@@ -204,9 +203,9 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
                     Status.ERROR -> {onRequestRecipesFailed(box.message ?: getString(R.string.error_msg))}
                     Status.LOAD_MORE_ERROR -> {onLoadMoreFailed()}
                     Status.REFRESH -> {onStartRefresh()}
-                    Status.LOAD_MORE,
+                    Status.LOAD_MORE -> {onStartLoadMore()}
                     Status.SUCCESS -> {
-                        onFoodsRequestSuccess(box.data!!)
+                        onRequestRecipesSuccess(box.data!!)
                         onStopRefresh()
                     }
                 }
@@ -238,11 +237,6 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
 
     override fun requestRecyclerViewLayoutChange() {
         rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
-    }
-
-    fun scrollToTop(){
-        rcvRecipes.stopScroll()
-        rcvRecipes.smoothScrollToPosition(0)
     }
 
     //endregion inner classes

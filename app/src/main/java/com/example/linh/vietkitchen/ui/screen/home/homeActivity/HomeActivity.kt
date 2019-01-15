@@ -9,13 +9,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import com.google.android.material.appbar.AppBarLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.navigation.NavigationView
-import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.core.view.GravityCompat
-import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
@@ -246,7 +242,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        drawerNavView.addHeaderView(headerView)
 //        drawerNavView.getHeaderView(0).visibility = View.GONE
         drawerNavAdapter = DrawerNavRcAdapter(drawerNavExpandableRc, childItemClickListener= this)
-        drawerNavExpandableRc.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        drawerNavExpandableRc.layoutManager = LinearLayoutManager(this)
         drawerNavExpandableRc.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
         drawerNavExpandableRc.adapter = drawerNavAdapter
     }

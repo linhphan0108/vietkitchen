@@ -1,23 +1,25 @@
 package com.example.linh.vietkitchen.ui.adapter
 
 import com.example.linh.vietkitchen.extension.findIndex
+import com.example.linh.vietkitchen.ui.adapter.base.AbsLoadMoreAdapter
+import com.example.linh.vietkitchen.ui.adapter.delegation.RecipeAdapterDelegate
+import com.example.linh.vietkitchen.ui.adapter.diffUtil.RecipeDiffUtilCallback
+import com.example.linh.vietkitchen.ui.adapter.viewholder.OnItemClickListener
+import com.example.linh.vietkitchen.ui.adapter.viewholder.PayLoads
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
 
-class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
-                    val listener: OnItemClickListener? = null) : LoadMoreAdapter() {
+class RecipeAdapter(items: List<Entity> = listOf(),
+                    val listener: OnItemClickListener? = null) : AbsLoadMoreAdapter() {
+
     init {
         delegatesManager.addDelegate(RecipeAdapterDelegate(listener))
+        diffUtilCallback.diffUtilDelegateManager.add(RecipeDiffUtilCallback())
         setItems(items)
     }
 
-    override fun setItems(items: MutableList<Entity>?) {
-        super.setItems(items)
-        notifyDataSetChanged()
-    }
-
     fun refresh(){
-        items.clear()
+        items = listOf()
         notifyDataSetChanged()
     }
 
@@ -34,8 +36,10 @@ class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
             (items[index] as Recipe).hasLiked = true
             notifyItemChanged(index, PayLoads.LIKE_CHANGE)
         }else{
-            items.add(0, recipe)
-            notifyItemInserted(0)
+            val mutableList = mutableListOf<Entity>()
+            mutableList.add(recipe)
+            mutableList.addAll(items)
+            items = mutableList
         }
     }
 
@@ -50,8 +54,10 @@ class RecipeAdapter(items: MutableList<Entity> = mutableListOf(),
         }
         if (index > -1){
             if (shouldRemove){
-                items.removeAt(index)
-                notifyItemRemoved(index)
+                val mutableList = mutableListOf<Entity>()
+                mutableList.addAll(items)
+                mutableList.removeAt(index)
+                items = mutableList
             }else {
                 (items[index] as Recipe).hasLiked = false
                 notifyItemChanged(index, PayLoads.LIKE_CHANGE)

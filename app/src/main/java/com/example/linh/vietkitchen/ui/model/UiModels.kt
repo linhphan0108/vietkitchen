@@ -39,10 +39,10 @@ class Ingredient(val name: String? = null, val notes: String?, val quantity: Int
     }
 }
 
-class Recipe(val id: String? = "", val name: String, val intro: CharSequence?, val ingredient: CharSequence, val spice: CharSequence,
+class Recipe(id: String? = "", val name: String, val intro: CharSequence?, val ingredient: CharSequence, val spice: CharSequence,
              var preparation: CharSequence, var processing: CharSequence, val notes: CharSequence?, val categories: List<String>,
              var tags: List<String>?, var thumbUrl: String, var imageUrl: String,
-             var hasLiked: Boolean = false) : Entity(), Parcelable {
+             var hasLiked: Boolean = false) : Entity(id), Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),//id
             parcel.readString()!!,//name
@@ -156,6 +156,13 @@ class Recipe(val id: String? = "", val name: String, val intro: CharSequence?, v
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        var result = false
+        if (other != null && other is Recipe){
+            result = hasLiked == other.hasLiked
+        }
+        return result
+    }
 }
 
 data class ProcessStep(val step: String = "", val imageUrl: String = "") : Parcelable{

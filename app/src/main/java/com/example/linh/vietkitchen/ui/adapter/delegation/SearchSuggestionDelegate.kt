@@ -1,6 +1,7 @@
-package com.example.linh.vietkitchen.ui.adapter
+package com.example.linh.vietkitchen.ui.adapter.delegation
 
 import android.view.ViewGroup
+import com.example.linh.vietkitchen.ui.adapter.viewholder.SearchSuggestionViewHolder
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.SearchItem
 import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate

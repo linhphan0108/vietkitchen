@@ -1,12 +1,15 @@
-package com.example.linh.vietkitchen.ui.adapter
+package com.example.linh.vietkitchen.ui.adapter.base
 
+import com.example.linh.vietkitchen.ui.adapter.delegation.LoadMoreAdapterDelegate
+import com.example.linh.vietkitchen.ui.adapter.diffUtil.LoadMoreDiffUtilCallback
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.LoadMoreItem
-import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 
-abstract class LoadMoreAdapter: ListDelegationAdapter<MutableList<Entity>>() {
+abstract class AbsLoadMoreAdapter:
+        AsyncListEntityDifferDelegationAdapter() {
     init {
         delegatesManager.addDelegate(LoadMoreAdapterDelegate())
+        addDiffUtilDelegate(LoadMoreDiffUtilCallback())
     }
 
     fun getItemAt(position: Int): Entity? {
@@ -24,13 +27,13 @@ abstract class LoadMoreAdapter: ListDelegationAdapter<MutableList<Entity>>() {
         val length = items.size
         this.items.addAll(items)
         notifyItemRangeInserted(lastSize, length)
-
     }
 
     fun startLoadMore(){
-        val count = itemCount
-        items.add(LoadMoreItem())
-        notifyItemInserted(count)
+        val mutableList = mutableListOf<Entity>()
+        mutableList.addAll(items)
+        mutableList.add(LoadMoreItem())
+        items = mutableList
     }
 
     fun stopLoadMore(){
