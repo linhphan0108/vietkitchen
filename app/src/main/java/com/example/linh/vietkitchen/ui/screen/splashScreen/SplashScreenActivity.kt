@@ -10,11 +10,9 @@ import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
-import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import timber.log.Timber
@@ -32,8 +30,6 @@ class SplashScreenActivity : BaseActivity() {
 
     private lateinit var viewModel: SplashScreenViewModel
     private val timeStartedSplashScreen: Long = System.currentTimeMillis()
-
-    lateinit var userInfo: UserInfo
 
     //region lifecycle callbacks ===================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,8 +122,7 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     private fun onHasLoggedIn() {
-        userInfo = VietKitchenApp.userInfo
-        viewModel.requestLikedRecipesId(userInfo.uid)
+        viewModel.requestLikedRecipesId()
     }
 
     private fun onHasNotLoggedIn() {

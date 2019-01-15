@@ -52,13 +52,13 @@ class SplashScreenViewModel(application: Application,
                 }
     }
 
-    fun requestLikedRecipesId(uid: String) {
+    fun requestLikedRecipesId() {
         launchDataLoad({
             val recipesId = withIoContext {
-                requestRecipesIdCommand.uid = uid
+                requestRecipesIdCommand.uid = userInfo.uid
                 requestRecipesIdCommand.execute(getApplication())
             }
-            userInfo.likedRecipesIds = recipesId.toMutableList()
+            userInfo.likedRecipesIds = recipesId.reversed().toMutableList()
             userInfo.numberFavoriteRecipes = recipesId.size
             likedRecipesId.value = StatusBox(Status.SUCCESS)
         }, {e->
