@@ -10,14 +10,12 @@ import com.example.linh.vietkitchen.domain.command.UpdateCategoriesCommand
 import com.example.linh.vietkitchen.extension.removeLast
 import com.example.linh.vietkitchen.util.TimberUtils
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 import com.example.linh.vietkitchen.util.RecipeUtil
@@ -44,9 +42,9 @@ class HomeFragmentViewModel(application: Application,
     private var hasReachLastRecord = false
 
     lateinit var categories: List<DrawerNavGroupItem>
-    internal var requestRecipesStatus: MutableLiveData<StatusBox<List<Entity>>> = MutableLiveData()
     internal var deleteRecipeStatus: MutableLiveData<StatusBox<Int>> = MutableLiveData()
-    private var listRecipes: MutableList<Entity> = mutableListOf()
+    internal var requestRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
+    private var listRecipes: MutableList<Recipe> = mutableListOf()
 
     private fun fetchRecipes(){
         launchDataLoad({
@@ -92,9 +90,7 @@ class HomeFragmentViewModel(application: Application,
     fun loadMoreRecipe() {
         if(isLoadMoreRecipe || isFreshRecipe || hasReachLastRecord) return
         isLoadMoreRecipe = true
-        if(addLoadMoreItem(listRecipes)){
-            requestRecipesStatus.value = StatusBox(Status.LOAD_MORE, data = listRecipes)
-        }
+        requestRecipesStatus.value = StatusBox(Status.LOAD_MORE)
         fetchRecipes()
     }
 

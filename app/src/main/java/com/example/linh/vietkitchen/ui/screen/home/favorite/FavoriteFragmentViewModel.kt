@@ -15,7 +15,9 @@ class FavoriteFragmentViewModel(application: Application,
         private val likedRecipesCommand: RequestLikedRecipesCommand = RequestLikedRecipesCommand())
     : BaseHomeViewModel(application){
 
-    internal val requestLikeRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
+    val requestLikeRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
+    private var listRecipes: MutableList<Recipe> = mutableListOf()
+
 
     fun requestLikedRecipes(ids: List<String>?) {
         if (ids.isNullOrEmpty()){
@@ -32,7 +34,9 @@ class FavoriteFragmentViewModel(application: Application,
             if (likedRecipes.isNullOrEmpty()){
                 requestLikeRecipesStatus.value = StatusBox(Status.ERROR_EMPTY)
             }else{
-                requestLikeRecipesStatus.value = StatusBox(Status.SUCCESS, data = likedRecipes)
+                listRecipes.clear()
+                listRecipes.addAll(likedRecipes)
+                requestLikeRecipesStatus.value = StatusBox(Status.SUCCESS, data = listRecipes)
             }
         }, onError = {
             requestLikeRecipesStatus.value = StatusBox(Status.ERROR, it.message)

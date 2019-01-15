@@ -4,9 +4,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
@@ -24,11 +26,12 @@ class FavoriteFragment : BaseHomeFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupRecyclerView()
-        observeViewModel()
         if (savedInstanceState == null) {
             viewModel.requestLikedRecipes(userInfo.likedRecipesIds)
         }
     }
+
+
 
     //region MVP callbacks =========================================================================
     override fun getFragmentLayoutRes() = R.layout.fragment_favorite
@@ -42,8 +45,8 @@ class FavoriteFragment : BaseHomeFragment() {
     }
 
     private fun onRequestLikedRecipesSuccess(recipes: List<Recipe>) {
-        recipeAdapter.items = recipes.toMutableList()
-        checkNoData()
+        recipeAdapter.items = recipes
+        setNoDataVisibility(recipes.isNullOrEmpty())
     }
 
     private fun onRequestLikedRecipesFailed() {
@@ -51,12 +54,17 @@ class FavoriteFragment : BaseHomeFragment() {
 
     override fun onLikeEventObserve(recipe: Recipe) {
         recipeAdapter.onLike(recipe)
-        checkNoData()
+        setNoDataVisibility(recipeAdapter.itemCount > 0)
+        if(recipeAdapter.itemCount > 0) {
+            rcvLikedRecipes.postDelayed({
+                scrollToTop()
+            }, 100)
+        }
     }
 
     override fun onUnlikeEventObserve(recipe: Recipe) {
         recipeAdapter.onUnLike(recipe, true)
-        checkNoData()
+        setNoDataVisibility(recipeAdapter.itemCount > 0)
     }
     //endregion MVP callbacks
 
@@ -73,15 +81,15 @@ class FavoriteFragment : BaseHomeFragment() {
         })
     }
 
-    private fun checkNoData(){
-        if (recipeAdapter.itemCount <= 0){
-            txtNoData.visibility = View.VISIBLE
+    private fun setNoDataVisibility(isVisible: Boolean){
+        if (isVisible){
+            txtNoData.visibility = View.GONE
         }else{
             txtNoData.visibility = View.GONE
         }
     }
 
-    override fun getRecyclerView(): androidx.recyclerview.widget.RecyclerView = rcvLikedRecipes
+    override fun getRecyclerView(): RecyclerView = rcvLikedRecipes
 
     override fun requestRecyclerViewLayoutChange() {
         rcvLikedRecipes.layoutManager = getRecyclerViewLayoutManager()

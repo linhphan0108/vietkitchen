@@ -1,6 +1,5 @@
-package com.example.linh.vietkitchen.ui.adapter
+package com.example.linh.vietkitchen.ui.adapter.viewholder
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import com.example.linh.vietkitchen.BuildConfig

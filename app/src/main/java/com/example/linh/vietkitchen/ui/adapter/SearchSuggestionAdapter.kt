@@ -1,5 +1,7 @@
 package com.example.linh.vietkitchen.ui.adapter
 
+import com.example.linh.vietkitchen.ui.adapter.delegation.SearchSuggestionDelegate
+import com.example.linh.vietkitchen.ui.adapter.viewholder.SearchSuggestionViewHolder
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 

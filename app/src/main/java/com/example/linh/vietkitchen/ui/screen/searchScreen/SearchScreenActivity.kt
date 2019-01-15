@@ -10,19 +10,17 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import com.google.android.material.appbar.AppBarLayout
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.adapter.OnItemClickListener
+import com.example.linh.vietkitchen.ui.adapter.viewholder.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionAdapter
-import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionViewHolder
+import com.example.linh.vietkitchen.ui.adapter.viewholder.SearchSuggestionViewHolder
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
@@ -141,8 +139,8 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
     //region end activity cycle callbacks
 
     //region MVP implements ======================================================================
-    private fun onRecipesRequestSuccess(recipes: MutableList<Entity>) {
-        recipeAdapter.items = recipes.toMutableList()
+    private fun onRecipesRequestSuccess(recipes: List<Entity>) {
+        recipeAdapter.items = recipes
         checkNoData()
         hideProgress()
     }
@@ -249,7 +247,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
             Timber.d("handle intent -> query = $query")
             title = query.query
             viewModel.refreshRecipes(query)
-            recipeAdapter.items = mutableListOf()
+            recipeAdapter.items = listOf()
         }
     }
 
