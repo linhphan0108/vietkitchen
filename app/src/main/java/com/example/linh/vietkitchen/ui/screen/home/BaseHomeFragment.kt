@@ -5,7 +5,6 @@ import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.adapter.viewholder.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
@@ -16,7 +15,12 @@ import com.example.linh.vietkitchen.util.RecyclerViewLayoutMode
 import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
 import android.view.MenuItem
+import com.example.linh.vietkitchen.extension.color
+import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseToolbarFragment
+import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
+import com.example.linh.vietkitchen.util.Constants
+import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
 
@@ -27,7 +31,7 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
     private var recyclerViewLayoutMode = RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL
     private var lastItemClicked = -1
     lateinit var recipeAdapter: RecipeAdapter
-    lateinit var txtNoDataSuper: TextView
+    private lateinit var rcvLoadMoreListener: EndlessScrollListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,9 +80,41 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
         }
     }
 
+    override fun getFragmentLayoutRes() = R.layout.fragment_home
     abstract override fun getViewModel(): BaseHomeViewModel
     internal abstract fun onLikeEventObserve(recipe: Recipe)
     internal abstract fun onUnlikeEventObserve(recipe: Recipe)
+
+    //================== view model callbacks ======================================================
+    protected fun onStartRefresh(){
+        swipeRefresh.isRefreshing = true
+        recipeAdapter.refresh()
+    }
+
+    protected fun onStopRefresh(){
+        swipeRefresh.isRefreshing = false
+    }
+
+    protected fun onStartLoadMore() {
+        recipeAdapter.startLoadMore()
+    }
+
+    protected fun onRequestRecipesSuccess(recipes: List<Recipe>) {
+        recipeAdapter.items = recipes
+        swipeRefresh.isRefreshing = false
+        setNoDataVisibility(recipes.isNullOrEmpty())
+    }
+
+    protected fun onRequestRecipesNoData() {
+    }
+
+    protected fun onRequestRecipesFailed(msg: String?) {
+        toast(msg ?: getString(R.string.error_msg))
+    }
+
+    protected fun onLoadMoreFailed() {
+//        recipeAdapter.stopLoadMore()
+    }
 
     //recycler view callback
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe) {
@@ -111,11 +147,31 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
         recyclerView.layoutManager = getRecyclerViewLayoutManager()
         recyclerView.addItemDecoration(getRecyclerViewItemDecoration())
         recyclerView.adapter = recipeAdapter
+        rcvLoadMoreListener = object : EndlessScrollListener(Constants.VISIBLE_THRESHOLD_TO_LOAD_MORE) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
+                rcvRecipes.post { getViewModel().loadMoreRecipe() }
+                Timber.d("rcvLoadMoreListener")
+                return true
+            }
+        }
+        rcvRecipes.addOnScrollListener(rcvLoadMoreListener)
     }
 
-    abstract fun getRecyclerView(): androidx.recyclerview.widget.RecyclerView
+    private fun setupSwipeRefreshLayout() {
+        val progressColor1 = context?.color(R.color.color_wave_refresh_progress_1) ?: 0
+        val progressColor2 = context?.color(R.color.color_wave_refresh_progress_2) ?: 0
+        val progressColor3 = context?.color(R.color.color_wave_refresh_progress_3) ?: 0
+        swipeRefresh.setColorSchemeColors(progressColor1, progressColor2, progressColor3)
+        swipeRefresh.isRefreshing = true
+        swipeRefresh.setOnRefreshListener {
+            rcvLoadMoreListener.onRefresh()
+            getViewModel().refreshRecipes()
+        }
+    }
 
-    protected fun getRecyclerViewLayoutManager(): androidx.recyclerview.widget.RecyclerView.LayoutManager{
+    protected fun getRecyclerView() = rcvRecipes
+
+    private fun getRecyclerViewLayoutManager(): androidx.recyclerview.widget.RecyclerView.LayoutManager{
         return when(recyclerViewLayoutMode){
             RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL -> {
                 getStaggeredGridLayoutManager()
@@ -168,6 +224,16 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
         getRecyclerView().smoothScrollToPosition(0)
     }
 
-    abstract fun requestRecyclerViewLayoutChange()
+    protected fun setNoDataVisibility(isVisible: Boolean){
+        if (isVisible){
+            txtNoData.visibility = View.GONE
+        }else{
+            txtNoData.visibility = View.GONE
+        }
+    }
+
+    private fun requestRecyclerViewLayoutChange() {
+        rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
+    }
     //endregion inner methods
 }

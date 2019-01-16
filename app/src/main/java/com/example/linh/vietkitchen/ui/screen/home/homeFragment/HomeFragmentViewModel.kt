@@ -87,14 +87,18 @@ class HomeFragmentViewModel(application: Application,
         }, false)
     }
 
-    fun loadMoreRecipe() {
+    override fun loadMoreRecipe() {
         if(isLoadMoreRecipe || isFreshRecipe || hasReachLastRecord) return
         isLoadMoreRecipe = true
         requestRecipesStatus.value = StatusBox(Status.LOAD_MORE)
         fetchRecipes()
     }
 
-    fun refreshRecipes(category: String? = null) {
+    override fun refreshRecipes() {
+        this.refreshRecipesByCat()
+    }
+
+    fun refreshRecipesByCat(category: String? = null) {
         isFreshRecipe = true
         isLoadMoreRecipe = false
         hasReachLastRecord = false

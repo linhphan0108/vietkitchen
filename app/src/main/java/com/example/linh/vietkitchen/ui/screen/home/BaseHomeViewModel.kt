@@ -28,6 +28,9 @@ abstract class BaseHomeViewModel(application: Application,
         super.onCleared()
     }
 
+    abstract fun refreshRecipes()
+    abstract fun loadMoreRecipe()
+
     fun likeRecipe(recipe: Recipe) {
         launchDataLoad(ioBlock = {
             withIoContext {
