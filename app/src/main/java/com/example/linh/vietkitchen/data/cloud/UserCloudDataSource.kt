@@ -15,7 +15,8 @@ class UserCloudDataSource : UserDataSource{
 
     override suspend fun likeRecipe(uid: String, recipeKey: String): Response<String> {
         val newDbRef = dbRef.child(uid).child(STORAGE_USER_LIKED_RECIPES_PATH).child(recipeKey)
-        val id = newDbRef.setValueAwait(true)
+        val timeStamp = System.currentTimeMillis()
+        val id = newDbRef.setValueAwait(timeStamp)
         return Response(RESPONSE_SUCCESS, id)
     }
 
@@ -27,7 +28,8 @@ class UserCloudDataSource : UserDataSource{
 
     override suspend fun getLikedRecipesId(uid: String): Response<DataSnapshot> {
         val dbRef = dbRef.child(uid).child(STORAGE_USER_LIKED_RECIPES_PATH)
-        val dataSnapshot = dbRef.addListenerForSingleValueEventAwait()
+        val query = dbRef.orderByKey()
+        val dataSnapshot = query.addListenerForSingleValueEventAwait()
         return Response(RESPONSE_SUCCESS, dataSnapshot)
     }
 }
