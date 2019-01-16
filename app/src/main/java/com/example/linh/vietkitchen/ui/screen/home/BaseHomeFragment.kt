@@ -36,19 +36,11 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        getViewModel().likeOrUnlikeAction.observe(this, Observer {recipe ->
-            recipe?.let {
-                if (it.hasLiked){
-                    onLikeEventObserve(it)
-                }else{
-                    onUnlikeEventObserve(it)
-                }
-            }
-        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        setupSwipeRefreshLayout()
         setupRecyclerView()
     }
 
@@ -235,5 +227,18 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
     private fun requestRecyclerViewLayoutChange() {
         rcvRecipes.layoutManager = getRecyclerViewLayoutManager()
     }
+
+    override fun observeViewModel() {
+        getViewModel().likeOrUnlikeAction.observe(this, Observer {recipe ->
+            recipe?.let {
+                if (it.hasLiked){
+                    onLikeEventObserve(it)
+                }else{
+                    onUnlikeEventObserve(it)
+                }
+            }
+        })
+    }
+
     //endregion inner methods
 }

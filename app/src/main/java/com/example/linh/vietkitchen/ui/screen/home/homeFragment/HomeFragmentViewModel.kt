@@ -68,10 +68,9 @@ class HomeFragmentViewModel(application: Application,
 
             lastRecipeId = pagingResponse.lastId
             hasReachLastRecord = pagingResponse.isEnd
+            requestRecipesStatus.value = StatusBox(Status.SUCCESS, data = listRecipes.toList())
             isFreshRecipe = false
             isLoadMoreRecipe = false
-
-            requestRecipesStatus.value = StatusBox(Status.SUCCESS, data = listRecipes.toList())
         }, { e ->
             Timber.e(e)
             when{

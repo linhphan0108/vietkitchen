@@ -150,6 +150,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
 
     //region inner methods =========================================================================
     override fun observeViewModel(){
+        super.observeViewModel()
         getViewModel().requestRecipesStatus.observe(this, Observer { box ->
             box?.let {
                 when(box.code){

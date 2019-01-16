@@ -3,7 +3,6 @@ package com.example.linh.vietkitchen.ui.screen.home.favorite
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
@@ -16,16 +15,13 @@ class FavoriteFragment : BaseHomeFragment() {
     }
 
     private lateinit var viewModel: FavoriteFragmentViewModel
-    private val userInfo by lazy { VietKitchenApp.userInfo }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (savedInstanceState == null) {
-            viewModel.requestLikedRecipes(userInfo.likedRecipesIds)
+            viewModel.refreshRecipes()
         }
     }
-
-
 
     //region MVP callbacks =========================================================================
     override fun getViewModel(): BaseHomeViewModel {
@@ -52,6 +48,7 @@ class FavoriteFragment : BaseHomeFragment() {
 
     //region inner methods =========================================================================
     override fun observeViewModel(){
+        super.observeViewModel()
         viewModel.requestLikeRecipesStatus.observe(this, Observer { box ->
             box?.let {
                 when(box.code) {
