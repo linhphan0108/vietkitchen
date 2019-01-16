@@ -18,6 +18,11 @@ class FavoriteFragmentViewModel(application: Application,
     val requestLikeRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
     private var listRecipes: MutableList<Recipe> = mutableListOf()
 
+    override fun refreshRecipes() {
+    }
+
+    override fun loadMoreRecipe() {
+    }
 
     fun requestLikedRecipes(ids: List<String>?) {
         if (ids.isNullOrEmpty()){

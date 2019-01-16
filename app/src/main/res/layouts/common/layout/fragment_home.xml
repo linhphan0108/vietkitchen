@@ -13,4 +13,14 @@
             android:paddingEnd="@dimen/padding_8dp"
             tools:listitem="@layout/item_recipe"/>
 
+        <TextView
+            android:id="@+id/txtNoData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="22sp"
+            android:background="@color/divider"
+            android:text="@string/no_favorite_recipe"
+            android:visibility="gone"/>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
