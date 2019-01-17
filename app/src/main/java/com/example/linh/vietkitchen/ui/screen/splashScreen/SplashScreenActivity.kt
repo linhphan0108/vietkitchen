@@ -9,6 +9,7 @@ import android.os.Handler
 import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.extension.showSnackBar
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
@@ -26,15 +27,25 @@ class SplashScreenActivity : BaseActivity() {
     companion object {
         private const val RC_SIGN_IN = 123
         private const val TIME_WAITING_IN_SPLASH_SCREEN = 7000//in millisecond
+        private const val MAX_TIME_TO_RETRY = 3
+        private const val ARG_SPLASH_SCREEN_TIME_STARTED = "ARG_SPLASH_SCREEN_TIME_STARTED"
+        private const val ARG_RETRY_REQUEST_CATEGORY_TIMES = "ARG_RETRY_REQUEST_CATEGORY_TIMES"
+        private const val ARG_RETRY_REQUEST_RECIPES_IDS_TIMES = "ARG_RETRY_REQUEST_RECIPES_IDS_TIMES"
     }
 
     private lateinit var viewModel: SplashScreenViewModel
-    private val timeStartedSplashScreen: Long = System.currentTimeMillis()
+    private var timeStartedSplashScreen: Long = System.currentTimeMillis()
+    private var retryRequestCategoryTimes = 0
+    private var retryRequestListLikedRecipesIdsTimes = 0
 
     //region lifecycle callbacks ===================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        savedInstanceState?.let {
+            timeStartedSplashScreen = it.getLong(ARG_SPLASH_SCREEN_TIME_STARTED)
+            retryRequestCategoryTimes = it.getInt(ARG_RETRY_REQUEST_CATEGORY_TIMES)
+            retryRequestListLikedRecipesIdsTimes = it.getInt(ARG_RETRY_REQUEST_RECIPES_IDS_TIMES)
+        }
         slackLoadingView.start()
         txtAppNameVersion.text = getString(R.string.app_name_version, BuildConfig.VERSION_NAME)
         viewModel.checkLogin()
@@ -76,6 +87,13 @@ class SplashScreenActivity : BaseActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putLong(ARG_SPLASH_SCREEN_TIME_STARTED, timeStartedSplashScreen)
+        outState.putInt(ARG_RETRY_REQUEST_CATEGORY_TIMES, retryRequestCategoryTimes)
+        outState.putInt(ARG_RETRY_REQUEST_RECIPES_IDS_TIMES, retryRequestListLikedRecipesIdsTimes)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onBackPressed() {
         finish()
     }
@@ -114,6 +132,16 @@ class SplashScreenActivity : BaseActivity() {
                 }
             }
         })
+        viewModel.requestNavStatus.observe(this, Observer {box ->
+            box?.let {
+                when(box.code){
+                    Status.ERROR_NO_INTERNET -> {onNoInternetException()}
+                    Status.ERROR -> {onRequestCategoriesFailed(box.message)}
+                    Status.SUCCESS -> {viewModel.requestLikedRecipesId()}
+
+                }
+            }
+        })
     }
 
     private fun onNoInternetException() {
@@ -122,7 +150,7 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     private fun onHasLoggedIn() {
-        viewModel.requestLikedRecipesId()
+        viewModel.requestCategory()
     }
 
     private fun onHasNotLoggedIn() {
@@ -145,8 +173,27 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     private fun onRequestLikedRecipesIdFailed(message: String?) {
-        message?.also {
-            toast(it)
+        if (retryRequestListLikedRecipesIdsTimes <= MAX_TIME_TO_RETRY) {
+            val handler = Handler()
+            handler.postDelayed({
+                viewModel.requestLikedRecipesId()
+            }, 1000 * retryRequestListLikedRecipesIdsTimes.toLong())
+            showSnackBar(root, "can not fetch the liked recipes because of $message\nretry $retryRequestListLikedRecipesIdsTimes times")
+        }else{
+            showSnackBar(root, "can not fetch the liked recipes because of $message")
+        }
+    }
+
+    private fun onRequestCategoriesFailed(message: String?) {
+        if (retryRequestCategoryTimes <= MAX_TIME_TO_RETRY) {
+            retryRequestCategoryTimes++
+            val handler = Handler()
+            handler.postDelayed({
+                viewModel.requestCategory()
+            }, 1000 * retryRequestCategoryTimes.toLong())
+            showSnackBar(root, "can not fetch the category because of $message\nretry $retryRequestCategoryTimes times")
+        }else{
+            showSnackBar(root, "can not fetch the category because of $message")
         }
     }
 

@@ -17,6 +17,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.adapter.viewholder.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionAdapter
@@ -71,10 +72,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
         setupAdapter()
         setupRecyclerView()
         handleIntent(intent)
-
-        observeViewModel()
         viewModel.requestTags()
-        viewModel.requestCategory()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -281,6 +279,9 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
                 Status.ERROR -> onGetTagsFailed("")
                 Status.LOAD_MORE_ERROR -> {}
             }
+        })
+        VietKitchenApp.category.observe(this, Observer {
+            viewModel.onCategoryChanged(it)
         })
     }
 

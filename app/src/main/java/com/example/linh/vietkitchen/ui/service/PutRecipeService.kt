@@ -14,6 +14,7 @@ import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.command.*
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
@@ -238,7 +239,7 @@ class PutRecipeService : BaseService() {
                 val uploadImageResponse = uploadImages(listOptimizedImagesPaths)
                 updateRecipeWithRemoteImageUri(recipe, recipeId, uploadImageResponse.data!!)
                 val wasUpdateCategorySuccess = updateCategories(drawerNav).data!!
-                if (wasUpdateCategorySuccess) EventBus.getDefault().post(drawerNav)
+                if (wasUpdateCategorySuccess) VietKitchenApp.category.postValue(drawerNav)
                 listNewTags?.let { putNewTags(it) }
                 null
             }

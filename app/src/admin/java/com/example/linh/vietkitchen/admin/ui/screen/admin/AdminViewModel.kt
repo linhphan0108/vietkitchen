@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.*
 import com.example.linh.vietkitchen.extension.filterFirst
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
@@ -29,7 +30,6 @@ class AdminViewModel(application: Application,
 
     internal val listTagsOnServerStatus: MutableLiveData<StatusBox<List<String>>> =  MutableLiveData()
     internal val serviceUploadingStatus: MutableLiveData<StatusBox<UploadProgress>> = MutableLiveData()
-    private lateinit var categories: List<DrawerNavGroupItem>
 
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.
@@ -49,10 +49,6 @@ class AdminViewModel(application: Application,
         super.onCleared()
     }
     //==============================================================================================
-    fun setCategoriesList(categories: List<DrawerNavGroupItem>) {
-        this.categories = categories
-    }
-
     fun putARecipe(recipe: Recipe, listImagesUri: MutableList<Uri>) {
         launchDataLoad({
             val message = Message.obtain(null, PutRecipeService.MSG_PREPARING_FOR_UPLOADING)
@@ -70,7 +66,7 @@ class AdminViewModel(application: Application,
 
             val updatedCategory = withComputationContext{
                 TimberUtils.checkNotMainThread()
-                updateCategories(recipe, categories)
+                updateCategories(recipe)
             }
             doBindService(recipe, extractedListImageUris, newTags, updatedCategory)
         }, {
@@ -104,22 +100,24 @@ class AdminViewModel(application: Application,
         return listMatchedUris
     }
 
-    private fun updateCategories(recipe: Recipe, categories: List<DrawerNavGroupItem>): List<DrawerNavGroupItem> {
-        val clonedCat = categories.map { it.clone() }
-        clonedCat.forEach { groupCat ->
-            var hasContained = false
-            groupCat.itemsList?.forEach { childCat ->
-                if(recipe.categories.contains(childCat.itemTitle)) {
-                    childCat.numberItems++
-                    hasContained = true
+    private fun updateCategories(recipe: Recipe): List<DrawerNavGroupItem> {
+        return VietKitchenApp.category.value?.let { cat ->
+            val clonedCat = cat.map { it.clone() }
+            clonedCat.forEach { groupCat ->
+                var hasContained = false
+                groupCat.itemsList?.forEach { childCat ->
+                    if(recipe.categories.contains(childCat.itemTitle)) {
+                        childCat.numberItems++
+                        hasContained = true
+                    }
                 }
+                if (hasContained) groupCat.numberItems++
             }
-            if (hasContained) groupCat.numberItems++
-        }
 
-        //increase the all item
-        clonedCat.first().numberItems++
-        return clonedCat
+            //increase the all item
+            clonedCat.first().numberItems++
+            clonedCat
+        } ?: listOf()
     }
 
     private fun doBindService(recipe: Recipe, listImagesUri: List<Uri>, newTags: List<String>?, newDrawerNav: List<DrawerNavGroupItem>) {
