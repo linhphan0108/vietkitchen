@@ -13,7 +13,6 @@ import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnDrawerNavItemChangedListener
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
-import com.example.linh.vietkitchen.util.Constants
 import timber.log.Timber
 
 class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
@@ -27,7 +26,6 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
         fun newInstance(navItems: List<DrawerNavGroupItem>) =
                 HomeFragment().apply {
                     arguments = Bundle().apply {
-                        putParcelableArrayList(Constants.BK_CATEGORIES, ArrayList(navItems))
                     }
                 }
 

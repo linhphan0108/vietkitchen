@@ -1,7 +1,9 @@
 package com.example.linh.vietkitchen.ui
 
+import androidx.lifecycle.MutableLiveData
 import androidx.multidex.MultiDexApplication
 import com.example.linh.vietkitchen.BuildConfig
+import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.util.NotLoggingTree
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +22,7 @@ class VietKitchenApp : MultiDexApplication(){
                 throw NullPointerException("user info not found!")
             }
         }
+        public val category: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()
     }
 
     override fun onCreate() {

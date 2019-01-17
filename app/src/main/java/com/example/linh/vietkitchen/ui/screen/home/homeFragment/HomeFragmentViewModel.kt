@@ -41,7 +41,6 @@ class HomeFragmentViewModel(application: Application,
     private var isFreshRecipe = false
     private var hasReachLastRecord = false
 
-    lateinit var categories: List<DrawerNavGroupItem>
     internal var deleteRecipeStatus: MutableLiveData<StatusBox<Int>> = MutableLiveData()
     internal var requestRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
     private var listRecipes: MutableList<Recipe> = mutableListOf()
@@ -118,7 +117,7 @@ class HomeFragmentViewModel(application: Application,
                 withIoContext {
                     val updatedCat = updateCategory(recipe)
                     val isSuccess = updateCategoryToServer(updatedCat).data!!
-                    if (isSuccess) EventBus.getDefault().post(updatedCat)
+                    if (isSuccess) VietKitchenApp.category.postValue(updatedCat)
                     isSuccess
                 }
             }
@@ -148,24 +147,26 @@ class HomeFragmentViewModel(application: Application,
         return updateCategoriesCommand.execute(getApplication())
     }
 
-    private suspend fun updateCategory(recipe: Recipe): List<DrawerNavGroupItem> {
-        val clonedCat = categories.map { it.clone() }
-        recipe.categories.forEach {checkedCat ->
-            clonedCat.forEach { groupCat ->
-                var isContained = false
-                groupCat.itemsList?.forEach { childCat ->
-                    if (checkedCat == childCat.itemTitle) {
-                        isContained = true
-                        childCat.numberItems--
-                        if (childCat.numberItems < 0) childCat.numberItems = 0
+    private fun updateCategory(recipe: Recipe): List<DrawerNavGroupItem> {
+        return VietKitchenApp.category.value?.let {cat ->
+            val clonedCat = cat.map { it.clone() }
+            recipe.categories.forEach {checkedCat ->
+                clonedCat.forEach { groupCat ->
+                    var isContained = false
+                    groupCat.itemsList?.forEach { childCat ->
+                        if (checkedCat == childCat.itemTitle) {
+                            isContained = true
+                            childCat.numberItems--
+                            if (childCat.numberItems < 0) childCat.numberItems = 0
+                        }
                     }
+                    if(isContained) groupCat.numberItems--
                 }
-                if(isContained) groupCat.numberItems--
             }
-        }
-        //decrease the item all
-        clonedCat.first().numberItems--
-        return clonedCat
+            //decrease the item all
+            clonedCat.first().numberItems--
+            clonedCat
+        } ?: listOf()
     }
 
     private suspend fun deleteRecipeInDb(recipe: Recipe): Response<Boolean> {
@@ -179,11 +180,5 @@ class HomeFragmentViewModel(application: Application,
                 this.removeLast()
             }
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onMessageEventBus(event: List<DrawerNavGroupItem>) {
-        this.categories = event
-        Timber.d("onMessageEventBus(): DrawerNavGroupItem received")
     }
 }

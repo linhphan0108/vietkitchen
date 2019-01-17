@@ -19,6 +19,7 @@ import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toast
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
@@ -61,7 +62,6 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setupViewPager()
         setupAdminFab()
         observeViewModel()
-        viewModel.requestCategory()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -101,9 +101,6 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         drawerNavAdapter.updateItemThenNotify(items)
         navItems = items
     }
-
-    private fun onRequestCategoriesFailed(message: String) {
-    }
     //endregion MVP callbacks
 
 
@@ -137,13 +134,8 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     //region inner methods =========================================================================
     override fun observeViewModel(){
-        viewModel.listNav.observe(this, Observer { listNav ->
-            listNav?.let { onRequestCategoriesSuccess(it) }
-        })
-        viewModel.requestNavStatus.observe(this, Observer {
-            when(it){
-                Status.ERROR -> {onRequestCategoriesFailed(getString(R.string.message_error))}
-            }
+        VietKitchenApp.category.observe(this, Observer {
+            onRequestCategoriesSuccess(it)
         })
     }
 
@@ -253,7 +245,6 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //            presenter.putARecipe(
             val intent = Intent(this, Class.forName("com.example.linh.vietkitchen.admin.ui.screen.admin.AdminActivity"))
             val bundle = Bundle()
-            bundle.putParcelableArrayList(Constants.BK_CATEGORIES, ArrayList(navItems))
             intent.putExtras(bundle)
             startActivityWithAnimation(intent)
         }

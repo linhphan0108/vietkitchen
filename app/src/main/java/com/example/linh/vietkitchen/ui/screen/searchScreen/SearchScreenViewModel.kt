@@ -2,20 +2,17 @@ package com.example.linh.vietkitchen.ui.screen.searchScreen
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import android.os.Looper
-import com.example.linh.vietkitchen.domain.command.RequestCategoryCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
 import com.example.linh.vietkitchen.domain.command.RequestTagsCommand
 import com.example.linh.vietkitchen.extension.removeAccent
-import com.example.linh.vietkitchen.extension.removeLast
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.mapper.TagMapper
+import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Entity
-import com.example.linh.vietkitchen.ui.model.LoadMoreItem
 import com.example.linh.vietkitchen.ui.model.SearchItem
 import com.example.linh.vietkitchen.util.TimberUtils
 import kotlinx.coroutines.Job
@@ -26,7 +23,6 @@ class SearchScreenViewModel(application: Application,
                             private val recipeMapper: RecipeMapper = RecipeMapper(),
                             private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand(),
                             private val tagMapper: TagMapper = TagMapper(),
-                            private val requestCategoryCommand: RequestCategoryCommand = RequestCategoryCommand(),
                             private val categoryMapper: CategoryMapper = CategoryMapper())
     : BaseViewModel(application) {
     private var searchItem: SearchItem? = null
@@ -171,19 +167,8 @@ class SearchScreenViewModel(application: Application,
         }, false)
     }
 
-    fun requestCategory() {
-        launchDataLoad({
-            listCategories = withIoContext {
-                Timber.d("on launchDataLoad: ${Looper.myLooper() == Looper.getMainLooper()}")
-                val response = requestCategoryCommand.execute()
-                response.data?.let { listCategories->
-                    return@withIoContext categoryMapper.toSearchItem(listCategories)
-                }
-            }
-        },{e->
-            Timber.e(e)
-            requestCategoriesStatus.value = Status.ERROR
-        }, false)
+    fun onCategoryChanged(listCat: List<DrawerNavGroupItem>) {
+        listCategories = categoryMapper.toSearchItemFromDrawerNav(listCat)
     }
 
     private fun getListCategories(): List<SearchItem>{

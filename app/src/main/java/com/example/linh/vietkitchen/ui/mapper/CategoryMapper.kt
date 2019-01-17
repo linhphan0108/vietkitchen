@@ -18,6 +18,16 @@ class CategoryMapper {
         return result
     }
 
+    fun toSearchItemFromDrawerNav(categories: List<DrawerNavGroupItem>): MutableList<SearchItem>{
+        val result = mutableListOf<SearchItem>()
+        categories.forEach { group ->
+            group.itemsList?.forEach { child ->
+                result.add(SearchItem(child.itemTitle, SearchItem.SearchItemType.CATEGORY))
+            }
+        }
+        return result
+    }
+
     fun convertToUI(categories: List<CategoryGroup>): List<DrawerNavGroupItem> {
         return categories.map {
             var navChildren: List<DrawerNavChildItem>?  = null

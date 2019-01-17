@@ -24,6 +24,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.extension.*
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
@@ -68,10 +69,8 @@ class AdminActivity : BaseActivity(),
     //#region life circle ==================================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val categories = intent.extras!!.getParcelableArrayList<DrawerNavGroupItem>(Constants.BK_CATEGORIES)!!.toList()
-        viewModel.setCategoriesList(categories)
         setupToolbar()
-        setupCategoryChip(categories)
+        setupCategoryChip()
         iBtnUpdateImage.setOnClickListener(this)
         setStyleableEditableViews()
         listImagesUri = mutableListOf()
@@ -321,6 +320,10 @@ class AdminActivity : BaseActivity(),
                 }
             }
         })
+
+        VietKitchenApp.category.observe(this, Observer {
+            setupCategoryChip()
+        })
     }
 
     private fun setupToolbar(){
@@ -411,8 +414,8 @@ class AdminActivity : BaseActivity(),
         }
     }
 
-    private fun setupCategoryChip(categories: List<DrawerNavGroupItem>) {
-        categories.forEach {groupItem ->
+    private fun setupCategoryChip() {
+        VietKitchenApp.category.value?.forEach { groupItem ->
             if (groupItem.itemsList.isNullOrEmpty()) return@forEach
             val llChipGroup = LayoutInflater.from(this).inflate(R.layout.chip_category, llContent, false) as LinearLayout
             val txtTitle = llChipGroup.getChildAt(0) as TextView
