@@ -10,7 +10,6 @@ import android.view.View
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.showSnackBar
-import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
@@ -46,7 +45,6 @@ class SplashScreenActivity : BaseActivity() {
             retryRequestCategoryTimes = it.getInt(ARG_RETRY_REQUEST_CATEGORY_TIMES)
             retryRequestListLikedRecipesIdsTimes = it.getInt(ARG_RETRY_REQUEST_RECIPES_IDS_TIMES)
         }
-        slackLoadingView.start()
         txtAppNameVersion.text = getString(R.string.app_name_version, BuildConfig.VERSION_NAME)
         viewModel.checkLogin()
     }
@@ -145,7 +143,6 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     private fun onNoInternetException() {
-        slackLoadingView.reset()
         txtDotLoader.visibility = View.INVISIBLE
     }
 
@@ -198,7 +195,6 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     private fun gotoHomeScreen(){
-        slackLoadingView.reset()
         startActivityWithAnimation(HomeActivity.createIntent(this))
         finish()
     }
