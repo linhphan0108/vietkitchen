@@ -13,7 +13,7 @@ import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.UserInfo
 
 class HomeFragmentViewModelFactory(private val application: Application,
-                                   private val userInfo: UserInfo = VietKitchenApp.userInfo,
+                                   private val userInfo: UserInfo = VietKitchenApp.getUserInfo(),
                                    private val recipeMapper: RecipeMapper = RecipeMapper(),
                                    private val categoryMapper: CategoryMapper = CategoryMapper(),
                                    private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),

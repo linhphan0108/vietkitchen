@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
-import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.model.Recipe
 import org.greenrobot.eventbus.EventBus
@@ -35,11 +35,11 @@ abstract class BaseHomeViewModel(application: Application,
         launchDataLoad(ioBlock = {
             withIoContext {
                 val recipeId = recipe.id!!
-                putLikeCommand.uid = userInfo.uid
+                putLikeCommand.uid = VietKitchenApp.getUserInfo().uid
                 putLikeCommand.recipeId = recipeId
                 putLikeCommand.execute(getApplication())
                 recipe.hasLiked = true
-                userInfo.likedRecipesIds!!.add(recipeId)
+                VietKitchenApp.addLikedRecipeId(recipeId)
                 null
             }
             emitLikeOrUnlikeAction(recipe)
@@ -54,11 +54,11 @@ abstract class BaseHomeViewModel(application: Application,
         launchDataLoad({
             withIoContext {
                 val recipeId = recipe.id!!
-                putUnlikeCommand.uid = userInfo.uid
+                putUnlikeCommand.uid = VietKitchenApp.getUserInfo().uid
                 putUnlikeCommand.recipeId = recipeId
                 putUnlikeCommand.execute(getApplication())
                 recipe.hasLiked = false
-                userInfo.likedRecipesIds!!.remove(recipeId)
+                VietKitchenApp.removeLikedRecipeId(recipeId)
                 null
             }
             emitLikeOrUnlikeAction(recipe)

@@ -8,7 +8,7 @@ import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.domain.model.Ingredient as IngredientDomain
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
-class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.userInfo.likedRecipesIds!!) {
+class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.getUserInfo().likedRecipesIds!!) {
 
     fun convertToUi(listDomain: List<RecipeDomain>, defaultHasLiked: Boolean = false): List<Recipe> {
         return listDomain.map {
