@@ -59,7 +59,7 @@ class ReStructureImageFileService : BaseService() {
 //        val notificationIntent = Intent(this, WorkoutActivity::class.java)
 //        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_bep_viet_launcher)
                 .setContentTitle("Re-structure image Files")
                 .setContentText(message)
                 .setTicker("TICKER")

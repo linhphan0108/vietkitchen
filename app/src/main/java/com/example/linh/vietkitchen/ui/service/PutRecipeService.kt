@@ -174,7 +174,7 @@ class PutRecipeService : BaseService() {
 //        val notificationIntent = Intent(this, WorkoutActivity::class.java)
 //        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_bep_viet_launcher)
                 .setContentTitle("TEST")
                 .setContentText("HELLO")
                 .setTicker("TICKER")
@@ -199,7 +199,7 @@ class PutRecipeService : BaseService() {
 
     private fun updateUploadNotification(message: String){
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_bep_viet_launcher)
                 .setContentTitle("create new recipe")
                 .setContentText(message)
                 .setTicker("TICKER")
@@ -215,7 +215,7 @@ class PutRecipeService : BaseService() {
     private fun updateProgressNotification(totalFiles: Int, counter: Int, progress: Int) {
         val contentText = "$progress% - $counter/$totalFiles files"
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_bep_viet_launcher)
                 .setContentTitle("uploading images")
                 .setContentText(contentText)
                 .setTicker("TICKER")
