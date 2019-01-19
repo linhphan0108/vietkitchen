@@ -13,13 +13,14 @@ import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseFragment
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.ui.model.UserInfo
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : BaseFragment(), View.OnClickListener {
 
     private lateinit var viewModel: ProfileViewModel
 
-    val userInfo by lazy { VietKitchenApp.userInfo }
+    val userInfo by lazy { VietKitchenApp.getUserInfo() }
 
     companion object {
         @JvmStatic
@@ -28,7 +29,7 @@ class ProfileFragment : BaseFragment(), View.OnClickListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        bindViews()
+        bindViews(userInfo)
     }
 
     //region MVP callbacks
@@ -48,6 +49,9 @@ class ProfileFragment : BaseFragment(), View.OnClickListener {
                     Status.ERROR -> {onLogoutFailed()}
                 }
             }
+        })
+        VietKitchenApp.getUserInfoObservable().observe(this, Observer {
+            bindViews(it)
         })
     }
 
@@ -74,7 +78,7 @@ class ProfileFragment : BaseFragment(), View.OnClickListener {
     //endregion callbacks
 
     @SuppressLint("StringFormatMatches")
-    private fun bindViews(){
+    private fun bindViews(userInfo: UserInfo) {
         with(userInfo){
             GlideApp.with(context!!)
                     .load(avatarUrl)

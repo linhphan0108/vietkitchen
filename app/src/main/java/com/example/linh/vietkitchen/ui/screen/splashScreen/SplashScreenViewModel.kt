@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.domain.command.RequestCategoryCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipesIdCommand
 import com.example.linh.vietkitchen.exception.NoInternetConnection
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.category
-import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
@@ -64,11 +64,11 @@ class SplashScreenViewModel(application: Application,
     fun requestLikedRecipesId() {
         launchDataLoad({
             val recipesId = withIoContext {
-                requestRecipesIdCommand.uid = userInfo.uid
+                requestRecipesIdCommand.uid = VietKitchenApp.getUserInfo().uid
                 requestRecipesIdCommand.execute(getApplication())
             }
-            userInfo.likedRecipesIds = recipesId.reversed().toMutableList()
-            userInfo.numberFavoriteRecipes = recipesId.size
+            VietKitchenApp.getUserInfo().likedRecipesIds = recipesId.reversed().toMutableList()
+            VietKitchenApp.getUserInfo().numberFavoriteRecipes = recipesId.size
             likedRecipesId.value = StatusBox(Status.SUCCESS)
         }, {e->
             when(e){

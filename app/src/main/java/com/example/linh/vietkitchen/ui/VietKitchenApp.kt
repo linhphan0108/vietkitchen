@@ -14,22 +14,41 @@ import timber.log.Timber
 
 class VietKitchenApp : MultiDexApplication(){
     companion object {
-        val userInfo: UserInfo by lazy {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            if (currentUser != null){
-                 UserInfo(currentUser.uid, currentUser.displayName, currentUser.email, currentUser.photoUrl)
-            }else{
-                throw NullPointerException("user info not found!")
+        private  val userInfo: MutableLiveData<UserInfo> = MutableLiveData()
+        val category: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()
+
+        fun getUserInfo() = userInfo.value!!
+        fun getUserInfoObservable() = userInfo
+        fun removeLikedRecipeId(id: String){
+            val removed = getUserInfo().likedRecipesIds?.remove(id) ?: false
+            if(removed) {
+                getUserInfo().numberFavoriteRecipes = getUserInfo().likedRecipesIds?.size ?: 0
+                userInfo.postValue(getUserInfo())
             }
         }
-        public val category: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()
+        fun addLikedRecipeId(id: String) {
+            val added = getUserInfo().likedRecipesIds?.add(id) ?: false
+            if (added) {
+                getUserInfo().numberFavoriteRecipes = getUserInfo().likedRecipesIds?.size ?: 0
+                userInfo.postValue(getUserInfo())
+            }
+        }
     }
 
     override fun onCreate() {
         super.onCreate()
-
+        initUserInfo()
         if(setupLeaksCanary()) return
         setupTimberLogger()
+    }
+
+    private fun initUserInfo(){
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null){
+            userInfo.value = UserInfo(currentUser.uid, currentUser.displayName, currentUser.email, currentUser.photoUrl)
+        }else{
+            throw NullPointerException("user info not found!")
+        }
     }
 
     private fun setupTimberLogger(){
