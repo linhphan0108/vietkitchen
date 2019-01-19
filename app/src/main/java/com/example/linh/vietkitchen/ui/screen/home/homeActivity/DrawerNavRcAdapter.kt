@@ -1,10 +1,8 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import com.example.linh.vietkitchen.extension.findIndex
-import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.userInfo
+import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavHeader
@@ -28,7 +26,7 @@ class DrawerNavRcAdapter(private val recyclerView: androidx.recyclerview.widget.
     private var collapsedSelectedChildItem = DEFAULT_SELECTED_POSITION
 
     init {
-        delegatesManager.addDelegate(DrawerNavHeaderLayoutDelegate(userInfo))
+        delegatesManager.addDelegate(DrawerNavHeaderLayoutDelegate(VietKitchenApp.getUserInfo()))
         delegatesManager.addDelegate(DrawerNavGroupItemDelegate(this))
         delegatesManager.addDelegate(DrawerNavChildItemDelegate(this))
         setItems(items.toMutableList())

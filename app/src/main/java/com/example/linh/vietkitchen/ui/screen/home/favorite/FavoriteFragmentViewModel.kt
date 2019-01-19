@@ -17,7 +17,7 @@ class FavoriteFragmentViewModel(application: Application,
         private val likedRecipesCommand: RequestLikedRecipesCommand = RequestLikedRecipesCommand())
     : BaseHomeViewModel(application){
 
-    private val userInfo by lazy { VietKitchenApp.userInfo }
+    private val userInfo by lazy { VietKitchenApp.getUserInfo() }
     internal val requestLikeRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
     private var listRecipes: MutableList<Recipe> = mutableListOf()
     private var isLoadMoreRecipe = false

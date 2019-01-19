@@ -26,7 +26,7 @@ import org.greenrobot.eventbus.Subscribe
 
 
 class HomeFragmentViewModel(application: Application,
-                            private val userInfo: UserInfo = VietKitchenApp.userInfo,
+                            private val userInfo: UserInfo = VietKitchenApp.getUserInfo(),
                             private val recipeMapper: RecipeMapper = RecipeMapper(),
                             private val categoryMapper: CategoryMapper = CategoryMapper(),
                             private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),

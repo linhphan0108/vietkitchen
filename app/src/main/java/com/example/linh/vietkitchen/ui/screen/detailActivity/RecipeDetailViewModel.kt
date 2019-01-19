@@ -18,7 +18,7 @@ class RecipeDetailViewModel(applicationContext: Application,
 
     val recipe: MutableLiveData<Recipe> by lazy { MutableLiveData<Recipe>() }
     val likeState: MutableLiveData<Boolean> by lazy { MutableLiveData<Boolean>() }
-    val userInfo: UserInfo by lazy { VietKitchenApp.userInfo }
+    val userInfo: UserInfo by lazy { VietKitchenApp.getUserInfo() }
 
     fun onCreate(intent: Intent){
         intent.getBundleExtra(EXTRA_BUNDLE).let {
