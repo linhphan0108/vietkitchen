@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_home"
+        android:id="@+id/home_dest"
         android:enabled="true"
         android:checked="true"
         android:icon="@drawable/ic_home_outline"
         android:title="@string/label_home"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_favorite"
+        android:id="@+id/favorite_dest"
         android:enabled="true"
         android:icon="@drawable/ic_heart_outline"
         android:title="@string/label_favorites"
@@ -21,7 +21,7 @@
         <!--android:query="@string/label_calendar"-->
         <!--app:showAsAction="ifRoom" />-->
     <item
-        android:id="@+id/action_profile"
+        android:id="@+id/profile_dest"
         android:enabled="true"
         android:icon="@drawable/ic_account_outline"
         android:title="@string/label_profile"

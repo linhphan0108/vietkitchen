@@ -11,29 +11,29 @@ import android.os.Bundle
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
-import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.adapter.HomePagerAdapter
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.baseMVVM.ToolbarActions
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.screen.home.homeFragment.HomeFragment
 import com.example.linh.vietkitchen.ui.screen.searchScreen.SearchScreenActivity
-import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
-import kotlinx.android.synthetic.main.activity_home_content.*
 import timber.log.Timber
 
 
@@ -44,8 +44,9 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             return Intent(context, HomeActivity::class.java)
         }
     }
+    private lateinit var appBarConfiguration : AppBarConfiguration
+
     private lateinit var viewModel: HomeActivityViewModel
-    private lateinit var homePagerAdapter: HomePagerAdapter
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
     private lateinit var navItems: List<DrawerNavGroupItem>
@@ -56,10 +57,14 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     //region lifecycle =============================================================================
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val host = supportFragmentManager.findFragmentById(R.id.navHostFragment)
+                as NavHostFragment? ?: return
+        val navController = host.navController
+        appBarConfiguration = AppBarConfiguration( setOf(R.id.home_dest), drawerLayout)
         setupAppbar()
-        setupDrawerNav()
-        setupBottomTabBar()
-        setupViewPager()
+        setupActionBar(navController, appBarConfiguration)
+        setupBottomNavMenu(navController)
+        setupDrawerNav(navController)
         setupAdminFab()
         observeViewModel()
     }
@@ -78,6 +83,12 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 true
             }else -> false
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        // Allows NavigationUI to support proper up navigation or the drawer layout
+        // drawer menu, depending on the situation
+        return findNavController(R.id.navHostFragment).navigateUp(appBarConfiguration)
     }
 
     override fun onBackPressed() {
@@ -139,63 +150,16 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         })
     }
 
-    private fun setupViewPager(){
-        homePagerAdapter = HomePagerAdapter(supportFragmentManager)
-        viewPager.adapter = homePagerAdapter
-        viewPager.offscreenPageLimit = 2
-        viewPager.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.OnPageChangeListener{
-            override fun onPageScrollStateChanged(state: Int) {}
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-
-            override fun onPageSelected(position: Int) {
-                bottomNav.selectedItemId = when(position){
-                    0 -> R.id.action_home
-                    1 -> R.id.action_favorite
-                    2 -> R.id.action_profile
-                    else -> R.id.action_home
-                }
-                showToolbar()
-            }
-
-        })
+    private fun setupBottomNavMenu(navController: NavController) {
+        bottomNav?.setupWithNavController(navController)
     }
 
-    private fun setupBottomTabBar(){
-        bottomNav.setOnNavigationItemSelectedListener {
-            when(it.itemId){
-                R.id.action_home ->{
-                    if (viewPager.currentItem == 0){
-                        if (halfDoubleTabOnHomeBottomNav) {
-                            halfDoubleTabOnHomeBottomNav = false
-                            val fragment = (viewPager.adapter as androidx.fragment.app.FragmentStatePagerAdapter).getItem(0)
-                            (fragment as HomeFragment).scrollToTop()
-                        }else {
-                            toast(getString(R.string.msg_double_tab_to_scroll_to_top))
-                            halfDoubleTabOnHomeBottomNav = true
-                            viewPager.postDelayed({
-                                halfDoubleTabOnHomeBottomNav = false
-                            }, 2000)
-                        }
-                    }else {
-                        viewPager.setCurrentItem(HomePagerAdapter.HOME, false)
-                    }
-                }
-                R.id.action_favorite -> {
-                    viewPager.setCurrentItem(HomePagerAdapter.FAVORITE, false)
-                }
-//                R.id.action_calendar -> {
-//                    viewPager.currentItem = 2
-//                }
-                R.id.action_profile -> {
-                    viewPager.setCurrentItem(HomePagerAdapter.PROFILE, false)
-                }
-                else -> {
-                }
-            }
-            showToolbar()
-            true
-        }
+    private fun setupActionBar(navController: NavController,
+                               appBarConfig : AppBarConfiguration) {
+        // This allows NavigationUI to decide what label to show in the action bar
+        // By using appBarConfig, it will also determine whether to
+        // show the up arrow or drawer menu icon
+        setupActionBarWithNavController(navController, appBarConfig)
     }
 
     private fun setupAppbar(){
@@ -213,30 +177,14 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
 
         })
-
-        val toggle = ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-//        val params: CoordinatorLayout.LayoutParams  = appBarLayout.layoutParams as CoordinatorLayout.LayoutParams
-//        if (params.behavior == null) params.behavior = AppBarLayout.Behavior()
-//        val behavior = params.behavior as AppBarLayout.Behavior
-//        behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-//            override fun canDrag(AppBarLayout: AppBarLayout): Boolean {
-//                return true
-//            }
-//        })
     }
 
-    private fun setupDrawerNav(){
-//        drawerNavView.setNavigationItemSelectedListener(this)
-//        val headerView = LayoutInflater.from(this).inflate(R.layout.activity_home_nav_header, null)
-//        drawerNavView.addHeaderView(headerView)
-//        drawerNavView.getHeaderView(0).visibility = View.GONE
+    private fun setupDrawerNav(navController: NavController) {
         drawerNavAdapter = DrawerNavRcAdapter(drawerNavExpandableRc, childItemClickListener= this)
         drawerNavExpandableRc.layoutManager = LinearLayoutManager(this)
         drawerNavExpandableRc.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
         drawerNavExpandableRc.adapter = drawerNavAdapter
+        drawerNavView.setupWithNavController(navController)
     }
 
     private fun setupAdminFab(){
