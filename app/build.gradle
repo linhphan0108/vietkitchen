@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'androidx.navigation.safeargs'
 //apply plugin: 'io.fabric'
 
 android {
@@ -84,7 +85,7 @@ dependencies {
     }
     implementation 'androidx.multidex:multidex:2.0.1'
 
-    //architecture components
+    //================ architecture components =====================================================
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
  // alternately - if using Java8, use the following instead of compiler
@@ -93,6 +94,11 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version"
     // optional - Test helpers for LiveData
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
+
+    // Navigation
+    implementation "android.arch.navigation:navigation-fragment-ktx:$navigation_version"
+    implementation "android.arch.navigation:navigation-ui-ktx:$navigation_version"
+    //================ end architecture ============================================================
 
     //coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
@@ -105,13 +111,10 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     //firebase dependencies
-    implementation('com.google.firebase:firebase-core:16.0.1') {
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-        exclude group: 'com.android.support', module: 'support-media-compat'
-    }
+    implementation('com.google.firebase:firebase-core:16.0.1')
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
-    implementation 'com.google.firebase:firebase-storage:16.0.1'
-    implementation 'com.google.firebase:firebase-database:16.0.1'
+    implementation "com.google.firebase:firebase-storage:$firebase_version"
+    implementation "com.google.firebase:firebase-database:$firebase_version"
     implementation 'androidx.browser:browser:1.0.0'//this lib is used inside firebase-ui-auth
     implementation ('com.firebaseui:firebase-ui-auth:4.0.0'){
         exclude group: 'com.android.support:', module: 'design'
@@ -141,6 +144,7 @@ dependencies {
     implementation 'com.hannesdorfmann:adapterdelegates4:4.0.0'
     implementation 'com.github.bhargavms:DotLoader:1.1.1'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha09'
 }
 
 apply plugin: 'com.google.gms.google-services'
