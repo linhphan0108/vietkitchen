@@ -14,6 +14,11 @@ abstract class BaseToolbarFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        mFullScreenFragmentChangeCallbacks.onRequireNormalScreen()
+    }
+
     override fun onDetach() {
         super.onDetach()
         toolbarActions = null

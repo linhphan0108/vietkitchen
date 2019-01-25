@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import com.example.linh.vietkitchen.ui.dialog.LoadingDialog
 import timber.log.Timber
 abstract class BaseFragment : Fragment() {
+
     private var loadingDialog: LoadingDialog? = null
+    protected lateinit var mFullScreenFragmentChangeCallbacks: FragmentScreenChangeCallbacks
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +22,11 @@ abstract class BaseFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context !is BaseActivity){
-            throw RuntimeException("the host activity should be BaseActivity or it's derived classes")
+            throw RuntimeException("the host activity $context should be ${BaseActivity::class.java} or it's derived classes")
         }
+        if (context !is FragmentScreenChangeCallbacks)
+            throw ClassCastException("the host $context must implement the ${FragmentScreenChangeCallbacks::class.java} interface")
+        mFullScreenFragmentChangeCallbacks = context
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -48,5 +53,11 @@ abstract class BaseFragment : Fragment() {
         loadingDialog?.let { loadingDialog ->
             if(loadingDialog.isVisible) loadingDialog.dismiss()
         }
+    }
+
+    //======= inner classes ========================================================================
+    interface FragmentScreenChangeCallbacks{
+        fun onRequireFullScreen()
+        fun onRequireNormalScreen()
     }
 }

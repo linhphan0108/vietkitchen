@@ -7,12 +7,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.showSnackBar
-import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
-import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
+import com.example.linh.vietkitchen.ui.baseMVVM.FullScreenFragment
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import timber.log.Timber
@@ -22,7 +22,7 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 
 
-class SplashScreenActivity : BaseActivity() {
+class SplashScreenFragment : FullScreenFragment() {
     companion object {
         private const val RC_SIGN_IN = 123
         private const val TIME_WAITING_IN_SPLASH_SCREEN = 7000//in millisecond
@@ -37,9 +37,8 @@ class SplashScreenActivity : BaseActivity() {
     private var retryRequestCategoryTimes = 0
     private var retryRequestListLikedRecipesIdsTimes = 0
 
-    //region lifecycle callbacks ===================================================================
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         savedInstanceState?.let {
             timeStartedSplashScreen = it.getLong(ARG_SPLASH_SCREEN_TIME_STARTED)
             retryRequestCategoryTimes = it.getInt(ARG_RETRY_REQUEST_CATEGORY_TIMES)
@@ -92,16 +91,13 @@ class SplashScreenActivity : BaseActivity() {
         super.onSaveInstanceState(outState)
     }
 
-    override fun onBackPressed() {
-        finish()
-    }
-
     //endregion lifecycle callbacks
 
     //region MVP callbacks =========================================================================
-    override fun getActivityLayoutRes() = R.layout.activity_splash_screen
+    override fun getFragmentLayoutRes() = R.layout.activity_splash_screen
+
     override fun getViewModel(): BaseViewModel {
-        val factory = SplashScreenViewModelFactory(application)
+        val factory = SplashScreenViewModelFactory(activity!!.application)
         viewModel = ViewModelProviders.of(this, factory).get(SplashScreenViewModel::class.java)
         return viewModel
     }
@@ -171,6 +167,7 @@ class SplashScreenActivity : BaseActivity() {
 
     private fun onRequestLikedRecipesIdFailed(message: String?) {
         if (retryRequestListLikedRecipesIdsTimes <= MAX_TIME_TO_RETRY) {
+            retryRequestListLikedRecipesIdsTimes++
             val handler = Handler()
             handler.postDelayed({
                 viewModel.requestLikedRecipesId()
@@ -195,8 +192,10 @@ class SplashScreenActivity : BaseActivity() {
     }
 
     private fun gotoHomeScreen(){
-        startActivityWithAnimation(HomeActivity.createIntent(this))
-        finish()
+        findNavController().navigate(R.id.action_splash_screen_dest_to_home_dest, null,
+                null)
+//        startActivityWithAnimation(HomeActivity.createIntent(this))
+//        finish()
     }
     //endregion MVP callbacks
 

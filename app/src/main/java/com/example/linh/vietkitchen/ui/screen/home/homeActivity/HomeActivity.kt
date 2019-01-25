@@ -25,9 +25,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
-import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
-import com.example.linh.vietkitchen.ui.baseMVVM.ToolbarActions
+import com.example.linh.vietkitchen.ui.baseMVVM.*
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.screen.searchScreen.SearchScreenActivity
@@ -38,7 +36,7 @@ import timber.log.Timber
 
 
 class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener,
-        OnItemClickListener, ToolbarActions {
+        OnItemClickListener, ToolbarActions, BaseFragment.FragmentScreenChangeCallbacks {
     companion object {
         fun createIntent(context: Context): Intent{
             return Intent(context, HomeActivity::class.java)
@@ -49,9 +47,8 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private lateinit var viewModel: HomeActivityViewModel
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
-    private lateinit var navItems: List<DrawerNavGroupItem>
 
-    private var halfDoubleTabOnHomeBottomNav = false
+//    private var halfDoubleTabOnHomeBottomNav = false
 
 
     //region lifecycle =============================================================================
@@ -110,7 +107,6 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
         drawerNavAdapter.updateItemThenNotify(items)
-        navItems = items
     }
     //endregion MVP callbacks
 
@@ -142,6 +138,18 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         showToolbar()
     }
     //endregion callbacks
+
+    override fun onRequireFullScreen() {
+        appBarLayout.visibility = View.GONE
+        bottomNav.visibility = View.GONE
+        fabAdmin.visibility = View.GONE
+    }
+
+    override fun onRequireNormalScreen() {
+        appBarLayout.visibility = View.VISIBLE
+        bottomNav.visibility = View.VISIBLE
+        fabAdmin.visibility = View.VISIBLE
+    }
 
     //region inner methods =========================================================================
     override fun observeViewModel(){

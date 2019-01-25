@@ -3,7 +3,32 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/mobile_navigation"
-            app:startDestination="@id/home_dest">
+            app:startDestination="@id/splash_screen_dest">
+
+    <fragment
+        android:id="@+id/splash_screen_dest"
+        android:name="com.example.linh.vietkitchen.ui.screen.splashScreen.SplashScreenFragment"
+        android:label="activity_splash_screen"
+        tools:layout="@layout/activity_splash_screen">
+        <action
+            android:id="@+id/action_splash_screen_dest_to_home_dest"
+            app:destination="@id/home_dest"
+            app:launchSingleTop="true"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/splash_screen_dest"/>
+        <action
+            android:id="@+id/action_splash_screen_dest_to_loginActivity"
+            app:destination="@id/login_dest"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/login_dest"
+        android:name="com.example.linh.vietkitchen.ui.screen.login.LoginFragment"
+        android:label="LoginActivity">
+        <action
+            android:id="@+id/action_loginActivity_to_home_dest"
+            app:destination="@id/home_dest"/>
+    </fragment>
 
     <fragment
         android:id="@+id/home_dest"
