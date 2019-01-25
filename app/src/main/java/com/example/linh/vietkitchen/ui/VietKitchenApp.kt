@@ -47,7 +47,7 @@ class VietKitchenApp : MultiDexApplication(){
         if (currentUser != null){
             userInfo.value = UserInfo(currentUser.uid, currentUser.displayName, currentUser.email, currentUser.photoUrl)
         }else{
-            throw NullPointerException("user info not found!")
+//            throw NullPointerException("user info not found!")
         }
     }
 

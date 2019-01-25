@@ -26,7 +26,7 @@ class DrawerNavRcAdapter(private val recyclerView: androidx.recyclerview.widget.
     private var collapsedSelectedChildItem = DEFAULT_SELECTED_POSITION
 
     init {
-        delegatesManager.addDelegate(DrawerNavHeaderLayoutDelegate(VietKitchenApp.getUserInfo()))
+        delegatesManager.addDelegate(DrawerNavHeaderLayoutDelegate())
         delegatesManager.addDelegate(DrawerNavGroupItemDelegate(this))
         delegatesManager.addDelegate(DrawerNavChildItemDelegate(this))
         setItems(items.toMutableList())
