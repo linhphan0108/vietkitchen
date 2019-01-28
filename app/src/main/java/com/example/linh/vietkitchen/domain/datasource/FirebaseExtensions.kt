@@ -1,7 +1,6 @@
 package com.example.linh.vietkitchen.domain.datasource
 
 import android.net.Uri
-import com.example.linh.vietkitchen.R.string.progress
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.util.ResponseCode

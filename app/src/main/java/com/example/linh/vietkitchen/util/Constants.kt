@@ -2,6 +2,7 @@ package com.example.linh.vietkitchen.util
 
 object Constants {
     //firebase realtime data path
+    const val STORAGE_FOOD = "category"
     const val STORAGE_RECIPES_PATH = "recipes"
     const val STORAGE_RECIPES_TAGS_PATH = "tag"
     const val STORAGE_RECIPES_CHILD_TAGS = "tags"

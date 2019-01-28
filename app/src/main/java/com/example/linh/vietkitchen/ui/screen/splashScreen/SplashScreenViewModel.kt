@@ -86,7 +86,7 @@ class SplashScreenViewModel(application: Application,
         launchDataLoad({
             val categories = withIoContext {
                 Timber.d("on launchDataLoad: ${Looper.myLooper() == Looper.getMainLooper()}")
-                val response = requestCategoryCommand.execute()
+                val response = requestCategoryCommand.execute(getApplication())
                 response.data?.let {listCategories->
                     return@withIoContext categoryMapper.convertToUI(listCategories)
                 }
