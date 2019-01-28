@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.screen.detailActivity.RecipeDetailActivity"
+        <activity android:name=".ui.screen.detailActivity.RecipeDetailFragment"
                   android:theme="@style/TranslucentStatusBar"
                   android:launchMode="singleTop"
                   android:screenOrientation="sensor">

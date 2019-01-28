@@ -14,18 +14,32 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_medium"
         android:orientation="vertical">
 
+        <com.example.linh.vietkitchen.ui.custom.SquareImageView
+            android:id="@+id/imgHeaderImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:layout_collapseMode="parallax"
+            tools:src="@drawable/img_drawer_nav_header"
+            />
+
         <LinearLayout
-            android:id="@+id/llDescriptionBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="visible"
-            tools:visibility="visible">
+            android:padding="@dimen/margin_medium"
+            android:orientation="vertical">
 
-            <!--<TextView-->
+            <LinearLayout
+                android:id="@+id/llDescriptionBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible"
+                tools:visibility="visible">
+
+                <!--<TextView-->
                 <!--android:id="@+id/txtTitle"-->
                 <!--android:layout_width="wrap_content"-->
                 <!--android:layout_height="wrap_content"-->
@@ -38,169 +52,170 @@
                 <!--android:textStyle="bold"-->
                 <!--tools:text="canh xương hầm khoai tây"/>-->
 
-            <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
-                android:id="@+id/txtDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBody1"
-                style="@style/styleBody1"
-                tools:text="@string/demo_desc"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llIngredientsBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:layout_marginBottom="@dimen/margin_medium"
-            android:padding="@dimen/padding_medium"
-            android:orientation="horizontal"
-            android:visibility="visible"
-            tools:visibility="visible">
+                <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
+                    android:id="@+id/txtDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    style="@style/styleBody1"
+                    tools:text="@string/demo_desc"/>
+            </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:id="@+id/llIngredientsBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingEnd="@dimen/margin_small"
-                android:paddingStart="0dp"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:padding="@dimen/padding_medium"
+                android:orientation="horizontal"
+                android:visibility="visible"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingEnd="@dimen/margin_small"
+                    android:paddingStart="0dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:text="@string/label_ingredients"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="@color/colorAccent"/>
+
+                    <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
+                        android:id="@+id/txtIngredients"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:gravity="start"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        style="@style/styleBody2"
+                        android:textStyle="italic"
+                        app:paragraphSpace="0.1"
+                        tools:text="xương\nbí"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/divider"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="@dimen/margin_small"
+                    android:paddingEnd="0dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_small"
+                        android:layout_gravity="start"
+                        android:text="@string/label_spices"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="@color/colorAccent"/>
+
+                    <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
+                        android:id="@+id/txtSpices"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        style="@style/styleBody2"
+                        android:textStyle="italic"
+                        app:paragraphSpace="0.1"
+                        tools:text="salt\nsugar"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llStepsToPreProcess"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_small"
-                    android:text="@string/label_ingredients"
+                    android:text="@string/label_pre_process"
                     android:textAppearance="?attr/textAppearanceSubtitle1"
                     android:textColor="@color/colorAccent"/>
 
                 <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
-                    android:id="@+id/txtIngredients"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/txtStepsToPreparation"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:gravity="start"
-                    android:textAppearance="?attr/textAppearanceBody2"
-                    style="@style/styleBody2"
-                    android:textStyle="italic"
-                    app:paragraphSpace="0.1"
-                    tools:text="xương\nbí"/>
-
+                    android:paddingBottom="@dimen/padding_8dp"
+                    android:paddingTop="@dimen/padding_medium"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    style="@style/styleBody1"
+                    tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
             </LinearLayout>
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/divider"/>
+            <LinearLayout
+                android:id="@+id/llStepsToProcess"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_process"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                    android:textColor="@color/colorAccent"/>
+
+                <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
+                    android:id="@+id/txtStepsToProcess"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/padding_8dp"
+                    android:paddingTop="@dimen/padding_medium"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    style="@style/styleBody1"
+                    tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
+            </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:id="@+id/llNotes"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingStart="@dimen/margin_small"
-                android:paddingEnd="0dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_small"
                     android:layout_gravity="start"
-                    android:text="@string/label_spices"
+                    android:text="@string/label_notes"
                     android:textAppearance="?attr/textAppearanceSubtitle1"
                     android:textColor="@color/colorAccent"/>
 
                 <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
-                    android:id="@+id/txtSpices"
+                    android:id="@+id/txtNotes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
-                    android:textAppearance="?attr/textAppearanceBody2"
-                    style="@style/styleBody2"
-                    android:textStyle="italic"
-                    app:paragraphSpace="0.1"
-                    tools:text="salt\nsugar"/>
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    style="@style/styleBody1"
+                    tools:text="@string/hint_short_intro"/>
 
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llStepsToPreProcess"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_pre_process"
-                android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textColor="@color/colorAccent"/>
-
-            <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
-                android:id="@+id/txtStepsToPreparation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/padding_8dp"
-                android:paddingTop="@dimen/padding_medium"
-                android:textAppearance="?attr/textAppearanceBody1"
-                style="@style/styleBody1"
-                tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llStepsToProcess"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="visible"
-            tools:visibility="visible">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_process"
-                android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textColor="@color/colorAccent"/>
-
-            <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
-                android:id="@+id/txtStepsToProcess"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/padding_8dp"
-                android:paddingTop="@dimen/padding_medium"
-                android:textAppearance="?attr/textAppearanceBody1"
-                style="@style/styleBody1"
-                tools:text="A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread. A club sandwich, also called a clubhouse sandwich, is a sandwich of bread (occasionally toasted), sliced cooked poultry, fried bacon, lettuce, tomato, and mayonnaise. It is often cut into quarters or halves and held together by cocktail sticks. Modern versions frequently have two layers which are separated by an additional slice of bread."/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llNotes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:layout_gravity="start"
-                android:text="@string/label_notes"
-                android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textColor="@color/colorAccent"/>
-
-            <com.example.linh.vietkitchen.ui.custom.imageSpanWidget.ImageSpanTextView
-                android:id="@+id/txtNotes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:textAppearance="?attr/textAppearanceBody1"
-                style="@style/styleBody1"
-                tools:text="@string/hint_short_intro"/>
-
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -3,6 +3,8 @@ package com.example.linh.vietkitchen.ui.screen.detailActivity
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import android.content.Intent
+import android.os.Build
+import android.os.Bundle
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.ui.VietKitchenApp
@@ -19,18 +21,6 @@ class RecipeDetailViewModel(applicationContext: Application,
     val recipe: MutableLiveData<Recipe> by lazy { MutableLiveData<Recipe>() }
     val likeState: MutableLiveData<Boolean> by lazy { MutableLiveData<Boolean>() }
     val userInfo: UserInfo by lazy { VietKitchenApp.getUserInfo() }
-
-    fun onCreate(intent: Intent){
-        intent.getBundleExtra(EXTRA_BUNDLE).let {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                appBarLayout.transitionName = it.getString(BK_THUMB_IMAGE_TRANSITION_NAME)
-//            }
-            it.getParcelable<Recipe>(BK_RECIPE)?.let {re ->
-                recipe.value = re
-                likeState.value = re.hasLiked
-            }
-        }
-    }
 
     internal fun stateHasChanged(): Boolean{
         return recipe.value?.hasLiked != likeState.value

@@ -68,7 +68,6 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.home_options, menu)
-
         return true
     }
 
@@ -143,12 +142,17 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         appBarLayout.visibility = View.GONE
         bottomNav.visibility = View.GONE
         fabAdmin.visibility = View.GONE
+//        val params = (navHostFragment.view as ViewGroup).layoutParams as CoordinatorLayout.LayoutParams
+//        params.behavior = null
+//        (navHostFragment.view as ViewGroup).requestLayout()
     }
 
     override fun onRequireNormalScreen() {
         appBarLayout.visibility = View.VISIBLE
         bottomNav.visibility = View.VISIBLE
         fabAdmin.visibility = View.VISIBLE
+//        val params = (navHostFragment.view as ViewGroup).layoutParams as CoordinatorLayout.LayoutParams
+//        params.behavior = ScrollingViewBehavior()
     }
 
     //region inner methods =========================================================================
@@ -206,7 +210,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
-    private fun showToolbar(){
+    internal fun showToolbar(){
         appBarLayout.postDelayed({
             appBarLayout.setExpanded(true, true)
         }, 500)
