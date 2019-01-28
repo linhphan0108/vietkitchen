@@ -112,9 +112,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     //firebase dependencies
     implementation('com.google.firebase:firebase-core:16.0.1')
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
-    implementation "com.google.firebase:firebase-storage:$firebase_version"
-    implementation "com.google.firebase:firebase-database:$firebase_version"
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.8'
+    implementation "com.google.firebase:firebase-storage:$firebase_storage"
+    implementation "com.google.firebase:firebase-database:$firebase_database"
     implementation 'androidx.browser:browser:1.0.0'//this lib is used inside firebase-ui-auth
     implementation ('com.firebaseui:firebase-ui-auth:4.0.0'){
         exclude group: 'com.android.support:', module: 'design'
