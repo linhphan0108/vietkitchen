@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.linh.vietkitchen.ui.dialog.LoadingDialog
+import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import timber.log.Timber
 abstract class BaseFragment : Fragment() {
 
@@ -54,6 +55,8 @@ abstract class BaseFragment : Fragment() {
             if(loadingDialog.isVisible) loadingDialog.dismiss()
         }
     }
+
+    internal fun getHomeActivity(): HomeActivity = activity as HomeActivity
 
     //======= inner classes ========================================================================
     interface FragmentScreenChangeCallbacks{

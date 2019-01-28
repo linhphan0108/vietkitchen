@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/splash_screen_dest"
         android:name="com.example.linh.vietkitchen.ui.screen.splashScreen.SplashScreenFragment"
-        android:label="activity_splash_screen"
+        android:label="@string/label_splash_screen"
         tools:layout="@layout/activity_splash_screen">
         <action
             android:id="@+id/action_splash_screen_dest_to_home_dest"
@@ -24,7 +24,7 @@
     <fragment
         android:id="@+id/login_dest"
         android:name="com.example.linh.vietkitchen.ui.screen.login.LoginFragment"
-        android:label="LoginActivity">
+        android:label="@string/label_login">
         <action
             android:id="@+id/action_loginActivity_to_home_dest"
             app:destination="@id/home_dest"/>
@@ -34,7 +34,11 @@
         android:id="@+id/home_dest"
         android:name="com.example.linh.vietkitchen.ui.screen.home.homeFragment.HomeFragment"
         android:label="@string/label_home"
-        tools:layout="@layout/fragment_home"/>
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_dest_to_Detail"
+            app:destination="@id/detail_dest"/>
+    </fragment>
     <fragment
         android:id="@+id/favorite_dest"
         android:name="com.example.linh.vietkitchen.ui.screen.home.favorite.FavoriteFragment"
@@ -45,4 +49,10 @@
         android:name="com.example.linh.vietkitchen.ui.screen.home.profile.ProfileFragment"
         android:label="@string/label_profile"
         tools:layout="@layout/fragment_profile"/>
+    <fragment
+        android:id="@+id/detail_dest"
+        android:name="com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailFragment"
+        android:label="detail"
+        tools:layout="@layout/activity_detail">
+    </fragment>
 </navigation>

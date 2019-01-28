@@ -29,7 +29,7 @@ import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.model.SearchItem
-import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
+import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailFragment
 import com.example.linh.vietkitchen.util.ScreenUtil
 import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
 import kotlinx.android.synthetic.main.activity_search_screen_app_bar.*
@@ -179,7 +179,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
 
     //region recipe adapter callbacks ==============================================================
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe) {
-        val intent = RecipeDetailActivity.createIntent(this, "", data)
+        val intent = RecipeDetailFragment.createIntent(this, "", data)
         startActivity(intent)
     }
 

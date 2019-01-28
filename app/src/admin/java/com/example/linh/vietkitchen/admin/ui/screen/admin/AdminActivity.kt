@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Bundle
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import androidx.palette.graphics.Palette
 import android.view.*
 import android.widget.*
 import com.example.linh.vietkitchen.R
@@ -32,11 +31,9 @@ import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.AnnotationKey
 import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.Style
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
-import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity.Companion.createIntent
+import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailFragment.Companion.createIntent
 import com.example.linh.vietkitchen.ui.service.PutRecipeService
-import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.GlideUtil
 
 

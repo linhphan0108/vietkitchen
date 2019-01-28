@@ -10,11 +10,12 @@ import com.example.linh.vietkitchen.ui.adapter.viewholder.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.detailActivity.BK_LIKE_STATE_JUST_CHANGED
-import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailActivity
+import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailFragment
 import com.example.linh.vietkitchen.util.RecyclerViewLayoutMode
 import com.example.linh.vietkitchen.util.VerticalSpaceItemDecoration
 import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
 import android.view.MenuItem
+import androidx.navigation.fragment.findNavController
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseToolbarFragment
@@ -110,14 +111,16 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
 
     //recycler view callback
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe) {
-        val intent = RecipeDetailActivity.createIntent(context, layoutPosition.toString(), data)
+//        val intent = RecipeDetailFragment.createIntent(context, layoutPosition.toString(), data)
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            itemView.transitionName = layoutPosition.toString()
 //            val activityOptions = ActivityOptions.makeSceneTransitionAnimation(context as Activity, itemView, itemView.transitionName)
 //            startActivityForResult(intent, REQUEST_DETAIL_RECIPE, activityOptions.toBundle())
 //        }else{
-            startActivityForResult(intent, REQUEST_DETAIL_RECIPE)
+//            startActivityForResult(intent, REQUEST_DETAIL_RECIPE)
 //        }
+        val bundle = RecipeDetailFragment.createBundle(context, layoutPosition.toString(), data)
+        findNavController().navigate(R.id.action_home_dest_to_Detail, bundle)
         lastItemClicked = adapterPosition
     }
 
