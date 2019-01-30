@@ -25,30 +25,40 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/activity_home_content"/>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        app:itemBackground="@color/tab_bar_bg"
-        app:itemIconTint="@drawable/bottom_nav_color_state"
-        app:itemTextColor="@drawable/bottom_nav_color_state"
-        app:menu="@menu/bottom_navigation"
-        app:itemTextAppearanceActive="@style/subtitle2"
-        app:layout_scrollFlags="snap"/>
+        android:layout_height="match_parent">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/fab_margin_end"
-        android:layout_marginBottom="@dimen/fab_margin_bottom_home"
-        app:srcCompat="@drawable/ic_add_24"
-        app:layout_scrollFlags="scroll"
-        app:layout_behavior="com.example.linh.vietkitchen.ui.custom.ScrollAwareFABBehavior"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        <include layout="@layout/activity_home_content"
+                 android:layout_height="0dp"
+                 android:layout_width="match_parent"
+                 app:layout_constraintTop_toTopOf="parent"
+                 app:layout_constraintBottom_toTopOf="@id/bottomNav"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:itemBackground="@color/tab_bar_bg"
+            app:itemIconTint="@drawable/bottom_nav_color_state"
+            app:itemTextColor="@drawable/bottom_nav_color_state"
+            app:menu="@menu/bottom_navigation"
+            app:itemTextAppearanceActive="@style/subtitle2"
+            app:layout_scrollFlags="snap"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/fab_margin_end"
+            android:layout_marginBottom="@dimen/fab_margin_bottom_home"
+            app:srcCompat="@drawable/ic_add_24"
+            app:layout_scrollFlags="scroll"
+            app:layout_behavior="com.example.linh.vietkitchen.ui.custom.ScrollAwareFABBehavior"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
