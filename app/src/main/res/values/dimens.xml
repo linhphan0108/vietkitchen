@@ -5,7 +5,7 @@
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">72dp</dimen>
     <dimen name="fab_margin_end">16dp</dimen>
-    <dimen name="fab_margin_bottom">64dp</dimen>
+    <dimen name="fab_margin_bottom">16dp</dimen>
     <dimen name="fab_margin_bottom_home">64dp</dimen>
     <dimen name="fab_elevation">12dp</dimen>
     <dimen name="rcv_item_decoration_top">56dp</dimen>
