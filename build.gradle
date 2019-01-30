@@ -7,8 +7,8 @@ buildscript {
     ext.lifecycle_version = '2.0.0'
     ext.navigation_version = '1.0.0-alpha09'
     ext.glide_version = '4.8.0'
-    ext.firebase_storage = '16.0.2'
-    ext.firebase_database = '16.0.2'
+    ext.firebase_storage = '16.0.1'
+    ext.firebase_database = '16.0.1'
 
     repositories {
         mavenCentral()

@@ -18,17 +18,13 @@ import android.view.View
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.*
 import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.*
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
-import com.example.linh.vietkitchen.ui.screen.searchScreen.SearchScreenActivity
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
@@ -36,7 +32,7 @@ import timber.log.Timber
 
 
 class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener,
-        OnItemClickListener, ToolbarActions, BaseFragment.FragmentScreenChangeCallbacks {
+        OnItemClickListener, BaseFragment.FragmentScreenChangeCallbacks {
     companion object {
         fun createIntent(context: Context): Intent{
             return Intent(context, HomeActivity::class.java)
@@ -72,13 +68,11 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
-            R.id.action_search -> {
-                startActivity(SearchScreenActivity.createIntent(this))
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                true
-            }else -> false
-        }
+        // Have the NavigationUI look for an action or destination matching the menu
+        // item id and navigate there if found.
+        // Otherwise, bubble up to the parent.
+        return item.onNavDestinationSelected(findNavController(R.id.navHostFragment))
+                || super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -120,18 +114,9 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    override fun changeToolbarTitle(title: String) {
-        toolbar.title = if(title.isBlank()){
-            "tất cả"
-        }else{
-            title
-        }
-    }
-
     //drawer navigation callback
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: DrawerNavChildItem?) {
         val category = data?.itemTitle ?: ""
-        changeToolbarTitle(category)
         onDrawerNavItemChangedListener?.onDrawerNavChanged(category)
         drawerLayout.closeDrawer(GravityCompat.START)
         showToolbar()
@@ -155,6 +140,12 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //        params.behavior = ScrollingViewBehavior()
     }
 
+    override fun onRequireJustToolbarScreen() {
+        appBarLayout.visibility = View.VISIBLE
+        bottomNav.visibility = View.GONE
+        fabAdmin.visibility = View.GONE
+    }
+
     //region inner methods =========================================================================
     override fun observeViewModel(){
         VietKitchenApp.category.observe(this, Observer {
@@ -171,11 +162,11 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         // This allows NavigationUI to decide what label to show in the action bar
         // By using appBarConfig, it will also determine whether to
         // show the up arrow or drawer menu icon
+        setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfig)
     }
 
     private fun setupAppbar(){
-        setSupportActionBar(toolbar)
         val appBarElevationMax = ScreenUtil.dp2px(1)
         appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appbar, verticalOffset ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -215,6 +206,10 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             appBarLayout.setExpanded(true, true)
         }, 500)
     }
+
+    internal fun getToolbar() = toolbar
+
+    internal fun getAppbar() = appBarLayout
 
     private fun changeToolbarScrollable(scrollable: Boolean){
         // Show toolbar when we are in maps mode

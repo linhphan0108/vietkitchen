@@ -20,15 +20,15 @@ import com.example.linh.vietkitchen.util.GlideUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.activity_detail_content.*
-import androidx.appcompat.app.AppCompatActivity
 import com.example.linh.vietkitchen.R
+import com.example.linh.vietkitchen.ui.baseMVVM.AbsJustToolbarFragment
 
 internal const val BK_THUMB_IMAGE_TRANSITION_NAME = "BK_THUMB_IMAGE_TRANSITION_NAME"
 internal const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
 internal const val BK_RECIPE = "BK_RECIPE"
 const val BK_LIKE_STATE_JUST_CHANGED = "BK_LIKE_STATE_JUST_CHANGED"
 
-class RecipeDetailFragment : BaseFragment(), View.OnClickListener {
+class RecipeDetailFragment : AbsJustToolbarFragment(), View.OnClickListener {
     private lateinit var viewModel: RecipeDetailViewModel
     companion object {
         fun createIntent(context: Context?, thumbImageTransitionName: String, recipe: Recipe): Intent{
@@ -122,7 +122,7 @@ class RecipeDetailFragment : BaseFragment(), View.OnClickListener {
 //        supportActionBar?.setHomeButtonEnabled(true)
 //        collapsingToolbarLayout.title = title
 //        applyPalette(null, collapsingToolbarLayout)
-        (activity as AppCompatActivity).supportActionBar?.title = title
+        setTitle(title)
     }
 
     private fun populateUI(recipe: Recipe) {
@@ -172,8 +172,9 @@ class RecipeDetailFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun onFabStateChanged(state: Boolean){
-        val fabIcon = if(state) R.drawable.ic_heart_pink else R.drawable.ic_heart_grey
-        fab.setImageResource(fabIcon)
+//        val fabIcon = if(state) R.drawable.ic_heart_pink else R.drawable.ic_heart_grey
+//        fab.setImageResource(fabIcon)
+        fab.isSelected = state
     }
 
     private fun updateBackground(fab: FloatingActionButton, palette: androidx.palette.graphics.Palette) {

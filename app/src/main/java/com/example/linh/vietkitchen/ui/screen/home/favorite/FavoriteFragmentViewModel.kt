@@ -79,7 +79,7 @@ class FavoriteFragmentViewModel(application: Application,
     }
 
     private fun getNextPageLikedRecipesIds(from: Int): List<String>?{
-        userInfo.likedRecipesIds?.let {listLikedRecipesIds ->
+        return userInfo.likedRecipesIds?.let { listLikedRecipesIds ->
             val count = listLikedRecipesIds.size
             val to = if (from + Constants.PAGINATION_LENGTH < count){
                 from + Constants.PAGINATION_LENGTH

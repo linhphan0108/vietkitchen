@@ -52,7 +52,16 @@
     <fragment
         android:id="@+id/detail_dest"
         android:name="com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailFragment"
-        android:label="detail"
+        android:label=""
         tools:layout="@layout/activity_detail">
+    </fragment>
+    <fragment
+        android:id="@+id/search_screen_dest"
+        android:name="com.example.linh.vietkitchen.ui.screen.searchScreen.SearchScreenFragment"
+        android:label=""
+        tools:layout="@layout/layout_search_view_suggestion">
+        <action
+            android:id="@+id/action_search_screen_dest_to_detail_dest"
+            app:destination="@id/detail_dest"/>
     </fragment>
 </navigation>

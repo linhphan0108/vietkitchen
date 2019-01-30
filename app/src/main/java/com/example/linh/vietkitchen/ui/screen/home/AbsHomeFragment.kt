@@ -18,7 +18,7 @@ import android.view.MenuItem
 import androidx.navigation.fragment.findNavController
 import com.example.linh.vietkitchen.extension.color
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.baseMVVM.BaseToolbarFragment
+import com.example.linh.vietkitchen.ui.baseMVVM.AbsFullNavFragment
 import com.example.linh.vietkitchen.ui.custom.shimmerRecyclerView.EndlessScrollListener
 import com.example.linh.vietkitchen.util.Constants
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -26,7 +26,7 @@ import timber.log.Timber
 
 
 private const val REQUEST_DETAIL_RECIPE = 2
-abstract class BaseHomeFragment : BaseToolbarFragment(),
+abstract class AbsHomeFragment : AbsFullNavFragment(),
         OnItemClickListener {
 
     private var recyclerViewLayoutMode = RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL
@@ -36,7 +36,6 @@ abstract class BaseHomeFragment : BaseToolbarFragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

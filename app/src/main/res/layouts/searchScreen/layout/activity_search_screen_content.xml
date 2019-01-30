@@ -8,7 +8,7 @@
              tools:context=".ui.screen.home.favorite.FavoriteFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcvLikedRecipes"
+        android:id="@+id/rcvRecipesResult"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:listitem="@layout/item_recipe"/>

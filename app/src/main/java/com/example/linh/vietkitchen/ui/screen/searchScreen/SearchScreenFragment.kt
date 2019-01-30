@@ -5,16 +5,18 @@ import android.animation.StateListAnimator
 import android.app.SearchManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import com.google.android.material.appbar.AppBarLayout
 import androidx.appcompat.widget.SearchView
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.VietKitchenApp
@@ -22,7 +24,7 @@ import com.example.linh.vietkitchen.ui.adapter.viewholder.OnItemClickListener
 import com.example.linh.vietkitchen.ui.adapter.RecipeAdapter
 import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionAdapter
 import com.example.linh.vietkitchen.ui.adapter.viewholder.SearchSuggestionViewHolder
-import com.example.linh.vietkitchen.ui.baseMVVM.BaseActivity
+import com.example.linh.vietkitchen.ui.baseMVVM.AbsJustToolbarFragment
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
@@ -32,20 +34,14 @@ import com.example.linh.vietkitchen.ui.model.SearchItem
 import com.example.linh.vietkitchen.ui.screen.detailActivity.RecipeDetailFragment
 import com.example.linh.vietkitchen.util.ScreenUtil
 import com.example.linh.vietkitchen.util.VerticalStaggeredSpaceItemDecoration
-import kotlinx.android.synthetic.main.activity_search_screen_app_bar.*
 import kotlinx.android.synthetic.main.activity_search_screen_content.*
 import kotlinx.android.synthetic.main.layout_search_view_suggestion.*
 import timber.log.Timber
 
 const val ARG_IS_SEARCH_VIEW_FOCUSED = "ARG_IS_SEARCH_VIEW_FOCUSED"
 const val ARG_CURRENT_QUERY = "ARG_CURRENT_QUERY"
-class SearchScreenActivity : BaseActivity(), OnItemClickListener,
+class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
         SearchView.OnQueryTextListener, SearchSuggestionViewHolder.OnItemListeners, MenuItem.OnActionExpandListener {
-    companion object {
-        fun createIntent(context: Context): Intent {
-            return Intent(context, SearchScreenActivity::class.java)
-        }
-    }
 
     private lateinit var optionsMenu: Menu
     private lateinit var searchMenuItem: MenuItem
@@ -61,23 +57,21 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate")
+        setHasOptionsMenu(true)
         isActivityJustRestore = savedInstanceState != null
         savedInstanceState?.let {
             isSearchViewFocused = savedInstanceState.getBoolean(ARG_IS_SEARCH_VIEW_FOCUSED)
             currentQuery = savedInstanceState.getString(ARG_CURRENT_QUERY)
         }
+        viewModel.requestTags()
+    }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         setupToolbar()
         setupAppbar()
         setupAdapter()
         setupRecyclerView()
-        handleIntent(intent)
-        viewModel.requestTags()
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        handleIntent(intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -86,21 +80,21 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
         super.onSaveInstanceState(outState)
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.search_screen_options, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        inflater.inflate(R.menu.search_screen_options, menu)
         optionsMenu = menu
 
         // Associate searchable configuration with the SearchView
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+//        val searchManager = context!!.getSystemService(Context.SEARCH_SERVICE) as SearchManager
         searchMenuItem = menu.findItem(R.id.action_search)
         val searchView = (searchMenuItem.actionView as SearchView).apply {
-            //setSearchableInfo(searchManager.getSearchableInfo(ComponentName(this@HomeActivity, SearchScreenActivity::class.java)))
-            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            //setSearchableInfo(searchManager.getSearchableInfo(ComponentName(this@HomeActivity, SearchScreenFragment::class.java)))
+//            setSearchableInfo(searchManager.getSearchableInfo(componentName))
             queryHint = getString(R.string.hint_search)
             setIconifiedByDefault(true) // Do not iconify the widget; expand it by default
             imeOptions = EditorInfo.IME_ACTION_SEARCH
-            setOnQueryTextListener(this@SearchScreenActivity)
+            setOnQueryTextListener(this@SearchScreenFragment)
             Timber.d("SearchView created")
             setOnQueryTextFocusChangeListener {_, hasFocus ->
                 isSearchViewFocused = hasFocus
@@ -112,25 +106,18 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
             forceSearchViewExpand()
             currentQuery?.let { searchView.setQuery(it, false) }
         }
-        return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
-            android.R.id.home->{
-                onBackPressed()
-                true
-            }
-            else ->{
-                super.onOptionsItemSelected(item)
-            }
-        }
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Have the NavigationUI look for an action or destination matching the menu
+        // item id and navigate there if found.
+        // Otherwise, bubble up to the parent.
+//    }
 
-    override fun getActivityLayoutRes(): Int = R.layout.activity_search_screen_app_bar
+    override fun getFragmentLayoutRes() = R.layout.activity_search_screen_content
 
     override fun getViewModel(): BaseViewModel {
-        val factory = SearchScreenViewModelFactory(application)
+        val factory = SearchScreenViewModelFactory(activity!!.application)
         viewModel = ViewModelProviders.of(this, factory).get(SearchScreenViewModel::class.java)
         return viewModel
     }
@@ -179,8 +166,8 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
 
     //region recipe adapter callbacks ==============================================================
     override fun onItemClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe) {
-        val intent = RecipeDetailFragment.createIntent(this, "", data)
-        startActivity(intent)
+        val bundle = RecipeDetailFragment.createBundle(context, layoutPosition.toString(), data)
+        findNavController().navigate(R.id.action_search_screen_dest_to_detail_dest, bundle)
     }
 
     override fun onItemLongClick(itemView: View, layoutPosition: Int, adapterPosition: Int, data: Recipe): Boolean {
@@ -243,7 +230,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
             val query = intent.getParcelableExtra<SearchItem>(SearchManager.USER_QUERY)
             //use the query to search your data somehow
             Timber.d("handle intent -> query = $query")
-            title = query.query
+            setTitle(query.query)
             viewModel.refreshRecipes(query)
             recipeAdapter.items = listOf()
         }
@@ -286,18 +273,18 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
     }
 
     private fun setupToolbar(){
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
-        toolbar.setOnClickListener {
+//        setSupportActionBar(toolbar)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setHomeButtonEnabled(true)
+        getToolbar().setOnClickListener {
             forceSearchViewExpand()
         }
-        title = ""
+        setTitle("")
     }
 
     private fun setupAppbar(){
         val appBarElevationMax = ScreenUtil.dp2px(1)
-        appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appbar, verticalOffset ->
+        getAppbar().addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appbar, verticalOffset ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Timber.d("addOnOffsetChangedListener $verticalOffset")
                 val currentPercent = Math.abs(verticalOffset) * 100 / Math.abs(appbar.totalScrollRange + 1).toFloat()
@@ -317,9 +304,9 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
 
     private fun setupRecyclerView() {
         val margin = resources.getDimensionPixelSize(R.dimen.padding_16)
-        rcvLikedRecipes.layoutManager = androidx.recyclerview.widget.StaggeredGridLayoutManager(2, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL)
-        rcvLikedRecipes.addItemDecoration(VerticalStaggeredSpaceItemDecoration(margin, margin, margin))
-        rcvLikedRecipes.adapter = recipeAdapter
+        rcvRecipesResult.layoutManager = androidx.recyclerview.widget.StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+        rcvRecipesResult.addItemDecoration(VerticalStaggeredSpaceItemDecoration(margin, margin, margin))
+        rcvRecipesResult.adapter = recipeAdapter
     }
 
     private fun checkNoData(){
@@ -333,7 +320,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
     private fun onSearchViewSubmit(item: SearchItem){
         viewModel.refreshRecipes(item)
         searchMenuItem.collapseActionView()
-        title = item.query
+        setTitle(item.query)
         onMenuItemActionCollapse(searchMenuItem)
     }
 
@@ -341,7 +328,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
         if(rcvSearchSuggestion == null){
             stub_search_suggestion.visibility = View.VISIBLE
             rcvSearchSuggestion.adapter = searchSuggestionAdapter
-            rcvSearchSuggestion.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+            rcvSearchSuggestion.layoutManager = LinearLayoutManager(context)
         }
         rcvSearchSuggestion.visibility =  if (isVisible) View.VISIBLE else View.GONE
         Timber.d("setSearchSuggestionVisibility $isVisible")
@@ -357,7 +344,7 @@ class SearchScreenActivity : BaseActivity(), OnItemClickListener,
             val item = optionsMenu.getItem(i)
             if (item !== exception) item.isVisible = visible
         }
-        if (visible)invalidateOptionsMenu()
+        if (visible)activity?.invalidateOptionsMenu()
     }
     //region end internal methods
 }

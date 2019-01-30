@@ -27,7 +27,6 @@ class SplashScreenViewModel(application: Application,
     internal val silentLoginStatus: MutableLiveData<StatusBox<Boolean>> = MutableLiveData()
     internal val likedRecipesId: MutableLiveData<StatusBox<List<String>>> = MutableLiveData()
     internal var requestNavStatus: MutableLiveData<StatusBox<List<DrawerNavGroupItem>>> = MutableLiveData()
-    internal val listNav: List<DrawerNavGroupItem>? = null
 
     fun checkLogin() {
         if (FirebaseAuth.getInstance().currentUser != null){
