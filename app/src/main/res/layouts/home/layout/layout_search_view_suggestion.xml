@@ -8,5 +8,5 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
     android:visibility="visible"
-    tools:context=".ui.screen.searchScreen.SearchScreenActivity">
+    tools:context=".ui.screen.searchScreen.SearchScreenFragment">
 </androidx.recyclerview.widget.RecyclerView>

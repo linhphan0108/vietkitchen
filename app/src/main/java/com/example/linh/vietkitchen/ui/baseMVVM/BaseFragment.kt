@@ -58,9 +58,14 @@ abstract class BaseFragment : Fragment() {
 
     internal fun getHomeActivity(): HomeActivity = activity as HomeActivity
 
+    protected fun setTitle(title: String){
+        getHomeActivity().supportActionBar?.title = title
+    }
+
     //======= inner classes ========================================================================
     interface FragmentScreenChangeCallbacks{
         fun onRequireFullScreen()
         fun onRequireNormalScreen()
+        fun onRequireJustToolbarScreen()
     }
 }

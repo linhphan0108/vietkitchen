@@ -64,7 +64,7 @@
         app:layout_behavior="com.example.linh.vietkitchen.ui.custom.ScrollAwareFABBehavior"
         app:borderWidth="0dp"
         android:elevation="@dimen/fab_elevation"
-        tools:srcCompat="@drawable/ic_heart_pink"
+        android:src="@drawable/fab_like_states"
         tools:targetApi="lollipop"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

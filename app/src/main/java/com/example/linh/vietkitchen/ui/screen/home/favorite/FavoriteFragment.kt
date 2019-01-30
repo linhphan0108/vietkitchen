@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
+import com.example.linh.vietkitchen.ui.screen.home.AbsHomeFragment
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 
-class FavoriteFragment : BaseHomeFragment() {
+class FavoriteFragment : AbsHomeFragment() {
     companion object {
         @JvmStatic
         fun newInstance() = FavoriteFragment()

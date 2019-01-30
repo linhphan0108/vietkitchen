@@ -12,10 +12,10 @@ import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnDrawerNavItemChangedListener
 import com.example.linh.vietkitchen.ui.model.Recipe
-import com.example.linh.vietkitchen.ui.screen.home.BaseHomeFragment
+import com.example.linh.vietkitchen.ui.screen.home.AbsHomeFragment
 import timber.log.Timber
 
-class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
+class HomeFragment : AbsHomeFragment(), OnDrawerNavItemChangedListener {
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -35,7 +35,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
 
     private var viewModel: HomeFragmentViewModel? = null
 
-    private var title: String = ""
+    private var category: String = "Tất Cả"
 
     private val bottomSheetOptions: BottomSheetOptions by lazy {BottomSheetOptions()}
 
@@ -62,7 +62,7 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
 
     override fun onResume() {
         super.onResume()
-        toolbarActions?.changeToolbarTitle(title)
+        setTitle(category)
         Timber.e("on resume")
     }
 
@@ -130,8 +130,9 @@ class HomeFragment : BaseHomeFragment(), OnDrawerNavItemChangedListener {
 
     //region callbacks =============================================================================
     override fun onDrawerNavChanged(category: String) {
-        if (title == category) return
-        title = category
+        if (this.category == category) return
+        this.category = category
+        setTitle(category)
         getViewModel().refreshRecipesByCat(category)
     }
 
