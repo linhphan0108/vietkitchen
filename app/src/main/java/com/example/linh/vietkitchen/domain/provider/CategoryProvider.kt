@@ -3,7 +3,7 @@ package com.example.linh.vietkitchen.domain.provider
 import com.example.linh.vietkitchen.data.cloud.CategoryCloudDs
 import com.example.linh.vietkitchen.data.local.CategoryLocalDs
 import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.extension.CategoryDataSource
+import com.example.linh.vietkitchen.domain.datasource.CategoryDataSource
 import com.example.linh.vietkitchen.domain.mapper.CategoryMapper
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 

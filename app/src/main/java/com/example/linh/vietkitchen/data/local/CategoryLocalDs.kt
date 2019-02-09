@@ -2,7 +2,7 @@ package com.example.linh.vietkitchen.data.local
 
 import com.example.linh.vietkitchen.data.cloud.Category
 import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.extension.CategoryDataSource
+import com.example.linh.vietkitchen.domain.datasource.CategoryDataSource
 import com.google.firebase.database.DataSnapshot
 
 class CategoryLocalDs : CategoryDataSource {
