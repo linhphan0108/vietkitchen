@@ -17,11 +17,12 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import timber.log.Timber
 import java.util.*
+import javax.inject.Inject
 
-class SplashScreenViewModel(application: Application,
-        private val requestCategoryCommand: RequestCategoryCommand = RequestCategoryCommand(),
-        private val categoryMapper: CategoryMapper = CategoryMapper(),
-        private val requestRecipesIdCommand: RequestRecipesIdCommand = RequestRecipesIdCommand())
+class SplashScreenViewModel @Inject constructor(application: Application,
+        private val requestCategoryCommand: RequestCategoryCommand,
+        private val categoryMapper: CategoryMapper,
+        private val requestRecipesIdCommand: RequestRecipesIdCommand)
     :  BaseViewModel(application){
 
     internal val silentLoginStatus: MutableLiveData<StatusBox<Boolean>> = MutableLiveData()

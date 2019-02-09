@@ -3,8 +3,6 @@ package com.example.linh.vietkitchen.ui.screen.home.homeActivity
 import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -23,6 +21,8 @@ import com.example.linh.vietkitchen.BuildConfig
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.*
+import com.example.linh.vietkitchen.di.injector
+import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.util.ScreenUtil
@@ -33,14 +33,9 @@ import timber.log.Timber
 
 class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener,
         OnItemClickListener, BaseFragment.FragmentScreenChangeCallbacks {
-    companion object {
-        fun createIntent(context: Context): Intent{
-            return Intent(context, HomeActivity::class.java)
-        }
-    }
     private lateinit var appBarConfiguration : AppBarConfiguration
 
-    private lateinit var viewModel: HomeActivityViewModel
+    private val viewModel: HomeActivityViewModel by viewModel(this) {injector.homeActivityViewModel}
     private lateinit var drawerNavAdapter: DrawerNavRcAdapter
     internal var onDrawerNavItemChangedListener: OnDrawerNavItemChangedListener? = null
 
@@ -92,12 +87,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     //region MVP callbacks==========================================================================
     override fun getActivityLayoutRes() = R.layout.activity_home
-    override fun getViewModel(): BaseViewModel {
-        val factory = HomeActivityModelViewFactory(application)
-        viewModel = ViewModelProviders.of(this, factory).get(HomeActivityViewModel::class.java)
-        return viewModel
-    }
-
+    override fun getViewModel(): BaseViewModel = viewModel
     private fun onRequestCategoriesSuccess(items: List<DrawerNavGroupItem>) {
         drawerNavAdapter.updateItemThenNotify(items)
     }

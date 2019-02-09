@@ -23,6 +23,7 @@ import com.example.linh.vietkitchen.util.ImageOptimizationUtil
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import javax.inject.Inject
 
 
 const val NOTIFICATION_CHANNEL_ID = "50"
@@ -96,13 +97,13 @@ class PutRecipeService : BaseService() {
      */
     private val messenger = Messenger(IncomingHandler())
 
-    private val recipeMapper by lazy { RecipeMapper() }
-    private val categoryMapper by lazy { CategoryMapper() }
-    private val putRecipeCommand by lazy { PutRecipeCommand() }
-    private val updateRecipeCommand by lazy { UpdateRecipeCommand() }
-    private val uploadImageCommand by lazy { UploadImageCommand() }
-    private val putTagsCommand by lazy { PutTagsCommand() }
-    private val updateCategoriesCommand by lazy { UpdateCategoriesCommand() }
+    @Inject lateinit var recipeMapper: RecipeMapper
+    @Inject lateinit var categoryMapper: CategoryMapper
+    @Inject lateinit var putRecipeCommand: PutRecipeCommand
+    @Inject lateinit var updateRecipeCommand: UpdateRecipeCommand
+    @Inject lateinit var uploadImageCommand: UploadImageCommand
+    @Inject lateinit var putTagsCommand: PutTagsCommand
+    @Inject lateinit var updateCategoriesCommand: UpdateCategoriesCommand
 
     private val imageCompressionUtil by lazy { ImageOptimizationUtil() }
 

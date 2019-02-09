@@ -3,37 +3,32 @@ package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.domain.command.DeleteImagesCommand
-import com.example.linh.vietkitchen.domain.command.DeleteRecipeCommand
-import com.example.linh.vietkitchen.domain.command.RequestRecipeCommand
-import com.example.linh.vietkitchen.domain.command.UpdateCategoriesCommand
+import com.example.linh.vietkitchen.domain.command.*
 import com.example.linh.vietkitchen.extension.removeLast
 import com.example.linh.vietkitchen.util.TimberUtils
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
-import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 import com.example.linh.vietkitchen.util.RecipeUtil
-import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
-import org.greenrobot.eventbus.ThreadMode
-import org.greenrobot.eventbus.Subscribe
+import javax.inject.Inject
 
 
-class HomeFragmentViewModel(application: Application,
-                            private val userInfo: UserInfo = VietKitchenApp.getUserInfo(),
-                            private val recipeMapper: RecipeMapper = RecipeMapper(),
-                            private val categoryMapper: CategoryMapper = CategoryMapper(),
-                            private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),
-                            private val deleteRecipeCommand: DeleteRecipeCommand = DeleteRecipeCommand(),
-                            private val deleteImagesCommand: DeleteImagesCommand = DeleteImagesCommand(),
-                            private val updateCategoriesCommand: UpdateCategoriesCommand = UpdateCategoriesCommand())
-    : BaseHomeViewModel(application) {
+class HomeFragmentViewModel @Inject constructor(application: Application,
+        private val recipeMapper: RecipeMapper,
+        private val categoryMapper: CategoryMapper,
+        private val requestRecipeCommand : RequestRecipeCommand,
+        private val deleteRecipeCommand: DeleteRecipeCommand,
+        private val deleteImagesCommand: DeleteImagesCommand,
+        private val updateCategoriesCommand: UpdateCategoriesCommand,
+        putLikeCommand: PutLikeCommand,
+        putUnlikeCommand: PutUnlikeCommand)
+    : BaseHomeViewModel(application, putLikeCommand, putUnlikeCommand) {
 
     private var category: String? = null
     private var lastRecipeId: String? = null

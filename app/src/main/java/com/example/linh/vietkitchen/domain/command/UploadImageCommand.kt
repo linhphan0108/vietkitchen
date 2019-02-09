@@ -5,7 +5,7 @@ import com.example.linh.vietkitchen.data.cloud.ImageUpload
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
 
-class UploadImageCommand(private val provider: RecipeProvider = RecipeProvider()) : CommandCoroutines<Response<List<ImageUpload>>> {
+class UploadImageCommand(private val provider: RecipeProvider) : CommandCoroutines<Response<List<ImageUpload>>> {
     lateinit var multiPartFileMap: List<ImageUpload>
 
     override suspend fun execute(context: Context): Response<List<ImageUpload>> {

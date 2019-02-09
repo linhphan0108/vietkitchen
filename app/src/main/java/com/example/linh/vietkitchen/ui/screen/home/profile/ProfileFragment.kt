@@ -2,7 +2,6 @@ package com.example.linh.vietkitchen.ui.screen.home.profile
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.request.RequestOptions
@@ -13,12 +12,14 @@ import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseFragment
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.di.injector
+import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : BaseFragment(), View.OnClickListener {
 
-    private lateinit var viewModel: ProfileViewModel
+    private val viewModel: ProfileViewModel by viewModel(this){ injector.profileFragmentViewModel }
 
     val userInfo by lazy { VietKitchenApp.getUserInfo() }
 
@@ -36,8 +37,6 @@ class ProfileFragment : BaseFragment(), View.OnClickListener {
     override fun getFragmentLayoutRes() = R.layout.fragment_profile
 
     override fun getViewModel(): BaseViewModel {
-        val factory = ProfileViewModelFactory(activity!!.application)
-        viewModel = ViewModelProviders.of(this, factory).get(ProfileViewModel::class.java)
         return viewModel
     }
 

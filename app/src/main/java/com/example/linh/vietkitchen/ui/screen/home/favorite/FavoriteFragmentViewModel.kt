@@ -2,6 +2,8 @@ package com.example.linh.vietkitchen.ui.screen.home.favorite
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
+import com.example.linh.vietkitchen.domain.command.PutLikeCommand
+import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.domain.command.RequestLikedRecipesCommand
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
@@ -11,11 +13,14 @@ import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.Constants
 import timber.log.Timber
+import javax.inject.Inject
 
-class FavoriteFragmentViewModel(application: Application,
-        private val recipeMapper: RecipeMapper = RecipeMapper(),
-        private val likedRecipesCommand: RequestLikedRecipesCommand = RequestLikedRecipesCommand())
-    : BaseHomeViewModel(application){
+class FavoriteFragmentViewModel @Inject constructor(application: Application,
+        private val recipeMapper: RecipeMapper,
+        private val likedRecipesCommand: RequestLikedRecipesCommand,
+        putLikeCommand: PutLikeCommand,
+        putUnlikeCommand: PutUnlikeCommand)
+    : BaseHomeViewModel(application, putLikeCommand, putUnlikeCommand){
 
     private val userInfo by lazy { VietKitchenApp.getUserInfo() }
     internal val requestLikeRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()

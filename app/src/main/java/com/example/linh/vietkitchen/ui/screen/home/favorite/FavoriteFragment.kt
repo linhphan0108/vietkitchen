@@ -1,20 +1,17 @@
 package com.example.linh.vietkitchen.ui.screen.home.favorite
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.di.injector
+import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.AbsHomeFragment
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 
 class FavoriteFragment : AbsHomeFragment() {
-    companion object {
-        @JvmStatic
-        fun newInstance() = FavoriteFragment()
-    }
 
-    private lateinit var viewModel: FavoriteFragmentViewModel
+    private val viewModel: FavoriteFragmentViewModel by viewModel(this){ injector.favoriteFragmentViewModel }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -24,10 +21,7 @@ class FavoriteFragment : AbsHomeFragment() {
     }
 
     //region MVP callbacks =========================================================================
-    override fun getViewModel(): BaseHomeViewModel {
-        val factory = FavoriteFragmentViewModelFactory(activity!!.application)
-        viewModel = ViewModelProviders.of(this, factory).get(FavoriteFragmentViewModel::class.java)
-        return viewModel
+    override fun getViewModel(): BaseHomeViewModel {return viewModel
     }
 
     override fun onLikeEventObserve(recipe: Recipe) {

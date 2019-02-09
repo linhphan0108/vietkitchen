@@ -10,11 +10,12 @@ import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
 import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
+import javax.inject.Inject
 
-class UserCloudDataSource : UserDataSource{
+class UserCloudDataSource @Inject constructor
+(private val database: FirebaseDatabase) : UserDataSource{
 
-    private val dbRef by lazy{
-        FirebaseDatabase.getInstance().getReference(STORAGE_USER_PATH)}
+    private val dbRef by lazy{database.getReference(STORAGE_USER_PATH)}
 
     override suspend fun likeRecipe(uid: String, recipeKey: String): Response<String> {
         val newDbRef = dbRef.child(uid).child(STORAGE_USER_LIKED_RECIPES_PATH).child(recipeKey)

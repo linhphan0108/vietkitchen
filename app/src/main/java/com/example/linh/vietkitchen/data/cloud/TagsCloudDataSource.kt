@@ -8,9 +8,11 @@ import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
+import javax.inject.Inject
 
-class TagsCloudDataSource : TagsDataSource{
-    private val database by lazy { FirebaseDatabase.getInstance() }
+class TagsCloudDataSource @Inject constructor
+(private val database: FirebaseDatabase) : TagsDataSource{
+
     private val dbRefRecipe by lazy { database.getReference(Constants.STORAGE_RECIPES_TAGS_PATH) }
 
     override suspend fun getTags(): Response<DataSnapshot>? {

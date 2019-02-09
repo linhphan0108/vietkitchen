@@ -8,9 +8,11 @@ import com.example.linh.vietkitchen.util.Constants.STORAGE_FOOD
 import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
+import javax.inject.Inject
 
-class CategoryCloudDs : CategoryDataSource {
-    private val database  by lazy { FirebaseDatabase.getInstance()}
+class CategoryCloudDs @Inject constructor
+(private val database: FirebaseDatabase) : CategoryDataSource {
+
     private val dbRef by lazy{ database.getReference(STORAGE_FOOD)}
 
     override suspend fun getCategories(): Response<DataSnapshot> {

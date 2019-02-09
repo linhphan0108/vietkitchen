@@ -5,8 +5,9 @@ import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.SearchItem
+import javax.inject.Inject
 
-class CategoryMapper {
+class CategoryMapper @Inject constructor() {
     fun toSearchItem(categories: List<CategoryGroup>): MutableList<SearchItem>{
         val result = mutableListOf<SearchItem>()
         categories.forEach {group ->

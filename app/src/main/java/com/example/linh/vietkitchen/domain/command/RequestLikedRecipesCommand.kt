@@ -4,8 +4,9 @@ import android.content.Context
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
+import javax.inject.Inject
 
-class RequestLikedRecipesCommand(private val provider: RecipeProvider = RecipeProvider())
+class RequestLikedRecipesCommand @Inject constructor(private val provider: RecipeProvider)
     : CommandCoroutines<Response<List<Recipe>>> {
     var ids: List<String>? = null
 

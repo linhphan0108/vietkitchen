@@ -1,14 +1,14 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.example.linh.vietkitchen.extension.toast
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.di.injector
+import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.dialog.BottomSheetOptions
-import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.HomeActivity
 import com.example.linh.vietkitchen.ui.screen.home.homeActivity.OnDrawerNavItemChangedListener
 import com.example.linh.vietkitchen.ui.model.Recipe
@@ -16,24 +16,8 @@ import com.example.linh.vietkitchen.ui.screen.home.AbsHomeFragment
 import timber.log.Timber
 
 class HomeFragment : AbsHomeFragment(), OnDrawerNavItemChangedListener {
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         * @return A new instance of fragment HomeFragment.
-         */
-        @JvmStatic
-        fun newInstance(navItems: List<DrawerNavGroupItem>) =
-                HomeFragment().apply {
-                    arguments = Bundle().apply {
-                    }
-                }
 
-        @JvmStatic
-        fun newInstance() = HomeFragment()
-    }
-
-    private var viewModel: HomeFragmentViewModel? = null
+    private val viewModel: HomeFragmentViewModel by viewModel(this){injector.homeFragmentViewModel}
 
     private var category: String = "Tất Cả"
 
@@ -101,13 +85,7 @@ class HomeFragment : AbsHomeFragment(), OnDrawerNavItemChangedListener {
     //endregion lifecycle
 
     //region MVP callbacks =========================================================================
-    override fun getViewModel(): HomeFragmentViewModel {
-        if(viewModel == null) {
-            val factory = HomeFragmentViewModelFactory(activity!!.application)
-            viewModel = ViewModelProviders.of(this, factory).get(HomeFragmentViewModel::class.java)
-        }
-        return viewModel!!
-    }
+    override fun getViewModel() =  viewModel
 
     override fun onLikeEventObserve(recipe: Recipe) {
         recipeAdapter.onLike(recipe)

@@ -2,9 +2,6 @@ package com.example.linh.vietkitchen.ui.screen.detailActivity
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import android.content.Intent
-import android.os.Build
-import android.os.Bundle
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.ui.VietKitchenApp
@@ -12,10 +9,11 @@ import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import timber.log.Timber
+import javax.inject.Inject
 
-class RecipeDetailViewModel(applicationContext: Application,
-                            private val likeCommand: PutLikeCommand = PutLikeCommand(),
-                            private val unlikeCommand: PutUnlikeCommand = PutUnlikeCommand())
+class RecipeDetailViewModel @Inject constructor(applicationContext: Application,
+        private val likeCommand: PutLikeCommand,
+        private val unlikeCommand: PutUnlikeCommand)
     : BaseViewModel(applicationContext) {
 
     val recipe: MutableLiveData<Recipe> by lazy { MutableLiveData<Recipe>() }

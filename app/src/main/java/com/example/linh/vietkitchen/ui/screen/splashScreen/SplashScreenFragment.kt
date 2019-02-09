@@ -2,7 +2,6 @@ package com.example.linh.vietkitchen.ui.screen.splashScreen
 
 import android.app.Activity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -17,6 +16,8 @@ import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import timber.log.Timber
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.di.injector
+import com.example.linh.vietkitchen.di.viewModel
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
@@ -32,7 +33,7 @@ class SplashScreenFragment : FullScreenFragment() {
         private const val ARG_RETRY_REQUEST_RECIPES_IDS_TIMES = "ARG_RETRY_REQUEST_RECIPES_IDS_TIMES"
     }
 
-    private lateinit var viewModel: SplashScreenViewModel
+    private val viewModel: SplashScreenViewModel by viewModel(this){ injector.splashScreenFragmentViewModel }
     private var timeStartedSplashScreen: Long = System.currentTimeMillis()
     private var retryRequestCategoryTimes = 0
     private var retryRequestListLikedRecipesIdsTimes = 0
@@ -97,8 +98,6 @@ class SplashScreenFragment : FullScreenFragment() {
     override fun getFragmentLayoutRes() = R.layout.activity_splash_screen
 
     override fun getViewModel(): BaseViewModel {
-        val factory = SplashScreenViewModelFactory(activity!!.application)
-        viewModel = ViewModelProviders.of(this, factory).get(SplashScreenViewModel::class.java)
         return viewModel
     }
 

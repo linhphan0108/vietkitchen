@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator
 import android.animation.StateListAnimator
 import android.app.SearchManager
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +26,8 @@ import com.example.linh.vietkitchen.ui.adapter.viewholder.SearchSuggestionViewHo
 import com.example.linh.vietkitchen.ui.baseMVVM.AbsJustToolbarFragment
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
+import com.example.linh.vietkitchen.di.injector
+import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Entity
 import com.example.linh.vietkitchen.ui.model.Recipe
@@ -45,7 +46,7 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
 
     private lateinit var optionsMenu: Menu
     private lateinit var searchMenuItem: MenuItem
-    private lateinit var viewModel: SearchScreenViewModel
+    private val viewModel: SearchScreenViewModel by viewModel(this){ injector.searchScreenFragmentViewModel }
     private val searchSuggestionAdapter: SearchSuggestionAdapter by lazy { SearchSuggestionAdapter(mutableListOf(), this) }
     private lateinit var recipeAdapter: RecipeAdapter
     private var isSearchViewFocused = true
@@ -117,8 +118,6 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
     override fun getFragmentLayoutRes() = R.layout.activity_search_screen_content
 
     override fun getViewModel(): BaseViewModel {
-        val factory = SearchScreenViewModelFactory(activity!!.application)
-        viewModel = ViewModelProviders.of(this, factory).get(SearchScreenViewModel::class.java)
         return viewModel
     }
     //region end activity cycle callbacks

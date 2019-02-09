@@ -3,8 +3,9 @@ package com.example.linh.vietkitchen.domain.command
 import android.content.Context
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
+import javax.inject.Inject
 
-class DeleteImagesCommand(private val recipeProvider: RecipeProvider = RecipeProvider())
+class DeleteImagesCommand @Inject constructor(private val recipeProvider: RecipeProvider)
     : CommandCoroutines<Response<Boolean>> {
 
     override suspend fun execute(context: Context): Response<Boolean> {

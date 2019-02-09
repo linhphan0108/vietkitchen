@@ -5,9 +5,10 @@ import com.example.linh.vietkitchen.data.cloud.Category as CatDataLayer
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.domain.model.CategoryChild
 import com.google.firebase.database.DataSnapshot
+import javax.inject.Inject
 
 const val NUMBER_ITEMS_COUNT = "COUNT"
-class CategoryMapper{
+class CategoryMapper @Inject constructor(){
     fun convertToDomain(res: Response<DataSnapshot>): Response<List<CategoryGroup>> {
         val data = if (res.data != null) convertToDomain(res.data) else null
         return Response(res.code, data, res.message, res.exception)

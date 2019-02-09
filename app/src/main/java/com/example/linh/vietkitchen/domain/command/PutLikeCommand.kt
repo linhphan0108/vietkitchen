@@ -3,8 +3,9 @@ package com.example.linh.vietkitchen.domain.command
 import android.content.Context
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.provider.UserProvider
+import javax.inject.Inject
 
-class PutLikeCommand(private val userProvider: UserProvider = UserProvider())
+class PutLikeCommand @Inject constructor(private val userProvider: UserProvider)
     : CommandCoroutines<Response<String>> {
     lateinit var uid: String
     lateinit var recipeId: String

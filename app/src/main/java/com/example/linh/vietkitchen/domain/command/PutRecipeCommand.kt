@@ -4,8 +4,9 @@ import android.content.Context
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
+import javax.inject.Inject
 
-class PutRecipeCommand(private val provider: RecipeProvider = RecipeProvider()) : CommandCoroutines<Response<String>>{
+class PutRecipeCommand @Inject constructor(private val provider: RecipeProvider) : CommandCoroutines<Response<String>>{
     lateinit var recipe: Recipe
 
     override suspend fun execute(context: Context): Response<String> {

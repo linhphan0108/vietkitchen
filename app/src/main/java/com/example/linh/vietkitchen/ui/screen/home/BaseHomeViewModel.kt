@@ -13,8 +13,8 @@ import org.greenrobot.eventbus.ThreadMode
 import timber.log.Timber
 
 abstract class BaseHomeViewModel(application: Application,
-     private val putLikeCommand: PutLikeCommand = PutLikeCommand(),
-     private val putUnlikeCommand: PutUnlikeCommand = PutUnlikeCommand()
+         private val putLikeCommand: PutLikeCommand,
+         private val putUnlikeCommand: PutUnlikeCommand
 ): BaseViewModel(application) {
 
     internal val likeOrUnlikeAction: MutableLiveData<Recipe> = MutableLiveData()

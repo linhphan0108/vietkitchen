@@ -4,9 +4,10 @@ import com.example.linh.vietkitchen.data.cloud.Recipe
 import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.google.firebase.database.DataSnapshot
+import javax.inject.Inject
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
-class RecipeMapper {
+class RecipeMapper @Inject constructor() {
 
     fun convertToDomain(children: List<DataSnapshot>): List<RecipeDomain> {
         return convertToDomain(children.asIterable())

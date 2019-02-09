@@ -7,20 +7,20 @@ import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_CATEGORIES
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
-import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
 import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import timber.log.Timber
 import java.lang.NullPointerException
+import javax.inject.Inject
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
-class RecipeCloudDataSource : RecipeDataSource {
-    private val database by lazy { FirebaseDatabase.getInstance() }
+class RecipeCloudDataSource @Inject constructor
+(private val database: FirebaseDatabase, private val storage: FirebaseStorage)
+    : RecipeDataSource {
+
     private val dbRefRecipe by lazy { database.getReference(STORAGE_RECIPES_PATH) }
-    private val dbRefUser by lazy { database.getReference(STORAGE_USER_PATH) }
-    private val storage = FirebaseStorage.getInstance()
     private val storageRecipeRef = storage.reference.child("images/recipes/")
 
     override suspend fun requestRecipesByTag(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? {

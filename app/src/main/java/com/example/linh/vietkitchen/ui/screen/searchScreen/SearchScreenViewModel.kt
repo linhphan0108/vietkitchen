@@ -17,13 +17,14 @@ import com.example.linh.vietkitchen.ui.model.SearchItem
 import com.example.linh.vietkitchen.util.TimberUtils
 import kotlinx.coroutines.Job
 import timber.log.Timber
+import javax.inject.Inject
 
-class SearchScreenViewModel(application: Application,
-                            private val requestRecipeCommand : RequestRecipeCommand = RequestRecipeCommand(),
-                            private val recipeMapper: RecipeMapper = RecipeMapper(),
-                            private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand(),
-                            private val tagMapper: TagMapper = TagMapper(),
-                            private val categoryMapper: CategoryMapper = CategoryMapper())
+class SearchScreenViewModel @Inject constructor(application: Application,
+                            private val requestRecipeCommand : RequestRecipeCommand,
+                            private val recipeMapper: RecipeMapper,
+                            private val requestTagsCommand: RequestTagsCommand,
+                            private val tagMapper: TagMapper,
+                            private val categoryMapper: CategoryMapper)
     : BaseViewModel(application) {
     private var searchItem: SearchItem? = null
     private var lastRecipeId: String? = null
