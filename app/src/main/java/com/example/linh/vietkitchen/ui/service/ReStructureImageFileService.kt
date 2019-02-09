@@ -19,12 +19,13 @@ import com.example.linh.vietkitchen.ui.GlideApp
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import timber.log.Timber
+import javax.inject.Inject
 
 class ReStructureImageFileService : BaseService() {
     private lateinit var nn: NotificationManager
     private val storageRecipeRef by lazy { FirebaseStorage.getInstance().reference.child("images/recipes/")}
-    private val requestRecipeCommand by lazy { RequestRecipeCommand(limit = 10_000_000) }
-    private val updateRecipeCommand by lazy { UpdateRecipeCommand() }
+    @Inject lateinit var requestRecipeCommand: RequestRecipeCommand
+    @Inject lateinit var  updateRecipeCommand: UpdateRecipeCommand
     /**
      * Target we publish for clients to send messages to IncomingHandler.
      */

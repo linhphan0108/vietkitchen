@@ -12,13 +12,11 @@ import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.ResponseCode
 import com.example.linh.vietkitchen.util.TimberUtils
 import timber.log.Timber
+import javax.inject.Inject
 
-class RecipeProvider(private val mapper: RecipeMapper = RecipeMapper(),
-        sources: List<RecipeDataSource> = SOURCES) : BaseProvider<RecipeDataSource>(sources){
-    companion object {
-        val SOURCES by lazy { listOf(RecipeLocalDataSource(), RecipeCloudDataSource()) }
-    }
-
+class RecipeProvider @Inject constructor(private val mapper: RecipeMapper,
+    localDataSource: RecipeLocalDataSource, cloudDataSource: RecipeCloudDataSource)
+    : BaseProvider<RecipeDataSource>(listOf(localDataSource, cloudDataSource)){
     suspend fun requestRecipeByCategory(cat: String? = null, limit: Int = Constants.PAGINATION_LENGTH,
                                         startAtId: String? = null) : PagingResponse<List<Recipe>>
             = requestFirstSources {

@@ -22,10 +22,11 @@ import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.util.RecipeUtil
 import com.example.linh.vietkitchen.util.TimberUtils
+import javax.inject.Inject
 
 
-class AdminViewModel(application: Application,
-        private val requestTagsCommand: RequestTagsCommand = RequestTagsCommand())
+class AdminViewModel @Inject constructor(application: Application,
+                 private val requestTagsCommand: RequestTagsCommand)
     : BaseViewModel(application) {
 
     internal val listTagsOnServerStatus: MutableLiveData<StatusBox<List<String>>> =  MutableLiveData()

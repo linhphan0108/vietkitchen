@@ -6,8 +6,9 @@ import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.firebase.ui.auth.AuthUI
+import javax.inject.Inject
 
-class ProfileViewModel(application: Application) : BaseViewModel(application) {
+class ProfileViewModel @Inject constructor(application: Application) : BaseViewModel(application) {
 
     internal val logoutStatus: MutableLiveData<StatusBox<Boolean>> = MutableLiveData()
 

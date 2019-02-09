@@ -1,8 +1,9 @@
 package com.example.linh.vietkitchen.ui.mapper
 
 import com.example.linh.vietkitchen.ui.model.SearchItem
+import javax.inject.Inject
 
-class TagMapper {
+class TagMapper @Inject constructor(){
     fun toSearchItem(list: List<String>): List<SearchItem>{
         return list.map {
             SearchItem(it, SearchItem.SearchItemType.TAG)

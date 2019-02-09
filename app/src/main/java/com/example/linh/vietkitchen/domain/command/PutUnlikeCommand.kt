@@ -3,8 +3,10 @@ package com.example.linh.vietkitchen.domain.command
 import android.content.Context
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.provider.UserProvider
+import javax.inject.Inject
 
-class PutUnlikeCommand(private val userProvider: UserProvider = UserProvider()) : CommandCoroutines<Response<Boolean>>{
+class PutUnlikeCommand @Inject constructor(private val userProvider: UserProvider)
+    : CommandCoroutines<Response<Boolean>>{
     lateinit var uid: String
     lateinit var recipeId: String
 

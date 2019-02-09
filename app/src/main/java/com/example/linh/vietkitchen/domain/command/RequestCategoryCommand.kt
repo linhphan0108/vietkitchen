@@ -4,8 +4,10 @@ import android.content.Context
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.domain.provider.CategoryProvider
+import javax.inject.Inject
 
-class RequestCategoryCommand(private val provider: CategoryProvider = CategoryProvider()) : CommandCoroutines<Response<List<CategoryGroup>>> {
+class RequestCategoryCommand @Inject constructor(private val provider: CategoryProvider)
+    : CommandCoroutines<Response<List<CategoryGroup>>> {
 
     override suspend fun execute(context: Context): Response<List<CategoryGroup>> {
         isInternetOn(context)

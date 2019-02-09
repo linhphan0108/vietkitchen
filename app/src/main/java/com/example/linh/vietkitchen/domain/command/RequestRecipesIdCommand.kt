@@ -2,8 +2,10 @@ package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
 import com.example.linh.vietkitchen.domain.provider.UserProvider
+import javax.inject.Inject
 
-class RequestRecipesIdCommand(private val userProvider: UserProvider = UserProvider())
+class RequestRecipesIdCommand @Inject constructor(
+        private val userProvider: UserProvider)
     : CommandCoroutines<List<String>> {
     lateinit var uid: String
 

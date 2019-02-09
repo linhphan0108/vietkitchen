@@ -6,13 +6,15 @@ import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
 import com.example.linh.vietkitchen.extension.isNotNullAndNotBlank
 import com.example.linh.vietkitchen.util.Constants
+import javax.inject.Inject
 
-class RequestRecipeCommand(var limit: Int = Constants.PAGINATION_LENGTH,
-                           var title: String? = null,
-                           var category: String? = null, var tag: String? = null,
-                           var startAtId: String? = null,
-                           private val provider: RecipeProvider = RecipeProvider())
+class RequestRecipeCommand @Inject constructor(private val provider: RecipeProvider)
     : CommandCoroutines<PagingResponse<List<Recipe>>>{
+    var limit: Int = Constants.PAGINATION_LENGTH
+    var title: String? = null
+    var category: String? = null
+    var tag: String? = null
+    var startAtId: String? = null
 
     override suspend fun execute(context: Context): PagingResponse<List<Recipe>> {
         isInternetOn(context)

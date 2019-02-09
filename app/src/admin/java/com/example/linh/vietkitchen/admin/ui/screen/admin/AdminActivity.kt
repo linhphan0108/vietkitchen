@@ -29,6 +29,8 @@ import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.AnnotationKey
 import com.example.linh.vietkitchen.ui.custom.imageSpanWidget.Style
+import com.example.linh.vietkitchen.ui.di.injector
+import com.example.linh.vietkitchen.ui.di.viewModel
 import com.example.linh.vietkitchen.ui.dialog.ProgressDialog
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.Recipe
@@ -44,17 +46,7 @@ private const val REQUEST_IMAGE_PROCESS = 96
 class AdminActivity : BaseActivity(),
         View.OnClickListener, ProgressDialog.Listener, View.OnFocusChangeListener {
 
-    companion object {
-        fun createIntent(context: Context): Intent{
-            return Intent(context, AdminActivity::class.java)
-        }
-
-        fun navigate(context: Context){
-
-        }
-    }
-
-    private lateinit var viewModel: AdminViewModel
+    private val viewModel: AdminViewModel by viewModel(this){ injector.adminActivityViewModel }
     private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
 
     private var imageUri: Uri? = null
@@ -183,8 +175,6 @@ class AdminActivity : BaseActivity(),
     override fun getActivityLayoutRes() = R.layout.activity_admin
 
     override fun getViewModel(): BaseViewModel {
-        val factory = AdminViewModelFactory(application)
-        viewModel = ViewModelProviders.of(this, factory).get(AdminViewModel::class.java)
         return viewModel
     }
 

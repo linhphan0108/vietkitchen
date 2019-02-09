@@ -3,6 +3,9 @@ package com.example.linh.vietkitchen.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.multidex.MultiDexApplication
 import com.example.linh.vietkitchen.BuildConfig
+import com.example.linh.vietkitchen.ui.di.ApplicationComponent
+import com.example.linh.vietkitchen.ui.di.DaggerApplicationComponent
+import com.example.linh.vietkitchen.ui.di.DaggerComponentProvider
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.UserInfo
 import com.example.linh.vietkitchen.util.NotLoggingTree
@@ -12,7 +15,14 @@ import timber.log.Timber
 
 
 
-class VietKitchenApp : MultiDexApplication(){
+class VietKitchenApp : MultiDexApplication(), DaggerComponentProvider{
+
+    override val component: ApplicationComponent by lazy {
+        DaggerApplicationComponent.builder()
+                .application(this)
+                .build()
+    }
+
     companion object {
         private  val userInfo: MutableLiveData<UserInfo> = MutableLiveData()
         val category: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()

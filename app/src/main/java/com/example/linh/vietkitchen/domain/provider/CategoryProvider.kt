@@ -6,14 +6,11 @@ import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.datasource.CategoryDataSource
 import com.example.linh.vietkitchen.domain.mapper.CategoryMapper
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
+import javax.inject.Inject
 
-class CategoryProvider(private val mapper: CategoryMapper = CategoryMapper(),
-                       sources: List<CategoryDataSource> = SOURCES) : BaseProvider<CategoryDataSource>(sources){
-    companion object {
-        val SOURCES by lazy {
-            listOf(CategoryLocalDs(), CategoryCloudDs())
-        }
-    }
+class CategoryProvider @Inject constructor(private val mapper: CategoryMapper,
+               localDataSource: CategoryLocalDs, cloudDataSource: CategoryCloudDs)
+    : BaseProvider<CategoryDataSource>(listOf(localDataSource, cloudDataSource)){
 
     suspend fun getCategories(): Response<List<CategoryGroup>> = requestFirstSources {
         it.getCategories()?.let {response->

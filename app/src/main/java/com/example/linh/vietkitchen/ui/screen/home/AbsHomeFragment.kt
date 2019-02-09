@@ -59,6 +59,11 @@ abstract class AbsHomeFragment : AbsFullNavFragment(),
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    override fun onDestroyView() {
+        getRecyclerView().removeOnScrollListener(rcvLoadMoreListener)
+        super.onDestroyView()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Timber.d("onOptionsItemSelected in fragment")
         return when (item.itemId) {
@@ -143,12 +148,12 @@ abstract class AbsHomeFragment : AbsFullNavFragment(),
         recyclerView.adapter = recipeAdapter
         rcvLoadMoreListener = object : EndlessScrollListener(Constants.VISIBLE_THRESHOLD_TO_LOAD_MORE) {
             override fun onLoadMore(page: Int, totalItemsCount: Int): Boolean {
-                rcvRecipes.post { getViewModel().loadMoreRecipe() }
+                recyclerView?.post { getViewModel().loadMoreRecipe() }
                 Timber.d("rcvLoadMoreListener")
                 return true
             }
         }
-        rcvRecipes.addOnScrollListener(rcvLoadMoreListener)
+        recyclerView.addOnScrollListener(rcvLoadMoreListener)
     }
 
     private fun setupSwipeRefreshLayout() {

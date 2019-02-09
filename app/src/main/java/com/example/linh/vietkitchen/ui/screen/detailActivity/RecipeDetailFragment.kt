@@ -1,7 +1,6 @@
 package com.example.linh.vietkitchen.ui.screen.detailActivity
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -15,13 +14,14 @@ import com.bumptech.glide.request.target.Target
 import com.example.linh.vietkitchen.ui.model.Recipe
 import androidx.palette.graphics.Palette.*
 import com.example.linh.vietkitchen.extension.*
-import com.example.linh.vietkitchen.ui.baseMVVM.BaseFragment
 import com.example.linh.vietkitchen.util.GlideUtil
 import com.example.linh.vietkitchen.util.ScreenUtil
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.activity_detail_content.*
 import com.example.linh.vietkitchen.R
 import com.example.linh.vietkitchen.ui.baseMVVM.AbsJustToolbarFragment
+import com.example.linh.vietkitchen.ui.di.injector
+import com.example.linh.vietkitchen.ui.di.viewModel
 
 internal const val BK_THUMB_IMAGE_TRANSITION_NAME = "BK_THUMB_IMAGE_TRANSITION_NAME"
 internal const val EXTRA_BUNDLE = "EXTRA_BUNDLE"
@@ -29,7 +29,7 @@ internal const val BK_RECIPE = "BK_RECIPE"
 const val BK_LIKE_STATE_JUST_CHANGED = "BK_LIKE_STATE_JUST_CHANGED"
 
 class RecipeDetailFragment : AbsJustToolbarFragment(), View.OnClickListener {
-    private lateinit var viewModel: RecipeDetailViewModel
+    private val viewModel: RecipeDetailViewModel by viewModel(this){ injector.detailFragmentViewModel }
     companion object {
         fun createIntent(context: Context?, thumbImageTransitionName: String, recipe: Recipe): Intent{
             val intent = Intent(context, RecipeDetailFragment::class.java)
@@ -83,8 +83,6 @@ class RecipeDetailFragment : AbsJustToolbarFragment(), View.OnClickListener {
     override fun getFragmentLayoutRes() = R.layout.activity_detail
 
     override fun getViewModel(): RecipeDetailViewModel {
-        val factory = DetailViewModelFactory(activity!!.application)
-        viewModel = ViewModelProviders.of(this, factory).get(RecipeDetailViewModel::class.java)
         return viewModel
     }
 

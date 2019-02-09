@@ -4,11 +4,10 @@ import com.example.linh.vietkitchen.data.cloud.UserCloudDataSource
 import com.example.linh.vietkitchen.data.local.UserLocalDataSource
 import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.datasource.UserDataSource
+import javax.inject.Inject
 
-class UserProvider(sources: List<UserDataSource> = SOURCES) : BaseProvider<UserDataSource>(sources) {
-    companion object {
-        val SOURCES by lazy { listOf(UserLocalDataSource(), UserCloudDataSource()) }
-    }
+class UserProvider @Inject constructor(localDataSource: UserLocalDataSource, cloudDataSource: UserCloudDataSource)
+    : BaseProvider<UserDataSource>(listOf(localDataSource, cloudDataSource)) {
 
     suspend fun likeRecipe(uid: String, recipeKey: String): Response<String> {
         return requestAllSources { it.likeRecipe(uid, recipeKey) }

@@ -5,10 +5,11 @@ import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.model.Recipe
+import javax.inject.Inject
 import com.example.linh.vietkitchen.domain.model.Ingredient as IngredientDomain
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
-class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.getUserInfo().likedRecipesIds!!) {
+class RecipeMapper @Inject constructor() {
 
     fun convertToUi(listDomain: List<RecipeDomain>, defaultHasLiked: Boolean = false): List<Recipe> {
         return listDomain.map {
@@ -63,5 +64,5 @@ class RecipeMapper(private val likedRecipes: List<String> = VietKitchenApp.getUs
 //    }
 
 
-    private fun hasLiked(recipeId: String) = likedRecipes.contains(recipeId)
+    private fun hasLiked(recipeId: String) = VietKitchenApp.getUserInfo().likedRecipesIds?.contains(recipeId) ?: false
 }
