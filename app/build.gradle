@@ -142,10 +142,10 @@ dependencies {
     kapt "com.github.bumptech.glide:compiler:$glide_version"
     implementation ("com.github.bumptech.glide:okhttp3-integration:$glide_version")
     //leaks canary
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary_version"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary_version"
     // Optional, if you use support library fragments:
-    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
+    debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:$leakCanary_version"
     //3th custom view libs
     implementation 'com.hannesdorfmann:adapterdelegates4:4.0.0'
     implementation 'com.github.bhargavms:DotLoader:1.1.1'

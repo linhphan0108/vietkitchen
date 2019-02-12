@@ -9,6 +9,7 @@ buildscript {
     ext.glide_version = '4.8.0'
     ext.firebase_storage = '16.0.1'
     ext.firebase_database = '16.0.1'
+    ext.leakCanary_version = '1.6.3'
 
     repositories {
         mavenCentral()
