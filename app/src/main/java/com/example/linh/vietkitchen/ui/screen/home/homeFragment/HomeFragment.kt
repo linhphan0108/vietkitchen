@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.example.linh.vietkitchen.extension.toast
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.di.injector
 import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.dialog.BottomSheetOptions
@@ -128,27 +127,30 @@ class HomeFragment : AbsHomeFragment(), OnDrawerNavItemChangedListener {
     //region inner methods =========================================================================
     override fun observeViewModel(){
         super.observeViewModel()
-        getViewModel().requestRecipesStatus.observe(this, Observer { box ->
+        getViewModel().listRecipeLiveData.observe(this, Observer { box ->
             box?.let {
-                when(box.code){
-                    Status.ERROR -> {onRequestRecipesFailed(box.message)}
-                    Status.LOAD_MORE_ERROR -> {onLoadMoreFailed()}
-                    Status.REFRESH -> {onStartRefresh()}
-                    Status.LOAD_MORE -> {onStartLoadMore()}
-                    Status.SUCCESS -> {
+                when(box.status){
+                    com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
                         onRequestRecipesSuccess(box.data!!)
                         onStopRefresh()
                     }
+                    com.example.linh.vietkitchen.vo.Status.LOADING -> {
+
+                    }
+                    com.example.linh.vietkitchen.vo.Status.ERROR -> {
+                        onRequestRecipesFailed(box.message)
+                    }
+//                    Status.LOAD_MORE_ERROR -> {onLoadMoreFailed()}
+//                    Status.REFRESH -> {onStartRefresh()}
+//                    Status.LOAD_MORE -> {onStartLoadMore()}
                 }
             }
         })
-        getViewModel().deleteRecipeStatus.observe(this, Observer {statusBox ->
-            statusBox?.let {
-                when(it.code){
-                    Status.SUCCESS -> {onDeleteRecipeSuccess(it.data!!)}
-                    Status.ERROR -> {onDeleteRecipeFailed(it.message!!)}
+        getViewModel().deleteRecipeStatus.observe(this, Observer {resource ->
+                when(resource.status){
+                    com.example.linh.vietkitchen.vo.Status.SUCCESS -> {onDeleteRecipeSuccess(resource.data!!)}
+                    com.example.linh.vietkitchen.vo.Status.ERROR -> {onDeleteRecipeFailed(resource.message!!)}
                 }
-            }
         })
     }
     //endregion inner classes

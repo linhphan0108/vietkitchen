@@ -1,17 +1,17 @@
 package com.example.linh.vietkitchen.data.local
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.data.cloud.Category
-import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.domain.datasource.CategoryDataSource
-import com.google.firebase.database.DataSnapshot
+import com.example.linh.vietkitchen.domain.model.CategoryGroup
 
-class CategoryLocalDs : CategoryDataSource {
-    override suspend fun updateCategories(category: Category): Response<Boolean>? {
-        return null
+class CategoryLocalDs {
+    fun updateCategories(category: Category): LiveData<Boolean> {
+        return MutableLiveData<Boolean>().apply { postValue(false)}
     }
 
-    override suspend fun getCategories(): Response<DataSnapshot>? {
-        return null
+    fun getCategories(): LiveData<List<CategoryGroup>> {
+        return MutableLiveData<List<CategoryGroup>>().apply { postValue(null) }
     }
 
 }

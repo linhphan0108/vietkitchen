@@ -1,13 +1,24 @@
 package com.example.linh.vietkitchen.data.local
 
-import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.domain.datasource.UserDataSource
-import com.google.firebase.database.DataSnapshot
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
-class UserLocalDataSource : UserDataSource {
-    override suspend fun getLikedRecipesId(uid: String): Response<DataSnapshot>? = null
+class UserLocalDataSource{
+    fun getLikedRecipesId(uid: String): LiveData<List<String>>{
+        return MutableLiveData<List<String>>().apply {
+            value = null
+        }
+    }
 
-    override suspend fun likeRecipe(uid: String, recipeKey: String): Response<String>? = null
+    fun likeRecipe(uid: String, recipeKey: String): LiveData<String>{
+        return MutableLiveData<String>().apply {
+            value = null
+        }
+    }
 
-    override suspend fun unLikeRecipe(uid: String, recipeKey: String): Response<Boolean>? = null
+    fun unLikeRecipe(uid: String, recipeKey: String): LiveData<Boolean>{
+        return MutableLiveData<Boolean>().apply {
+            value = null
+        }
+    }
 }

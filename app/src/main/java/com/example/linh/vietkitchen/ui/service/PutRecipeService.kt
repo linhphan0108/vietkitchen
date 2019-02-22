@@ -10,8 +10,8 @@ import android.os.*
 import androidx.core.app.NotificationCompat
 import com.example.linh.vietkitchen.R
 import android.os.Messenger
+import androidx.lifecycle.LiveData
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
-import com.example.linh.vietkitchen.data.response.Response
 import com.example.linh.vietkitchen.domain.command.*
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
 import com.example.linh.vietkitchen.ui.VietKitchenApp
@@ -20,6 +20,7 @@ import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.ImageOptimizationUtil
+import com.example.linh.vietkitchen.vo.Resource
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -238,9 +239,9 @@ class PutRecipeService : BaseService() {
                 val listOptimizedImagesPaths = optimizeImages(listImages)
                 listOptimizedImagesPaths.forEach { it.apply { this.remoteDir = recipeId } }
                 val uploadImageResponse = uploadImages(listOptimizedImagesPaths)
-                updateRecipeWithRemoteImageUri(recipe, recipeId, uploadImageResponse.data!!)
-                val wasUpdateCategorySuccess = updateCategories(drawerNav).data!!
-                if (wasUpdateCategorySuccess) VietKitchenApp.category.postValue(drawerNav)
+                updateRecipeWithRemoteImageUri(recipe, recipeId, uploadImageResponse.value!!.data!!)
+                val wasUpdateCategorySuccess = updateCategories(drawerNav).value!!.data!!
+                if (wasUpdateCategorySuccess) VietKitchenApp.setCategory(drawerNav)
                 listNewTags?.let { putNewTags(it) }
                 null
             }
@@ -259,10 +260,10 @@ class PutRecipeService : BaseService() {
             updateUploadNotification("the recipe was put into remote server success")
         }
         Timber.d("a recipe was put into firebase server")
-        return id.data!!
+        return id.value!!.data!!
     }
 
-    private suspend fun updateRecipeWithRemoteImageUri(recipe: Recipe, id: String, remoteUris: List<ImageUpload>): Response<Boolean> {
+    private suspend fun updateRecipeWithRemoteImageUri(recipe: Recipe, id: String, remoteUris: List<ImageUpload>): LiveData<Resource<Boolean>> {
         Timber.d("updateRecipeWithRemoteImageUri")
         val newRecipe = recipe.let {
             Recipe(id, it.name, it.intro, it.ingredient, it.spice, it.preparation, it.processing,
@@ -284,7 +285,7 @@ class PutRecipeService : BaseService() {
         Timber.d("just put ${tags.size} tags successfully")
     }
 
-    private suspend fun updateCategories(categories: List<DrawerNavGroupItem>): Response<Boolean> {
+    private suspend fun updateCategories(categories: List<DrawerNavGroupItem>): LiveData<Resource<Boolean>> {
         Timber.d("update categories")
         sendMessageToClients(MSG_UPDATE_NEW_CATEGORIES)
         updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(categories)
@@ -311,9 +312,7 @@ class PutRecipeService : BaseService() {
         return result
     }
 
-
-
-    private suspend fun uploadImages(multipartFiles: List<ImageUpload>): Response<List<ImageUpload>> {
+    private suspend fun uploadImages(multipartFiles: List<ImageUpload>): LiveData<Resource<List<ImageUpload>>> {
         Timber.d("start uploading images")
         sendMessageToClients(MSG_START_UPLOADING_IMAGES)
         totalImageFiles = multipartFiles.count()

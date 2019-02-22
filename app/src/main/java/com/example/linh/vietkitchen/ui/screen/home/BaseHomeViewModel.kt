@@ -1,12 +1,14 @@
 package com.example.linh.vietkitchen.ui.screen.home
 
 import android.app.Application
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.model.Recipe
+import com.example.linh.vietkitchen.vo.Status
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -17,7 +19,8 @@ abstract class BaseHomeViewModel(application: Application,
          private val putUnlikeCommand: PutUnlikeCommand
 ): BaseViewModel(application) {
 
-    internal val likeOrUnlikeAction: MutableLiveData<Recipe> = MutableLiveData()
+    private val _likeOrUnlikeAction: MediatorLiveData<Recipe> = MediatorLiveData()
+    internal val likeOrUnlikeAction: LiveData<Recipe> = _likeOrUnlikeAction
 
     init {
         EventBus.getDefault().register(this)
@@ -32,40 +35,46 @@ abstract class BaseHomeViewModel(application: Application,
     abstract fun loadMoreRecipe()
 
     fun likeRecipe(recipe: Recipe) {
-        launchDataLoad(ioBlock = {
-            withIoContext {
-                val recipeId = recipe.id!!
-                putLikeCommand.uid = VietKitchenApp.getUserInfo().uid
-                putLikeCommand.recipeId = recipeId
-                putLikeCommand.execute(getApplication())
-                recipe.hasLiked = true
-                VietKitchenApp.addLikedRecipeId(recipeId)
-                null
+        val recipeId = recipe.id!!
+        putLikeCommand.uid = VietKitchenApp.getUserInfo().uid
+        putLikeCommand.recipeId = recipeId
+        val liveData = putLikeCommand.execute(getApplication())
+        _likeOrUnlikeAction.addSource(liveData) {resource ->
+            when(resource.status) {
+                Status.SUCCESS -> {
+                    recipe.hasLiked = true
+                    VietKitchenApp.addLikedRecipeId(recipeId)
+                    emitLikeOrUnlikeAction(recipe)
+                    Timber.d("on likeRecipe success")
+                }
+                else ->{
+                    Timber.d(resource.message)
+                }
             }
-            emitLikeOrUnlikeAction(recipe)
-            Timber.d("on likeRecipe success")
-        }, onError = {e->
-            Timber.e(e)
-        }, shouldShowProgress = false)
+            _likeOrUnlikeAction.removeSource(liveData)
+        }
 
     }
 
     fun unLikeRecipe(recipe: Recipe) {
-        launchDataLoad({
-            withIoContext {
-                val recipeId = recipe.id!!
-                putUnlikeCommand.uid = VietKitchenApp.getUserInfo().uid
-                putUnlikeCommand.recipeId = recipeId
-                putUnlikeCommand.execute(getApplication())
-                recipe.hasLiked = false
-                VietKitchenApp.removeLikedRecipeId(recipeId)
-                null
+        val recipeId = recipe.id!!
+        putUnlikeCommand.uid = VietKitchenApp.getUserInfo().uid
+        putUnlikeCommand.recipeId = recipeId
+        val liveData = putUnlikeCommand.execute(getApplication())
+        _likeOrUnlikeAction.addSource(liveData){resource ->
+            when(resource.status) {
+                Status.SUCCESS -> {
+                    recipe.hasLiked = false
+                    VietKitchenApp.removeLikedRecipeId(recipeId)
+                    emitLikeOrUnlikeAction(recipe)
+                    Timber.d("on unLikeRecipe success")
+                }
+                else -> {
+                    Timber.d(resource.message)
+                }
             }
-            emitLikeOrUnlikeAction(recipe)
-            Timber.d("on unLikeRecipe success")
-        }, {
-            Timber.e(it)
-        }, shouldShowProgress = false)
+            _likeOrUnlikeAction.removeSource(liveData)
+        }
     }
 
     internal fun emitLikeOrUnlikeAction(recipe: Recipe) {
@@ -74,6 +83,6 @@ abstract class BaseHomeViewModel(application: Application,
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     internal fun onMessageEventBus(event: Recipe) {
-        likeOrUnlikeAction.value = event
+        _likeOrUnlikeAction.value = event
     }
 }

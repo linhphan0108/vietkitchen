@@ -1,5 +1,6 @@
 package com.example.linh.vietkitchen.ui
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.multidex.MultiDexApplication
 import com.example.linh.vietkitchen.BuildConfig
@@ -25,7 +26,8 @@ class VietKitchenApp : MultiDexApplication(), DaggerComponentProvider{
 
     companion object {
         private  val userInfo: MutableLiveData<UserInfo> = MutableLiveData()
-        val category: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()
+        private val _category: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()
+        val category: LiveData<List<DrawerNavGroupItem>> = _category
 
         fun getUserInfo() = userInfo.value!!
         fun getUserInfoObservable() = userInfo
@@ -42,6 +44,10 @@ class VietKitchenApp : MultiDexApplication(), DaggerComponentProvider{
                 getUserInfo().numberFavoriteRecipes = getUserInfo().likedRecipesIds?.size ?: 0
                 userInfo.postValue(getUserInfo())
             }
+        }
+
+        fun setCategory(newCat: List<DrawerNavGroupItem>){
+            _category.value = newCat
         }
     }
 

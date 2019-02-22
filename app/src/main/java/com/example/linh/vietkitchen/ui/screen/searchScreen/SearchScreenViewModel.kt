@@ -89,13 +89,13 @@ class SearchScreenViewModel @Inject constructor(application: Application,
 
             val recipes = withComputationContext{
                 TimberUtils.checkNotMainThread()
-                pagingResponse.data?.let {data ->
-                    recipeMapper.convertToUi(data)
+                pagingResponse.value?.data?.let {data ->
+                    recipeMapper.convertToUi(data.data!!)
                 }
             }
 
-            lastRecipeId = pagingResponse.lastId
-            hasReachLastRecord = pagingResponse.isEnd
+//            lastRecipeId = pagingResponse.lastId todo
+//            hasReachLastRecord = pagingResponse.isEnd todo
             requestRecipesStatus.value = Status.NORMAL
 
             if (recipes.isNullOrEmpty()) {
@@ -128,7 +128,7 @@ class SearchScreenViewModel @Inject constructor(application: Application,
         launchDataLoad({
             val tags = withIoContext {
                 val map = requestTagsCommand.execute(getApplication())
-                map.data!!.toListOfStringOfKey()
+                map.value?.data!!.toListOfStringOfKey()
             }
             listTags = tagMapper.toSearchItem(tags)
         }, {

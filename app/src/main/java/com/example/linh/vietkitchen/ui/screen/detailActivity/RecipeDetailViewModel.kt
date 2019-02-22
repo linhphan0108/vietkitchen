@@ -40,7 +40,7 @@ class RecipeDetailViewModel @Inject constructor(applicationContext: Application,
             withIoContext {
                 likeCommand.uid = uid
                 likeCommand.recipeId = id
-                likeCommand.execute(getApplication()).data!!
+                likeCommand.execute(getApplication())
             }
             likeState.value = true
 //            viewContract?.onLikeChangedSuccess(true)
@@ -56,7 +56,7 @@ class RecipeDetailViewModel @Inject constructor(applicationContext: Application,
             val isSuccess = withIoContext {
                 unlikeCommand.uid = uid
                 unlikeCommand.recipeId = id
-                unlikeCommand.execute(getApplication()).data!!
+                unlikeCommand.execute(getApplication()).value?.data ?: false
             }
             if (isSuccess) {
                 likeState.value = false

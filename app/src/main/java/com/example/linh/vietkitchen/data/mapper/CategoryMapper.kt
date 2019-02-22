@@ -1,14 +1,14 @@
-package com.example.linh.vietkitchen.domain.mapper
+package com.example.linh.vietkitchen.data.mapper
 
-import com.example.linh.vietkitchen.data.cloud.Category as CatDataLayer
-import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.domain.model.CategoryChild
+import com.example.linh.vietkitchen.domain.model.CategoryGroup
+import com.example.linh.vietkitchen.data.cloud.Category as CatDataLayer
 import com.google.firebase.database.DataSnapshot
 import javax.inject.Inject
 
 const val NUMBER_ITEMS_COUNT = "COUNT"
 class CategoryMapper @Inject constructor(){
-    fun convertToDomain(categorySnapshot: DataSnapshot): List<CategoryGroup>{
+    fun toData(categorySnapshot: DataSnapshot): List<CategoryGroup>{
         val categoryGroups = mutableListOf<CategoryGroup>()
         categorySnapshot.children.forEachIndexed { order, orderDataSnapshot ->
             orderDataSnapshot.children.forEach{ groupDataSnapshot ->

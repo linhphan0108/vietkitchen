@@ -206,11 +206,11 @@ class AdminActivity : BaseActivity(),
     }
 
     fun onPutNewTagsSuccess() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") //To change data of created functions use File | Settings | File Templates.
     }
 
     fun onPutNewTagsFailed(message: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") //To change data of created functions use File | Settings | File Templates.
     }
 
     private fun onPutRecipeSuccess() {
@@ -219,7 +219,7 @@ class AdminActivity : BaseActivity(),
     }
 
     fun onPutRecipeFailed(message: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") //To change data of created functions use File | Settings | File Templates.
     }
     //#endregion MVP callbacks
 

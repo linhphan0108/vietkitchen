@@ -1,18 +1,17 @@
 package com.example.linh.vietkitchen.ui.screen.home.favorite
 
 import android.app.Application
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.example.linh.vietkitchen.domain.command.PutLikeCommand
 import com.example.linh.vietkitchen.domain.command.PutUnlikeCommand
 import com.example.linh.vietkitchen.domain.command.RequestLikedRecipesCommand
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
-import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.util.Constants
-import timber.log.Timber
+import com.example.linh.vietkitchen.vo.Resource
 import javax.inject.Inject
 
 class FavoriteFragmentViewModel @Inject constructor(application: Application,
@@ -23,7 +22,8 @@ class FavoriteFragmentViewModel @Inject constructor(application: Application,
     : BaseHomeViewModel(application, putLikeCommand, putUnlikeCommand){
 
     private val userInfo by lazy { VietKitchenApp.getUserInfo() }
-    internal val requestLikeRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
+    private val _requestLikeRecipesStatus: MediatorLiveData<Resource<List<Recipe>>> = MediatorLiveData()
+    internal val requestLikeRecipesStatus: LiveData<Resource<List<Recipe>>> = _requestLikeRecipesStatus
     private var listRecipes: MutableList<Recipe> = mutableListOf()
     private var isLoadMoreRecipe = false
     private var isFreshRecipe = false
@@ -34,7 +34,7 @@ class FavoriteFragmentViewModel @Inject constructor(application: Application,
         isLoadMoreRecipe = false
         hasReachLastRecord = false
         listRecipes.clear()
-        requestLikeRecipesStatus.value = StatusBox(Status.REFRESH, data = listRecipes)
+//        requestLikeRecipesStatus.value = StatusBox(Status.REFRESH, data = listRecipes)
         requestLikedRecipes(getNextPageLikedRecipesIds(0))
     }
 
@@ -47,40 +47,37 @@ class FavoriteFragmentViewModel @Inject constructor(application: Application,
             return
         }
         isLoadMoreRecipe = true
-        requestLikeRecipesStatus.value = StatusBox(Status.LOAD_MORE)
+//        requestLikeRecipesStatus.value = StatusBox(Status.LOAD_MORE)
         requestLikedRecipes(getNextPageLikedRecipesIds(from))
     }
 
     private fun requestLikedRecipes(ids: List<String>?) {
         if (ids.isNullOrEmpty()){
-            requestLikeRecipesStatus.value = StatusBox(Status.ERROR_EMPTY)
+//            requestLikeRecipesStatus.value = StatusBox(Status.ERROR_EMPTY)
             return
         }
-        launchDataLoad(ioBlock = {
-            val likedRecipes = withIoContext {
-                likedRecipesCommand.ids = ids
-                val response = likedRecipesCommand.execute(getApplication())
-                recipeMapper.convertToUi(response.data!!, true)
-            }
 
-            listRecipes.addAll(likedRecipes)
-            requestLikeRecipesStatus.value = StatusBox(Status.SUCCESS, data = listRecipes.toList())
+        likedRecipesCommand.ids = ids
+        val liveData = likedRecipesCommand.execute(getApplication())
+        _requestLikeRecipesStatus.addSource(liveData){resource ->
+            val res = when(resource.status){
+                com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
+                    val list = recipeMapper.convertToUi(resource.data!!, true)
+                    listRecipes.addAll(list)
+                    Resource.success(listRecipes.toList())
+                }
+                com.example.linh.vietkitchen.vo.Status.LOADING -> {
+                    Resource.loading()
+                }
+                com.example.linh.vietkitchen.vo.Status.ERROR -> {
+                    Resource.error(resource.message)
+                }
+            }
+            _requestLikeRecipesStatus.value = res
+            _requestLikeRecipesStatus.removeSource(liveData)
             isLoadMoreRecipe = false
             isFreshRecipe = false
-        }, onError = {
-            when{
-                isLoadMoreRecipe -> {
-                    requestLikeRecipesStatus.value = StatusBox(Status.LOAD_MORE_ERROR)
-                    isLoadMoreRecipe = false
-                }
-                else -> {
-                    requestLikeRecipesStatus.value = StatusBox(Status.ERROR)
-                    isFreshRecipe = false
-                }
-            }
-            Timber.e(it)
-        })
-
+        }
     }
 
     private fun getNextPageLikedRecipesIds(from: Int): List<String>?{

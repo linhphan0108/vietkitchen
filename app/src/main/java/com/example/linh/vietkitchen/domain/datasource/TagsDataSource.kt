@@ -1,9 +1,9 @@
 package com.example.linh.vietkitchen.domain.datasource
 
-import com.example.linh.vietkitchen.data.response.Response
+import androidx.lifecycle.LiveData
 import com.google.firebase.database.DataSnapshot
 
 interface TagsDataSource {
-    suspend fun getTags() : Response<DataSnapshot>?
-    suspend fun putTags(tags: Map<String, Boolean>) : Response<Boolean>?
+    suspend fun getTags() : LiveData<DataSnapshot>?
+    suspend fun putTags(tags: Map<String, Boolean>) : LiveData<Boolean>?
 }

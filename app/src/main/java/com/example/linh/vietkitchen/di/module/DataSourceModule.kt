@@ -18,18 +18,11 @@ import javax.inject.Singleton
 
 @Module
 object DataSourceModule {
-    @Singleton
-    @JvmStatic @Provides
-    @Named("recipeDataSourcesDependencies")
-    fun provideRecipeDataSources(database: FirebaseDatabase, storage: FirebaseStorage): List<RecipeDataSource> {
-        return listOf(RecipeLocalDataSource(), RecipeCloudDataSource(database, storage))
-    }
-
-    @Singleton
-    @JvmStatic @Provides
-    fun provideRecipeCloudDataSources(database: FirebaseDatabase, storage: FirebaseStorage): RecipeCloudDataSource {
-        return RecipeCloudDataSource(database, storage)
-    }
+//    @Singleton
+//    @JvmStatic @Provides
+//    fun provideRecipeCloudDataSources(database: FirebaseDatabase, storage: FirebaseStorage): RecipeCloudDataSource {
+//        return RecipeCloudDataSource(database, storage)
+//    }
 
     @Singleton
     @JvmStatic @Provides
@@ -43,11 +36,11 @@ object DataSourceModule {
         return TagsLocalDataSource()
     }
 
-    @Singleton
-    @JvmStatic @Provides
-    fun provideTagCloudDataSources(database: FirebaseDatabase): TagsCloudDataSource {
-        return TagsCloudDataSource(database)
-    }
+//    @Singleton
+//    @JvmStatic @Provides
+//    fun provideTagCloudDataSources(database: FirebaseDatabase): TagsCloudDataSource {
+//        return TagsCloudDataSource(database)
+//    }
 
     @Singleton
     @JvmStatic @Provides
@@ -55,11 +48,11 @@ object DataSourceModule {
         return CategoryLocalDs()
     }
 
-    @Singleton
-    @JvmStatic @Provides
-    fun provideCategoryCloudDataSources(database: FirebaseDatabase): CategoryCloudDs {
-        return CategoryCloudDs(database)
-    }
+//    @Singleton
+//    @JvmStatic @Provides
+//    fun provideCategoryCloudDataSources(database: FirebaseDatabase): CategoryCloudDs {
+//        return CategoryCloudDs(database)
+//    }
 
     @Singleton
     @JvmStatic @Provides

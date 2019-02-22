@@ -1,14 +1,14 @@
 package com.example.linh.vietkitchen.data.cloud
 
-import com.example.linh.vietkitchen.data.response.PagingResponse
-import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.domain.datasource.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import com.example.linh.vietkitchen.data.mapper.RecipeMapper
+import com.example.linh.vietkitchen.data.response.*
 import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_CATEGORIES
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
-import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import timber.log.Timber
@@ -17,48 +17,63 @@ import javax.inject.Inject
 import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
 
 class RecipeCloudDataSource @Inject constructor
-(private val database: FirebaseDatabase, private val storage: FirebaseStorage)
-    : RecipeDataSource {
+(   private val mapper: RecipeMapper,
+    private val database: FirebaseDatabase, private val storage: FirebaseStorage){
 
     private val dbRefRecipe by lazy { database.getReference(STORAGE_RECIPES_PATH) }
     private val storageRecipeRef = storage.reference.child("images/recipes/")
 
-    override suspend fun requestRecipesByTag(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? {
+    fun requestRecipesByTag(tag: String?, limit: Int, startAtId: String?): LiveData<ApiResponse<PagingResponse<List<Recipe>>>> {
         return requestRecipes(null, tag, limit, startAtId)
     }
 
-    override suspend fun requestRecipesByCategory(category: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
+    fun requestRecipesByCategory(category: String?, limit: Int, startAtId: String?): LiveData<ApiResponse<PagingResponse<List<Recipe>>>> {
         return requestRecipes(category, null, limit, startAtId)
     }
 
-    override suspend fun getLikedRecipes(ids: List<String>): Response<List<DataSnapshot>> {
-        val result = mutableListOf<DataSnapshot>()
+    fun getLikedRecipes(ids: List<String>): LiveData<ApiResponse<List<Recipe>>> {
+        val result = mutableListOf<Recipe>()
         ids.forEach {key ->
             val query = dbRefRecipe.child(key)
-            result.add(query.addListenerForSingleValueEventAwait())
+            Transformations.map(query.addListenerForSingleValueEventAwait()){apiResponse ->
+                when(apiResponse) {
+                    is ApiSuccessResponse -> {
+                        result.add(mapper.toData(apiResponse.data))
+                    }
+                    is ApiEmptyResponse -> {
+                    }
+                    is ApiErrorResponse -> {
+                    }
+                }
+            }
+
         }
-        return Response(RESPONSE_SUCCESS, result)
+        val apiResponse = ApiResponse.createSuccess(result.toList())
+        return MutableLiveData<ApiResponse<List<Recipe>>>().apply { value = apiResponse }
     }
 
-    override suspend fun deleteRecipe(recipe: Recipe): Response<Boolean> {
-        val isSuccess = dbRefRecipe.child(recipe.id!!).removeValueAwait()
-        return Response(RESPONSE_SUCCESS, isSuccess)
+    fun deleteRecipe(id: String): LiveData<ApiResponse<Boolean>> {
+        return dbRefRecipe.child(id).removeValueAwait()
     }
 
-    override suspend fun putRecipe(recipe: Recipe): Response<String>? {
-        val id = dbRefRecipe.push().setValueAwait(recipe)
-        return Response(RESPONSE_SUCCESS, id)
+    fun putRecipe(recipe: Recipe): LiveData<ApiResponse<String>> {
+        return dbRefRecipe.push().setValueAwait(recipe)
     }
 
-    override suspend fun updateRecipe(recipe: Recipe): Response<Boolean> {
+    fun updateRecipe(recipe: Recipe): LiveData<ApiResponse<Boolean>> {
         val id = recipe.id
         if (id.isNullOrBlank()) throw NullPointerException("id must be not null")
         recipe.id = null
-        dbRefRecipe.child(id).setValueAwait(recipe)
-        return Response(RESPONSE_SUCCESS, true)
+        return Transformations.map(dbRefRecipe.child(id).setValueAwait(recipe)){apiResponse ->
+            return@map when(apiResponse){
+                is ApiSuccessResponse -> {ApiResponse.createSuccess(true)}
+                else -> {ApiResponse.createSuccess(false)}
+            }
+        }
+
     }
 
-    override suspend fun putRecipeWithDumpData(): Response<Boolean>? {
+//    suspend fun putRecipeWithDumpData(): Response<Boolean>? {
 //        return Completable.create { emitter ->
 //            dbRefRecipe.push().setValue(createADumpFood())
 //                    .addOnSuccessListener {
@@ -74,19 +89,29 @@ class RecipeCloudDataSource @Inject constructor
 //        }.observeOn(Schedulers.computation())
 
 //        return RxFirebaseDatabase.setValue(dbRefRecipe, createADumpFood())
-        return null
-    }
+//        return null
+//    }
 
-    override suspend fun uploadImages(multiPartFileList: List<ImageUpload>): Response<List<ImageUpload>> {
+    fun uploadImages(multiPartFileList: List<ImageUpload>): LiveData<ApiResponse<List<ImageUpload>>> {
+        val result = mutableListOf<ImageUpload>()
+        val liveData = MutableLiveData<ApiResponse<List<ImageUpload>>>()
         multiPartFileList.forEach {
-            uploadImage(it)
+            val apiResponse = uploadImage(it).value
+            when(apiResponse){
+                is ApiSuccessResponse -> {
+                    result.add(apiResponse.data)
+                    liveData.value = ApiResponse.createSuccess(result)
+                }
+                is ApiErrorResponse -> {}
+                is ApiEmptyResponse -> {}
+            }
         }
-        return Response(RESPONSE_SUCCESS, multiPartFileList)
+        return liveData
     }
 
 
 
-    private suspend fun uploadImage(image: ImageUpload): Response<ImageUpload> {
+    private fun uploadImage(image: ImageUpload): LiveData<ApiResponse<ImageUpload>> {
         val dirRef = image.remoteDir?.let {
             storageRecipeRef.child(it)
         } ?: storageRecipeRef
@@ -94,30 +119,37 @@ class RecipeCloudDataSource @Inject constructor
         return storageRecipeImageRef.putImageAwait(image)
     }
 
-    override suspend fun deleteImages(fileUrls: List<String>): Response<Boolean> {
+    fun deleteImages(fileUrls: List<String>): LiveData<ApiResponse<Boolean>> {
         var result = true
         fileUrls.forEach {
-            val isSuccess = deleteImage(it)
-            if (!isSuccess.data!!){
-                result = false
+            val apiResponse = deleteImage(it).value
+            when(apiResponse){
+                is ApiSuccessResponse -> {
+
+                }
+                is ApiErrorResponse -> {result = false}
+                is ApiEmptyResponse -> {result = false}
             }
         }
-        return Response(RESPONSE_SUCCESS, result)
+        return MutableLiveData<ApiResponse<Boolean>>().apply {
+            value = ApiResponse.createSuccess(result)
+        }
     }
 
-    private suspend fun deleteImage(url: String): Response<Boolean>{
+    private fun deleteImage(url: String): LiveData<ApiResponse<Boolean>>{
             return storage.getReferenceFromUrl(url)
                     .deleteAwait()
     }
 
-    private suspend fun requestRecipes(category: String?, tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>> {
+    private fun requestRecipes(category: String?, tag: String?, limit: Int, startAtId: String?): LiveData<ApiResponse<PagingResponse<List<Recipe>>>> {
         val isLoadingMore = startAtId != null
         val limitFixed = if (isLoadingMore) limit + 1 else limit
         val query = if (category.isNotNullAndNotBlank()) {
             if (isLoadingMore) {
+                Timber.d("isLoadingMore startAtId = $startAtId")
                 dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$category")
                         .equalTo(true)
-                        .endAt(startAtId)
+//                        .endAt(startAtId)
             } else {
                 dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_CATEGORIES/$category")
                         .equalTo(true)
@@ -126,7 +158,7 @@ class RecipeCloudDataSource @Inject constructor
             if (isLoadingMore) {
                 dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_TAGS/$tag")
                         .equalTo(true)
-                        .endAt(startAtId)
+//                        .endAt(startAtId)
             } else {
                 dbRefRecipe.orderByChild("$STORAGE_RECIPES_CHILD_TAGS/$tag")
                         .equalTo(true)
@@ -137,23 +169,38 @@ class RecipeCloudDataSource @Inject constructor
                         .endAt(startAtId)
             } else {
                 dbRefRecipe.orderByKey()
+
             }.limitToLast(limitFixed)
         }
 
 
         startAtId?.let { Timber.d("requestRecipesByCategory from $startAtId") }
 
-        val dataSnapshot = query.addListenerForSingleValueEventAwait()
-        val listDataSnapshot = if (isLoadingMore){
-            dataSnapshot.children.toList().dropLast(1)
-        }else{
-            dataSnapshot.children
-        }.reversed()
-        val lastId = if(!listDataSnapshot.isNullOrEmpty()){
-            listDataSnapshot.last().key
-        }else {null}
-        val hasReachEnd = listDataSnapshot.count() < limit
-        return PagingResponse(RESPONSE_SUCCESS, listDataSnapshot, hasReachEnd, lastId)
+        val responseLiveData = query.addListenerForSingleValueEventAwait()
+        return Transformations.map(responseLiveData){ response ->
+            when(response){
+                is ApiSuccessResponse -> {
+                    val dataSnapshot = response.data
+                    val listDataSnapshot = if (isLoadingMore){
+                        dataSnapshot.children.toList().dropLast(1)
+                    }else{
+                        dataSnapshot.children
+                    }.reversed()
+                    val listRecipes = listDataSnapshot.let {
+                        Timber.d("onFetchData data's length ${listDataSnapshot.count()}")
+                        Timber.d("latest key ${listDataSnapshot.last().key}")
+                        mapper.toData(listDataSnapshot) }
+                    val hasReachEnd = listDataSnapshot.count() < limit
+                            || tag.isNotNullAndNotBlank() || category.isNotNullAndNotBlank()
+                    val nextPage = if(hasReachEnd) null else listRecipes.last().id
+                    val pagingResponse = PagingResponse(listRecipes, hasReachEnd, nextPage)
+                    ApiResponse.createSuccess(pagingResponse)
+                }
+                is ApiEmptyResponse -> {ApiResponse.createEmpty()}
+                is ApiErrorResponse -> {ApiResponse.createError(response.errorMessage)}
+                else -> {ApiResponse.createEmpty()}
+            }
+        }
     }
 
     private fun createADumpFood(): Recipe {

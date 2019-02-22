@@ -87,10 +87,10 @@ class ReStructureImageFileService : BaseService() {
         startInForeground("retrieve all recipes")
         launchDataLoad{
             val listRecipes = withIoContext {
-                requestRecipeCommand.execute(this).data
+                requestRecipeCommand.execute(this).value!!.data!!
 
             }
-            listRecipes?.let {
+            listRecipes.data?.let {
                 restructureImageFileInFireStorage(it)
             }
         }
@@ -160,7 +160,8 @@ class ReStructureImageFileService : BaseService() {
     private suspend fun uploadFile(recipeImageStorage: StorageReference, destination: String, resource: ByteArray): String {
         val fileName = destination.split("/").last()
         val ref = recipeImageStorage.child(fileName)
-        return ref.putBytesAwait(resource).data!!
+//        return ref.putBytesAwait(resource).value
+        return ""
     }
 
     private suspend fun deleteImageFile(uri: String){

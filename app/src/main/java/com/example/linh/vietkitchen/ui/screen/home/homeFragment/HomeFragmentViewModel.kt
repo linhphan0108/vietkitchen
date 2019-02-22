@@ -1,20 +1,21 @@
 package com.example.linh.vietkitchen.ui.screen.home.homeFragment
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.linh.vietkitchen.data.response.Response
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import com.example.linh.vietkitchen.domain.command.*
 import com.example.linh.vietkitchen.extension.removeLast
 import com.example.linh.vietkitchen.util.TimberUtils
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
-import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.mapper.RecipeMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
 import com.example.linh.vietkitchen.util.RecipeUtil
+import com.example.linh.vietkitchen.vo.Resource
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,7 +29,7 @@ class HomeFragmentViewModel @Inject constructor(application: Application,
         private val updateCategoriesCommand: UpdateCategoriesCommand,
         putLikeCommand: PutLikeCommand,
         putUnlikeCommand: PutUnlikeCommand)
-    : BaseHomeViewModel(application, putLikeCommand, putUnlikeCommand) {
+    : BaseHomeViewModel(application, putLikeCommand, putUnlikeCommand), Observer<Resource<List<Recipe>>> {
 
     private var category: String? = null
     private var lastRecipeId: String? = null
@@ -36,54 +37,51 @@ class HomeFragmentViewModel @Inject constructor(application: Application,
     private var isFreshRecipe = false
     private var hasReachLastRecord = false
 
-    internal var deleteRecipeStatus: MutableLiveData<StatusBox<Int>> = MutableLiveData()
-    internal var requestRecipesStatus: MutableLiveData<StatusBox<List<Recipe>>> = MutableLiveData()
+    private val _deleteRecipeStatus: MutableLiveData<Resource<Int>> = MutableLiveData()
+    val deleteRecipeStatus: LiveData<Resource<Int>> = _deleteRecipeStatus
+    private val _listRecipeLiveData: MutableLiveData<Resource<List<Recipe>>> = MutableLiveData()
+    private var liveDataPagingResponse: LiveData<Resource<List<Recipe>>>? = null
+    val listRecipeLiveData: LiveData<Resource<List<Recipe>>> = _listRecipeLiveData
     private var listRecipes: MutableList<Recipe> = mutableListOf()
 
-    private fun fetchRecipes(){
-        launchDataLoad({
-            val pagingResponse = withIoContext {
-                requestRecipeCommand.category = category
-                requestRecipeCommand.startAtId = lastRecipeId
-                requestRecipeCommand.execute(getApplication())
-            }
-
-            val recipes = withComputationContext{
-                TimberUtils.checkNotMainThread()
-                pagingResponse.data?.let {data ->
-                    recipeMapper.convertToUi(data)
+    private fun fetchRecipes() {
+        requestRecipeCommand.category = category
+        requestRecipeCommand.startAtId = lastRecipeId
+        val liveData = requestRecipeCommand.execute(getApplication())
+        liveDataPagingResponse?.removeObserver(this)
+        liveDataPagingResponse = Transformations.map(liveData) { resource ->
+            val result = when (resource.status) {
+                com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
+                    val list = resource.data?.also { pagingResponse ->
+                        lastRecipeId = pagingResponse.lastId
+                        hasReachLastRecord = pagingResponse.isEnd
+                    }?.data?.let {
+                        listRecipes.addAll(recipeMapper.convertToUi(it))
+                        listRecipes.toList()
+                    } ?: listRecipes.toList()
+                    Resource.success(list)
                 }
-            } ?: listOf()
-
-            if(isLoadMoreRecipe) {
-                removeLoadMoreItem()
+                com.example.linh.vietkitchen.vo.Status.LOADING -> {
+                    Resource.loading(null)
+                }
+                com.example.linh.vietkitchen.vo.Status.ERROR -> {
+                    Resource.error(resource.message, null)
+                }
             }
-            listRecipes.addAll(recipes)
-
-            lastRecipeId = pagingResponse.lastId
-            hasReachLastRecord = pagingResponse.isEnd
-            requestRecipesStatus.value = StatusBox(Status.SUCCESS, data = listRecipes.toList())
             isFreshRecipe = false
             isLoadMoreRecipe = false
-        }, { e ->
-            Timber.e(e)
-            when{
-                isLoadMoreRecipe -> {
-                    requestRecipesStatus.value = StatusBox(Status.LOAD_MORE_ERROR)
-                    isLoadMoreRecipe = false
-                }
-                else -> {
-                    requestRecipesStatus.value = StatusBox(Status.ERROR)
-                    isFreshRecipe = false
-                }
-            }
-        }, false)
+            result
+        }
+        liveDataPagingResponse!!.observeForever(this)
+//            if(isLoadMoreRecipe) {
+//                removeLoadMoreItem()
+//            }
     }
 
     override fun loadMoreRecipe() {
         if(isLoadMoreRecipe || isFreshRecipe || hasReachLastRecord) return
         isLoadMoreRecipe = true
-        requestRecipesStatus.value = StatusBox(Status.LOAD_MORE)
+//        requestRecipesStatus.value = StatusBox(Status.LOAD_MORE)
         fetchRecipes()
     }
 
@@ -98,7 +96,7 @@ class HomeFragmentViewModel @Inject constructor(application: Application,
         lastRecipeId = null
         listRecipes.clear()
         category?.let { this.category = it }
-        requestRecipesStatus.value = StatusBox(Status.REFRESH, data = listRecipes)
+//        requestRecipesStatus.value = StatusBox(Status.REFRESH, data = listRecipes)
         fetchRecipes()
     }
 
@@ -106,38 +104,50 @@ class HomeFragmentViewModel @Inject constructor(application: Application,
         launchDataLoad({
             val wasDeleteImagesSuccess =  withIoContext {
                 TimberUtils.checkNotMainThread()
-                deleteImages(recipe).data!!}
+                Transformations.map(deleteImages(recipe)){resource ->
+                    resource.status == com.example.linh.vietkitchen.vo.Status.SUCCESS
+                }}
 
             val wasUpdateCategorySuccess = withIoContext {
                 withIoContext {
                     val updatedCat = updateCategory(recipe)
-                    val isSuccess = updateCategoryToServer(updatedCat).data!!
-                    if (isSuccess) VietKitchenApp.category.postValue(updatedCat)
-                    isSuccess
+                    Transformations.map(updateCategoryToServer(updatedCat)){resource ->
+                        if (resource.status == com.example.linh.vietkitchen.vo.Status.SUCCESS){
+                            VietKitchenApp.setCategory(updatedCat)
+                            true
+                        }else{
+                            false
+                        }
+                    }
                 }
             }
             val wasDeleteRecipeSuccess = withIoContext {
-                withIoContext{deleteRecipeInDb(recipe).data!!} }
+                withIoContext{
+                    Transformations.map(deleteRecipeInDb(recipe)){resource ->
+                        resource.status == com.example.linh.vietkitchen.vo.Status.SUCCESS
+                    }
+                }
+            }
 
 
-            if (wasDeleteImagesSuccess) {Timber.d("deleted images successfully")}
-            if(wasUpdateCategorySuccess) {Timber.d("updated category successfully")}
-            if(wasDeleteRecipeSuccess) {Timber.d("deleted Recipe successfully")}
+            if (wasDeleteImagesSuccess.value!!) {Timber.d("deleted images successfully")}
+            if(wasUpdateCategorySuccess.value!!) {Timber.d("updated category successfully")}
+            if(wasDeleteRecipeSuccess.value!!) {Timber.d("deleted Recipe successfully")}
 //            if (wasDeleteImagesSuccess && wasUpdateCategorySuccess && wasDeleteRecipeSuccess) {
-            deleteRecipeStatus.value = StatusBox(Status.SUCCESS, data = adapterPosition)
+            _deleteRecipeStatus.value = Resource.success(adapterPosition)
 //            }
         },{e ->
             Timber.e(e)
-            deleteRecipeStatus.value = StatusBox(Status.ERROR, e.message)
+            _deleteRecipeStatus.value = Resource.error(e.message)
         })
     }
 
-    private suspend fun deleteImages(recipe: Recipe): Response<Boolean> {
+    private fun deleteImages(recipe: Recipe): LiveData<Resource<Boolean>> {
         deleteImagesCommand.fileUrls = RecipeUtil.extractAllImagePaths(recipe)
         return deleteImagesCommand.execute(getApplication())
     }
 
-    private suspend fun updateCategoryToServer(cat: List<DrawerNavGroupItem>): Response<Boolean> {
+    private fun updateCategoryToServer(cat: List<DrawerNavGroupItem>): LiveData<Resource<Boolean>> {
         updateCategoriesCommand.listCatGroup = categoryMapper.toDomain(cat)
         return updateCategoriesCommand.execute(getApplication())
     }
@@ -164,7 +174,7 @@ class HomeFragmentViewModel @Inject constructor(application: Application,
         } ?: listOf()
     }
 
-    private suspend fun deleteRecipeInDb(recipe: Recipe): Response<Boolean> {
+    private fun deleteRecipeInDb(recipe: Recipe): LiveData<Resource<Boolean>> {
         deleteRecipeCommand.recipe = recipeMapper.toDomain(recipe)
         return deleteRecipeCommand.execute(getApplication())
     }
@@ -175,5 +185,9 @@ class HomeFragmentViewModel @Inject constructor(application: Application,
                 this.removeLast()
             }
         }
+    }
+
+    override fun onChanged(t: Resource<List<Recipe>>?) {
+        _listRecipeLiveData.value = t
     }
 }

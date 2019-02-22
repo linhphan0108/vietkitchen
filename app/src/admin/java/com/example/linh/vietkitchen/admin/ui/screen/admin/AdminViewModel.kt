@@ -80,7 +80,7 @@ class AdminViewModel @Inject constructor(application: Application,
         launchDataLoad({
             val listTags = withIoContext {
                 val map = requestTagsCommand.execute(getApplication())
-                map.data!!.toListOfStringOfKey()
+                map.value!!.data?.toListOfStringOfKey()
             }
             listTagsOnServerStatus.value = StatusBox(Status.SUCCESS, data = listTags)
         }, {
