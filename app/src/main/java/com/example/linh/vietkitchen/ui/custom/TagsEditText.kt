@@ -630,11 +630,11 @@ class TagsEditText : AppCompatAutoCompleteTextView {
 
     private class Tag() : Parcelable {
         override fun writeToParcel(dest: Parcel?, flags: Int) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            TODO("not implemented") //To change data of created functions use File | Settings | File Templates.
         }
 
         override fun describeContents(): Int {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            TODO("not implemented") //To change data of created functions use File | Settings | File Templates.
         }
 
         internal var position: Int = 0

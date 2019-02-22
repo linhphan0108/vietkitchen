@@ -1,37 +1,51 @@
 package com.example.linh.vietkitchen.data.local
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.data.cloud.ImageUpload
-import com.example.linh.vietkitchen.domain.datasource.RecipeDataSource
-import com.google.firebase.database.DataSnapshot
 import com.example.linh.vietkitchen.data.cloud.Recipe
-import com.example.linh.vietkitchen.data.response.PagingResponse
-import com.example.linh.vietkitchen.data.response.Response
 import javax.inject.Inject
 
-class RecipeLocalDataSource @Inject constructor() : RecipeDataSource {
-    override suspend fun deleteImages(fileUrls: List<String>): Response<Boolean>? {
-        return null
+class RecipeLocalDataSource @Inject constructor(){
+    fun deleteImages(fileUrls: List<String>): LiveData<Boolean> {
+        return MutableLiveData<Boolean>().apply { value = true }
     }
 
-    override suspend fun deleteRecipe(recipe: Recipe): Response<Boolean>? {
-        return null
+    fun deleteRecipe(recipe: String): LiveData<Boolean> {
+        return MutableLiveData<Boolean>().apply { value = true }
     }
 
-    override suspend fun uploadImages(multiPartFileList: List<ImageUpload>): Response<List<ImageUpload>>? = null
+    fun uploadImages(multiPartFileList: List<ImageUpload>): LiveData<List<ImageUpload>>{
+        return MutableLiveData<List<ImageUpload>>().apply { value = null }
+    }
 
-    override suspend fun putRecipe(recipe: Recipe): Response<String>? = null
+    fun putRecipe(recipe: Recipe): LiveData<String> {
+        return MutableLiveData<String>().apply {
+            value = null
+        }
+    }
 
-    override suspend fun updateRecipe(recipe: Recipe): Response<Boolean>? = null
+    fun updateRecipe(recipe: Recipe): LiveData<Boolean>{
+        return MutableLiveData<Boolean>().apply { value = true }
+    }
 
-    override suspend fun getLikedRecipes(ids: List<String>): Response<List<DataSnapshot>>? = null
+    fun getLikedRecipes(ids: List<String>): LiveData<List<Recipe>>{
+        return MutableLiveData<List<Recipe>>().apply { value = null }
+    }
 
 //    override fun getLikedRecipes(uid: String): Flowable<List<Recipe>>?  = null
 
-    override suspend fun putRecipeWithDumpData(): Response<Boolean>? = null
+//    suspend fun putRecipeWithDumpData(): Response<Boolean>? = null
 
-    override suspend fun requestRecipesByCategory(category: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? = null
+    fun requestRecipesByCategory(category: String?, limit: Int, startAtId: String?): LiveData<List<Recipe>>{
+        return MutableLiveData<List<Recipe>>().apply {
+            value = null
+        }
+    }
 
-    override suspend fun requestRecipesByTag(tag: String?, limit: Int, startAtId: String?): PagingResponse<List<DataSnapshot>>? {
-        return null
+    fun requestRecipesByTag(tag: String?, limit: Int, startAtId: String?): LiveData<List<Recipe>> {
+        return MutableLiveData<List<Recipe>>().apply {
+            value = null
+        }
     }
 }

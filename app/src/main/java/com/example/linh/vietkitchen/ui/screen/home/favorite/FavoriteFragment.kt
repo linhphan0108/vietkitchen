@@ -2,12 +2,12 @@ package com.example.linh.vietkitchen.ui.screen.home.favorite
 
 import androidx.lifecycle.Observer
 import android.os.Bundle
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.di.injector
 import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.Recipe
 import com.example.linh.vietkitchen.ui.screen.home.AbsHomeFragment
 import com.example.linh.vietkitchen.ui.screen.home.BaseHomeViewModel
+import com.example.linh.vietkitchen.vo.Status.*
 
 class FavoriteFragment : AbsHomeFragment() {
 
@@ -43,17 +43,16 @@ class FavoriteFragment : AbsHomeFragment() {
     //region inner methods =========================================================================
     override fun observeViewModel(){
         super.observeViewModel()
-        viewModel.requestLikeRecipesStatus.observe(this, Observer { box ->
-            box?.let {
-                when(box.code) {
-                    Status.ERROR -> {onRequestRecipesFailed(box.message)}
-                    Status.LOAD_MORE_ERROR -> { onLoadMoreFailed()}
-                    Status.REFRESH -> {onStartRefresh()}
-                    Status.LOAD_MORE -> { onStartLoadMore()}
-                    Status.SUCCESS -> {
-                        onRequestRecipesSuccess(box.data!!)
-                        onStopRefresh()
-                    }
+        viewModel.requestLikeRecipesStatus.observe(this, Observer { resource ->
+            when(resource.status) {
+                LOADING -> {}
+                ERROR -> {onRequestRecipesFailed(resource.message)}
+//                Status.LOAD_MORE_ERROR -> { onLoadMoreFailed()}
+//                Status.REFRESH -> {onStartRefresh()}
+//                Status.LOAD_MORE -> { onStartLoadMore()}
+                SUCCESS -> {
+                    onRequestRecipesSuccess(resource.data!!)
+                    onStopRefresh()
                 }
             }
         })

@@ -1,21 +1,22 @@
 package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
-import com.example.linh.vietkitchen.data.response.Response
+import androidx.lifecycle.LiveData
 import com.example.linh.vietkitchen.domain.provider.UserProvider
+import com.example.linh.vietkitchen.vo.Resource
 import javax.inject.Inject
 
 class PutUnlikeCommand @Inject constructor(private val userProvider: UserProvider)
-    : CommandCoroutines<Response<Boolean>>{
+    : CommandCoroutines<Boolean>{
     lateinit var uid: String
     lateinit var recipeId: String
 
-    override suspend fun execute(context: Context): Response<Boolean> {
+    override fun execute(context: Context): LiveData<Resource<Boolean>> {
         isInternetOn(context)
         return execute()
     }
 
-    override suspend fun execute(): Response<Boolean> {
+    override fun execute(): LiveData<Resource<Boolean>> {
         return userProvider.unLikeRecipe(uid, recipeId)
     }
 }

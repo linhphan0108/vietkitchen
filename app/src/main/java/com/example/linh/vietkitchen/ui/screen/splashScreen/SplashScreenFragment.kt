@@ -15,9 +15,9 @@ import com.example.linh.vietkitchen.ui.baseMVVM.FullScreenFragment
 import com.firebase.ui.auth.AuthUI
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import timber.log.Timber
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.di.injector
 import com.example.linh.vietkitchen.di.viewModel
+import com.example.linh.vietkitchen.vo.Status.*
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
@@ -102,37 +102,17 @@ class SplashScreenFragment : FullScreenFragment() {
     }
 
     override fun observeViewModel() {
-        viewModel.silentLoginStatus.observe(this, androidx.lifecycle.Observer { box ->
-            box?.let {
-                when(box.code){
-                    Status.HAS_LOGGED_IN -> {
-                        if (box.data!!){
-                            onHasLoggedIn()
-                        }else{
-                            onHasNotLoggedIn()
-                        }
-                    }
-                    Status.ERROR_NO_INTERNET -> {onNoInternetException()}
+        viewModel.silentLoginStatus.observe(this, androidx.lifecycle.Observer { resource ->
+            when(resource.status){
+                SUCCESS -> {
+                    onHasLoggedIn()
                 }
-            }
-        })
-        viewModel.likedRecipesId.observe(this, Observer {box ->
-            box?.let {
-                when(box.code){
-                    Status.ERROR_NO_INTERNET -> {onNoInternetException()}
-                    Status.ERROR -> {onRequestLikedRecipesIdFailed(box.message)}
-                    Status.SUCCESS -> {gotoNextScreen()}
+                //Status.ERROR_NO_INTERNET -> {onNoInternetException()}
+                ERROR -> {
+                    onHasNotLoggedIn()
                 }
-            }
-        })
-        viewModel.requestNavStatus.observe(this, Observer {box ->
-            box?.let {
-                when(box.code){
-                    Status.ERROR_NO_INTERNET -> {onNoInternetException()}
-                    Status.ERROR -> {onRequestCategoriesFailed(box.message)}
-                    Status.SUCCESS -> {viewModel.requestLikedRecipesId()}
 
-                }
+                LOADING -> {}
             }
         })
     }
@@ -142,7 +122,7 @@ class SplashScreenFragment : FullScreenFragment() {
     }
 
     private fun onHasLoggedIn() {
-        viewModel.requestCategory()
+        requestCategory()
     }
 
     private fun onHasNotLoggedIn() {
@@ -165,36 +145,34 @@ class SplashScreenFragment : FullScreenFragment() {
     }
 
     private fun onRequestLikedRecipesIdFailed(message: String?) {
-        if (retryRequestListLikedRecipesIdsTimes <= MAX_TIME_TO_RETRY) {
-            retryRequestListLikedRecipesIdsTimes++
-            val handler = Handler()
-            handler.postDelayed({
-                viewModel.requestLikedRecipesId()
-            }, 1000 * retryRequestListLikedRecipesIdsTimes.toLong())
-            showSnackBar(root, "can not fetch the liked recipes because of $message\nretry $retryRequestListLikedRecipesIdsTimes times")
-        }else{
+//        if (retryRequestListLikedRecipesIdsTimes <= MAX_TIME_TO_RETRY) {
+//            retryRequestListLikedRecipesIdsTimes++
+//            val handler = Handler()
+//            handler.postDelayed({
+//                requestLikedRecipesId()
+//            }, 1000 * retryRequestListLikedRecipesIdsTimes.toLong())
+//            showSnackBar(root, "can not fetch the liked recipes because of $message\nretry $retryRequestListLikedRecipesIdsTimes times")
+//        }else{
             showSnackBar(root, "can not fetch the liked recipes because of $message")
-        }
+//        }
     }
 
     private fun onRequestCategoriesFailed(message: String?) {
-        if (retryRequestCategoryTimes <= MAX_TIME_TO_RETRY) {
-            retryRequestCategoryTimes++
-            val handler = Handler()
-            handler.postDelayed({
-                viewModel.requestCategory()
-            }, 1000 * retryRequestCategoryTimes.toLong())
-            showSnackBar(root, "can not fetch the category because of $message\nretry $retryRequestCategoryTimes times")
-        }else{
+//        if (retryRequestCategoryTimes <= MAX_TIME_TO_RETRY) {
+//            retryRequestCategoryTimes++
+//            val handler = Handler()
+//            handler.postDelayed({
+//                requestCategory()
+//            }, 1000 * retryRequestCategoryTimes.toLong())
+//            showSnackBar(root, "can not fetch the category because of $message\nretry $retryRequestCategoryTimes times")
+//        }else{
             showSnackBar(root, "can not fetch the category because of $message")
-        }
+//        }
     }
 
     private fun gotoHomeScreen(){
         findNavController().navigate(R.id.action_splash_screen_dest_to_home_dest, null,
                 null)
-//        startActivityWithAnimation(HomeActivity.createIntent(this))
-//        finish()
     }
     //endregion MVP callbacks
 
@@ -211,6 +189,32 @@ class SplashScreenFragment : FullScreenFragment() {
                 gotoHomeScreen()
             }, delayTime)
         }
+    }
+
+    private fun requestCategory(){
+        viewModel.requestCategory().observe(this, Observer { resource ->
+            when(resource.status){
+                SUCCESS -> {
+                    requestLikedRecipesId()
+                }
+                LOADING -> {
+
+                }
+                ERROR -> {
+                    onRequestCategoriesFailed(resource.message)
+                }
+            }
+        })
+    }
+
+    private fun requestLikedRecipesId(){
+        viewModel.requestLikedRecipesId().observe(this, Observer { resource ->
+            when(resource.status){
+                LOADING -> {}
+                ERROR -> {onRequestLikedRecipesIdFailed(resource.message)}
+                SUCCESS -> {gotoNextScreen()}
+            }
+        })
     }
     //endregion inner methods
 }

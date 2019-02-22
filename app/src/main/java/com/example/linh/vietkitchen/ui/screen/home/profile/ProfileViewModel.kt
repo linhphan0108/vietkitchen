@@ -1,16 +1,17 @@
 package com.example.linh.vietkitchen.ui.screen.home.profile
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
-import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
+import com.example.linh.vietkitchen.vo.Resource
 import com.firebase.ui.auth.AuthUI
 import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(application: Application) : BaseViewModel(application) {
 
-    internal val logoutStatus: MutableLiveData<StatusBox<Boolean>> = MutableLiveData()
+    private val _logoutStatus: MutableLiveData<Resource<Boolean>> = MutableLiveData()
+    internal val logoutStatus: LiveData<Resource<Boolean>> = _logoutStatus
 
     fun onAllowNotificationChanged(hasAllow: Boolean) {
 
@@ -20,9 +21,9 @@ class ProfileViewModel @Inject constructor(application: Application) : BaseViewM
         AuthUI.getInstance()
                 .signOut(getApplication())
                 .addOnCompleteListener {
-                    logoutStatus.value = StatusBox(Status.SUCCESS, data = true)
+                    _logoutStatus.value = Resource.success(true)
                 }.addOnFailureListener {
-                    logoutStatus.value = StatusBox(Status.ERROR, it.message, data = false)
+                    _logoutStatus.value = Resource.error(it.message)
                 }
     }
 }

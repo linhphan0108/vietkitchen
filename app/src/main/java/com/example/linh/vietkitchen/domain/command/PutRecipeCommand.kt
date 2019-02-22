@@ -1,19 +1,21 @@
 package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
-import com.example.linh.vietkitchen.data.response.Response
+import androidx.lifecycle.LiveData
 import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.domain.provider.RecipeProvider
+import com.example.linh.vietkitchen.vo.Resource
 import javax.inject.Inject
 
-class PutRecipeCommand @Inject constructor(private val provider: RecipeProvider) : CommandCoroutines<Response<String>>{
+class PutRecipeCommand @Inject constructor(private val provider: RecipeProvider)
+    : CommandCoroutines<String>{
     lateinit var recipe: Recipe
 
-    override suspend fun execute(context: Context): Response<String> {
+    override fun execute(context: Context): LiveData<Resource<String>> {
         isInternetOn(context)
         return execute()
     }
 
-    override suspend fun execute() = provider.putRecipe(recipe)
+    override fun execute() = provider.putRecipe(recipe)
 
 }

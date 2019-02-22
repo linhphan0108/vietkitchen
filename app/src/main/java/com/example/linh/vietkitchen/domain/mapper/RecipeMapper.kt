@@ -1,45 +1,33 @@
 package com.example.linh.vietkitchen.domain.mapper
 
-import com.example.linh.vietkitchen.data.cloud.Recipe
-import com.example.linh.vietkitchen.extension.toListOfStringOfKey
+import com.example.linh.vietkitchen.data.cloud.Recipe as RecipeData
 import com.example.linh.vietkitchen.extension.toMapOfStringBoolean
-import com.google.firebase.database.DataSnapshot
 import javax.inject.Inject
-import com.example.linh.vietkitchen.domain.model.Recipe as RecipeDomain
+import com.example.linh.vietkitchen.domain.model.Recipe
+import com.example.linh.vietkitchen.extension.toListOfStringOfKey
 
 class RecipeMapper @Inject constructor() {
-
-    fun convertToDomain(children: List<DataSnapshot>): List<RecipeDomain> {
-        return convertToDomain(children.asIterable())
-    }
-
-    fun convertToDomain(children: Iterable<DataSnapshot>): List<RecipeDomain> {
-        return if (children.none()){
+    fun convertToDomain(listData: List<RecipeData>): List<Recipe> {
+        return if (listData.isNullOrEmpty()){
             listOf()
         }else {
-            children.map {
+            listData.map {
                 convertToDomain(it)
             }
         }
     }
 
-    fun convertToDomain(dataSnapshot: DataSnapshot): RecipeDomain {
-        val f = dataSnapshot.getValue(Recipe::class.java)!!
-        val id = dataSnapshot.key
-//        val preProcess = f.preparation.map {
-//            ProcessStep(it.step, it.imageUrl)
-//        }
-//        val process = f.processing.map {
-//            ProcessStep(it.step, it.imageUrl)
-//        }
-        return RecipeDomain(id, f.name, f.intro, f.ingredient, f.spice,
-                f.preparation, f.processing, f.notes, f.categories.toListOfStringOfKey(),
-                f.tags, f.thumbUrl, f.imageUrl)
+    fun convertToDomain(recipeData: RecipeData): Recipe {
+        return with(recipeData){
+            Recipe(id, name, intro, ingredient, spice,
+                    preparation, processing, notes, categories.toListOfStringOfKey(),
+                    tags, thumbUrl, imageUrl)
+        }
     }
 
-    fun toData(domain: RecipeDomain): Recipe {
-        with(domain){
-            return Recipe(id, name, intro, ingredient, spice, preparation, processing, notes,
+    fun toData(domain: Recipe): RecipeData {
+        return with(domain){
+            RecipeData(id, name, intro, ingredient, spice, preparation, processing, notes,
                     categories.toMapOfStringBoolean(), tags, thumbUrl, imageUrl)
         }
     }

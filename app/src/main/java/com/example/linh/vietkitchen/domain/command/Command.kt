@@ -2,15 +2,17 @@ package com.example.linh.vietkitchen.domain.command
 
 import android.content.Context
 import android.net.ConnectivityManager
+import androidx.lifecycle.LiveData
 import com.example.linh.vietkitchen.exception.NoInternetConnection
+import com.example.linh.vietkitchen.vo.Resource
 
-interface CommandCoroutines<out T>{
+interface CommandCoroutines<T>{
 
-    suspend fun execute(): T
+    fun execute(): LiveData<Resource<T>>
 
-    suspend fun execute(context: Context): T
+    fun execute(context: Context): LiveData<Resource<T>>
 
-    suspend fun isInternetOn(context: Context): Boolean {
+    fun isInternetOn(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return if (activeNetworkInfo != null && activeNetworkInfo.isConnected){

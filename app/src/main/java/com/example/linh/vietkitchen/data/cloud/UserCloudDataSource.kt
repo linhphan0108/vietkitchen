@@ -1,39 +1,48 @@
 package com.example.linh.vietkitchen.data.cloud
 
-import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.domain.datasource.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.example.linh.vietkitchen.data.response.ApiResponse
+import com.example.linh.vietkitchen.data.response.ApiSuccessResponse
 import com.example.linh.vietkitchen.extension.addListenerForSingleValueEventAwait
 import com.example.linh.vietkitchen.extension.removeValueAwait
 import com.example.linh.vietkitchen.extension.setValueAwait
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_LIKED_RECIPES_PATH
 import com.example.linh.vietkitchen.util.Constants.STORAGE_USER_PATH
-import com.example.linh.vietkitchen.util.ResponseCode.RESPONSE_SUCCESS
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import javax.inject.Inject
 
 class UserCloudDataSource @Inject constructor
-(private val database: FirebaseDatabase) : UserDataSource{
+(private val database: FirebaseDatabase){
 
     private val dbRef by lazy{database.getReference(STORAGE_USER_PATH)}
 
-    override suspend fun likeRecipe(uid: String, recipeKey: String): Response<String> {
+    fun likeRecipe(uid: String, recipeKey: String): LiveData<ApiResponse<String>> {
         val newDbRef = dbRef.child(uid).child(STORAGE_USER_LIKED_RECIPES_PATH).child(recipeKey)
         val timeStamp = System.currentTimeMillis()
-        val id = newDbRef.setValueAwait(timeStamp)
-        return Response(RESPONSE_SUCCESS, id)
+       return newDbRef.setValueAwait(timeStamp)
     }
 
-    override suspend fun unLikeRecipe(uid: String, recipeKey: String): Response<Boolean> {
+    fun unLikeRecipe(uid: String, recipeKey: String): LiveData<ApiResponse<Boolean>> {
         val newDbRef = dbRef.child(uid).child(STORAGE_USER_LIKED_RECIPES_PATH).child(recipeKey)
-        val isSuccess = newDbRef.removeValueAwait()
-        return Response(RESPONSE_SUCCESS, isSuccess)
+        return newDbRef.removeValueAwait()
     }
 
-    override suspend fun getLikedRecipesId(uid: String): Response<DataSnapshot> {
+    fun getLikedRecipesId(uid: String): LiveData<ApiResponse<List<String>>>{
         val dbRef = dbRef.child(uid).child(STORAGE_USER_LIKED_RECIPES_PATH)
         val query = dbRef.orderByKey()
-        val dataSnapshot = query.addListenerForSingleValueEventAwait()
-        return Response(RESPONSE_SUCCESS, dataSnapshot)
+        val apiResponse = query.addListenerForSingleValueEventAwait()
+        return Transformations.map(apiResponse){ response ->
+            val listIds = mutableListOf<String>()
+            when(response){
+                is ApiSuccessResponse -> {
+                    val snapshot = response.data
+                    for (child in snapshot.children) {
+                        child.key?.let { listIds.add(child.key!!) }
+                    }
+                }
+            }
+            ApiResponse.createSuccess(if (listIds.isEmpty()) null else listIds.toList())
+        }
     }
 }

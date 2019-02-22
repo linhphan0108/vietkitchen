@@ -11,10 +11,10 @@ import com.example.linh.vietkitchen.ui.GlideApp
 import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseFragment
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.di.injector
 import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.UserInfo
+import com.example.linh.vietkitchen.vo.Status.*
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : BaseFragment(), View.OnClickListener {
@@ -41,12 +41,11 @@ class ProfileFragment : BaseFragment(), View.OnClickListener {
     }
 
     override fun observeViewModel() {
-        viewModel.logoutStatus.observe(this, Observer {box ->
-            box?.let {
-                when(box.code){
-                    Status.SUCCESS -> {onLogoutSuccess()}
-                    Status.ERROR -> {onLogoutFailed()}
-                }
+        viewModel.logoutStatus.observe(this, Observer {resource ->
+            when(resource.status){
+                SUCCESS -> {onLogoutSuccess()}
+                ERROR -> {onLogoutFailed()}
+                LOADING -> {}
             }
         })
         VietKitchenApp.getUserInfoObservable().observe(this, Observer {

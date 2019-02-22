@@ -1,11 +1,14 @@
 package com.example.linh.vietkitchen.data.local
 
-import com.example.linh.vietkitchen.data.response.Response
-import com.example.linh.vietkitchen.domain.datasource.TagsDataSource
-import com.google.firebase.database.DataSnapshot
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
-class TagsLocalDataSource : TagsDataSource {
-    override suspend fun getTags(): Response<DataSnapshot>? = null
+class TagsLocalDataSource {
+    fun getTags(): LiveData<Map<String, Boolean>> {
+        return MutableLiveData<Map<String, Boolean>>().apply { value = null }
+    }
 
-    override suspend fun putTags(tags: Map<String, Boolean>): Response<Boolean>? = null
+    fun putTags(tags: Map<String, Boolean>): LiveData<Boolean> {
+        return MutableLiveData<Boolean>().apply { value = false }
+    }
 }

@@ -2,17 +2,17 @@ package com.example.linh.vietkitchen.ui.screen.splashScreen
 
 import android.app.Application
 import android.os.Looper
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations.map
 import com.example.linh.vietkitchen.domain.command.RequestCategoryCommand
 import com.example.linh.vietkitchen.domain.command.RequestRecipesIdCommand
-import com.example.linh.vietkitchen.exception.NoInternetConnection
 import com.example.linh.vietkitchen.ui.VietKitchenApp
-import com.example.linh.vietkitchen.ui.VietKitchenApp.Companion.category
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
-import com.example.linh.vietkitchen.ui.baseMVVM.StatusBox
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.vo.Resource
+import com.example.linh.vietkitchen.vo.Status.*
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import timber.log.Timber
@@ -25,13 +25,12 @@ class SplashScreenViewModel @Inject constructor(application: Application,
         private val requestRecipesIdCommand: RequestRecipesIdCommand)
     :  BaseViewModel(application){
 
-    internal val silentLoginStatus: MutableLiveData<StatusBox<Boolean>> = MutableLiveData()
-    internal val likedRecipesId: MutableLiveData<StatusBox<List<String>>> = MutableLiveData()
-    internal var requestNavStatus: MutableLiveData<StatusBox<List<DrawerNavGroupItem>>> = MutableLiveData()
+    private val _silentLoginStatus: MutableLiveData<Resource<Boolean>> = MutableLiveData()
+    internal val silentLoginStatus: LiveData<Resource<Boolean>> = _silentLoginStatus
 
     fun checkLogin() {
         if (FirebaseAuth.getInstance().currentUser != null){
-            silentLoginStatus.value = StatusBox(Status.HAS_LOGGED_IN, data = true)
+            _silentLoginStatus.value = Resource.success(true)
         }else {
             silentLogin()
         }
@@ -51,61 +50,56 @@ class SplashScreenViewModel @Inject constructor(application: Application,
 //                }
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
-                        silentLoginStatus.value = StatusBox(Status.HAS_LOGGED_IN, data = true)
+                        _silentLoginStatus.value = Resource.success(true)
                         // Signed in! Start loading data
                     } else {
                         // Uh oh, show error data
                         Timber.e("log in failed ${it.exception?.message}")
-                        silentLoginStatus.value = StatusBox(Status.HAS_LOGGED_IN, it.exception?.message, false)
+                        _silentLoginStatus.value = Resource.error(it.exception?.message)
                     }
                 }
     }
 
-    fun requestLikedRecipesId() {
-        launchDataLoad({
-            val recipesId = withIoContext {
-                requestRecipesIdCommand.uid = VietKitchenApp.getUserInfo().uid
-                requestRecipesIdCommand.execute(getApplication())
-            }
-            VietKitchenApp.getUserInfo().likedRecipesIds = recipesId.reversed().toMutableList()
-            VietKitchenApp.getUserInfo().numberFavoriteRecipes = recipesId.size
-            likedRecipesId.value = StatusBox(Status.SUCCESS)
-        }, {e->
-            when(e){
-                is NoInternetConnection ->{
-                    likedRecipesId.value = StatusBox(Status.ERROR_NO_INTERNET)
+    fun requestLikedRecipesId(): LiveData<Resource<Nothing>> {
+            requestRecipesIdCommand.uid = VietKitchenApp.getUserInfo().uid
+            val liveData = requestRecipesIdCommand.execute(getApplication())
+            return map(liveData){ resource ->
+                when(resource.status){
+                    SUCCESS -> {
+                        VietKitchenApp.getUserInfo().likedRecipesIds = resource.data!!.reversed().toMutableList()
+                        VietKitchenApp.getUserInfo().numberFavoriteRecipes = resource.data.size
+                        Resource.success(null)
+                    }
+                    LOADING -> {
+                        Resource.loading()
+                    }
+                    ERROR -> {
+                        Resource.error(resource.message)
+                    }
                 }
-                else -> {
-                    likedRecipesId.value = StatusBox(Status.ERROR, e.message)
-                }
             }
-        }, false)
     }
 
-    fun requestCategory() {
-        launchDataLoad({
-            val categories = withIoContext {
-                Timber.d("on launchDataLoad: ${Looper.myLooper() == Looper.getMainLooper()}")
-                val response = requestCategoryCommand.execute(getApplication())
-                response.data?.let {listCategories->
-                    return@withIoContext categoryMapper.convertToUI(listCategories)
+    fun requestCategory(): LiveData<Resource<List<DrawerNavGroupItem>>> {
+            Timber.d("on launchDataLoad: ${Looper.myLooper() == Looper.getMainLooper()}")
+            val response = requestCategoryCommand.execute(getApplication())
+            return map(response){ resource ->
+                when(resource.status){
+                    SUCCESS -> {
+                        val data = categoryMapper.convertToUI(resource.data!!)
+                        VietKitchenApp.setCategory(data)
+                        Resource.success(null)
+                    }
+
+                    LOADING -> {
+                        Resource.loading()
+                    }
+
+                    ERROR -> {
+                        Resource.error(resource.message)
+                    }
                 }
             }
-            categories?.let {
-                category.value = it
-                requestNavStatus.value = StatusBox(Status.SUCCESS)
-            }
-        },{e->
-            when(e){
-                is NoInternetConnection ->{
-                    requestNavStatus.value = StatusBox(Status.ERROR_NO_INTERNET)
-                }
-                else -> {
-                    requestNavStatus.value = StatusBox(Status.ERROR, e.message)
-                }
-            }
-            Timber.e(e)
-        }, false)
     }
 
     fun getSelectedProviders(): List<AuthUI.IdpConfig> = Arrays.asList(
