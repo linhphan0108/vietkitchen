@@ -17,7 +17,6 @@ abstract class BaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getViewModel()
-        observeViewModel()
     }
 
     override fun onAttach(context: Context) {
@@ -33,6 +32,11 @@ abstract class BaseFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Timber.e("on create view")
         return inflateFragmentView(inflater, container, savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        observeViewModel()
     }
 
     protected open fun inflateFragmentView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?

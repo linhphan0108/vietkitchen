@@ -6,7 +6,6 @@ import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +25,7 @@ import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.DrawerNavChildItem
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
 import com.example.linh.vietkitchen.util.ScreenUtil
+import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_home_app_bar.*
 import timber.log.Timber
@@ -48,7 +48,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         val host = supportFragmentManager.findFragmentById(R.id.navHostFragment)
                 as NavHostFragment? ?: return
         val navController = host.navController
-        appBarConfiguration = AppBarConfiguration( setOf(R.id.home_dest), drawerLayout)
+        appBarConfiguration = AppBarConfiguration( setOf(R.id.home_dest, R.id.favorite_dest), drawerLayout)
         setupAppbar()
         setupActionBar(navController, appBarConfiguration)
         setupBottomNavMenu(navController)
@@ -74,6 +74,7 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         // Allows NavigationUI to support proper up navigation or the drawer layout
         // drawer menu, depending on the situation
         return findNavController(R.id.navHostFragment).navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
     }
 
     override fun onBackPressed() {
@@ -152,11 +153,11 @@ class HomeActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         // This allows NavigationUI to decide what label to show in the action bar
         // By using appBarConfig, it will also determine whether to
         // show the up arrow or drawer menu icon
-        setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfig)
     }
 
     private fun setupAppbar(){
+        setSupportActionBar(toolbar)
         val appBarElevationMax = ScreenUtil.dp2px(1)
         appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appbar, verticalOffset ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

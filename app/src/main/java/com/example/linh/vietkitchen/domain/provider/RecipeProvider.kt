@@ -112,8 +112,8 @@ class RecipeProvider @Inject constructor(
             }
 
             override fun callDb(): LiveData<List<Recipe>> {
-                return Transformations.map(localDataSource.getLikedRecipes(ids)){
-                    mapper.convertToDomain(it)
+                return Transformations.map(localDataSource.getLikedRecipes(ids)){ list ->
+                    list?.let { mapper.convertToDomain(it) }
                 }
             }
 

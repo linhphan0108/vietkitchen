@@ -2,6 +2,7 @@ package com.example.linh.vietkitchen.data.cloud
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import com.example.linh.vietkitchen.data.mapper.RecipeMapper
 import com.example.linh.vietkitchen.data.response.*
@@ -9,6 +10,7 @@ import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_CATEGORIES
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import timber.log.Timber
@@ -32,13 +34,20 @@ class RecipeCloudDataSource @Inject constructor
     }
 
     fun getLikedRecipes(ids: List<String>): LiveData<ApiResponse<List<Recipe>>> {
+       val liveData = MutableLiveData<ApiResponse<List<Recipe>>>()
         val result = mutableListOf<Recipe>()
+        var counter = 0
         ids.forEach {key ->
             val query = dbRefRecipe.child(key)
-            Transformations.map(query.addListenerForSingleValueEventAwait()){apiResponse ->
+            val liveDataQuery = query.addListenerForSingleValueEventAwait()
+            ApiObserver(liveDataQuery){apiResponse ->
+                counter++
                 when(apiResponse) {
                     is ApiSuccessResponse -> {
                         result.add(mapper.toData(apiResponse.data))
+                        if(counter == ids.size) {
+                            liveData.value = ApiResponse.createSuccess(result.toList())
+                        }
                     }
                     is ApiEmptyResponse -> {
                     }
@@ -46,10 +55,9 @@ class RecipeCloudDataSource @Inject constructor
                     }
                 }
             }
-
         }
-        val apiResponse = ApiResponse.createSuccess(result.toList())
-        return MutableLiveData<ApiResponse<List<Recipe>>>().apply { value = apiResponse }
+
+        return liveData
     }
 
     fun deleteRecipe(id: String): LiveData<ApiResponse<Boolean>> {
@@ -246,5 +254,17 @@ class RecipeCloudDataSource @Inject constructor
         val imageUrl = "https://znews-photo-td.zadn.vn/w660/Uploaded/Ohunoaa/2017_01_17/IMG_7731.JPG"
         return Recipe( name, intro, ingredients, spices, preparation, processing, null, categories,
                 tags, thumbImageUrl, imageUrl)
+    }
+}
+
+class ApiObserver(private val liveData: LiveData<ApiResponse<DataSnapshot>>,
+                  private val callback:(apiResponse: ApiResponse<DataSnapshot>) -> Unit)
+    : Observer<ApiResponse<DataSnapshot>> {
+    init {
+        liveData.observeForever(this)
+    }
+    override fun onChanged(t: ApiResponse<DataSnapshot>?) {
+        t?.let(callback)
+        liveData.removeObserver(this)
     }
 }

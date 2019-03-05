@@ -64,17 +64,18 @@ class FavoriteFragmentViewModel @Inject constructor(application: Application,
                 com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
                     val list = recipeMapper.convertToUi(resource.data!!, true)
                     listRecipes.addAll(list)
+                    _requestLikeRecipesStatus.removeSource(liveData)
                     Resource.success(listRecipes.toList())
                 }
                 com.example.linh.vietkitchen.vo.Status.LOADING -> {
                     Resource.loading()
                 }
                 com.example.linh.vietkitchen.vo.Status.ERROR -> {
+                    _requestLikeRecipesStatus.removeSource(liveData)
                     Resource.error(resource.message)
                 }
             }
             _requestLikeRecipesStatus.value = res
-            _requestLikeRecipesStatus.removeSource(liveData)
             isLoadMoreRecipe = false
             isFreshRecipe = false
         }
