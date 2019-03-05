@@ -11,7 +11,7 @@
 
     <item android:id="@+id/action_change_rc_layout"
           app:showAsAction="ifRoom"
-          android:title="@string/label_search"
+          android:title="@string/label_change_layout"
           android:menuCategory="secondary"
           android:icon="@drawable/outline_view_module_24"
           tools:ignore="AlwaysShowAction"/>
