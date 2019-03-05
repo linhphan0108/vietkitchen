@@ -27,15 +27,13 @@ class HomeFragment : AbsHomeFragment(), OnDrawerNavItemChangedListener {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
+        getViewModel().refreshRecipes()
         Timber.e("on create")
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         Timber.e("on activity created")
-        if (savedInstanceState == null) {
-            getViewModel().refreshRecipes()
-        }
     }
 
     override fun onStart() {
@@ -127,23 +125,21 @@ class HomeFragment : AbsHomeFragment(), OnDrawerNavItemChangedListener {
     //region inner methods =========================================================================
     override fun observeViewModel(){
         super.observeViewModel()
-        getViewModel().listRecipeLiveData.observe(this, Observer { box ->
-            box?.let {
-                when(box.status){
-                    com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
-                        onRequestRecipesSuccess(box.data!!)
-                        onStopRefresh()
-                    }
-                    com.example.linh.vietkitchen.vo.Status.LOADING -> {
+        getViewModel().listRecipeLiveData.observe(this, Observer { resource ->
+            when(resource.status){
+                com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
+                    onRequestRecipesSuccess(resource.data!!)
+                    onStopRefresh()
+                }
+                com.example.linh.vietkitchen.vo.Status.LOADING -> {
 
-                    }
-                    com.example.linh.vietkitchen.vo.Status.ERROR -> {
-                        onRequestRecipesFailed(box.message)
-                    }
+                }
+                com.example.linh.vietkitchen.vo.Status.ERROR -> {
+                    onRequestRecipesFailed(resource.message)
+                }
 //                    Status.LOAD_MORE_ERROR -> {onLoadMoreFailed()}
 //                    Status.REFRESH -> {onStartRefresh()}
 //                    Status.LOAD_MORE -> {onStartLoadMore()}
-                }
             }
         })
         getViewModel().deleteRecipeStatus.observe(this, Observer {resource ->
