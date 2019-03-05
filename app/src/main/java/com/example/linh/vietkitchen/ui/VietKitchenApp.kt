@@ -25,24 +25,24 @@ class VietKitchenApp : MultiDexApplication(), DaggerComponentProvider{
     }
 
     companion object {
-        private  val userInfo: MutableLiveData<UserInfo> = MutableLiveData()
+        private  val _userInfo: MutableLiveData<UserInfo> = MutableLiveData()
         private val _category: MutableLiveData<List<DrawerNavGroupItem>> = MutableLiveData()
         val category: LiveData<List<DrawerNavGroupItem>> = _category
 
-        fun getUserInfo() = userInfo.value!!
-        fun getUserInfoObservable() = userInfo
+        fun getUserInfo() = _userInfo.value!!
+        fun getUserInfoObservable(): LiveData<UserInfo> = _userInfo
         fun removeLikedRecipeId(id: String){
             val removed = getUserInfo().likedRecipesIds?.remove(id) ?: false
             if(removed) {
                 getUserInfo().numberFavoriteRecipes = getUserInfo().likedRecipesIds?.size ?: 0
-                userInfo.postValue(getUserInfo())
+                _userInfo.postValue(getUserInfo())
             }
         }
         fun addLikedRecipeId(id: String) {
             val added = getUserInfo().likedRecipesIds?.add(id) ?: false
             if (added) {
                 getUserInfo().numberFavoriteRecipes = getUserInfo().likedRecipesIds?.size ?: 0
-                userInfo.postValue(getUserInfo())
+                _userInfo.postValue(getUserInfo())
             }
         }
 
@@ -60,7 +60,7 @@ class VietKitchenApp : MultiDexApplication(), DaggerComponentProvider{
 
     fun initUserInfo(){
         FirebaseAuth.getInstance().currentUser?.let { currentUser ->
-            userInfo.value = UserInfo(currentUser.uid, currentUser.displayName, currentUser.email, currentUser.photoUrl)
+            _userInfo.value = UserInfo(currentUser.uid, currentUser.displayName, currentUser.email, currentUser.photoUrl)
         }
     }
 
