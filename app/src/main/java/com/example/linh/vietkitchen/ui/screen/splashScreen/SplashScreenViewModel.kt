@@ -50,6 +50,7 @@ class SplashScreenViewModel @Inject constructor(application: Application,
 //                }
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
+                        getApplication<VietKitchenApp>().initUserInfo()
                         _silentLoginStatus.value = Resource.success(true)
                         // Signed in! Start loading data
                     } else {

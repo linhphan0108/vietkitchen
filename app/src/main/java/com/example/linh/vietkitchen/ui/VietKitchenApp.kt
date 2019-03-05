@@ -58,12 +58,9 @@ class VietKitchenApp : MultiDexApplication(), DaggerComponentProvider{
         setupTimberLogger()
     }
 
-    private fun initUserInfo(){
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null){
+    fun initUserInfo(){
+        FirebaseAuth.getInstance().currentUser?.let { currentUser ->
             userInfo.value = UserInfo(currentUser.uid, currentUser.displayName, currentUser.email, currentUser.photoUrl)
-        }else{
-//            throw NullPointerException("user info not found!")
         }
     }
 
