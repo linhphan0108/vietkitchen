@@ -132,10 +132,11 @@ class HomeFragment : AbsHomeFragment(), OnDrawerNavItemChangedListener {
                     onStopRefresh()
                 }
                 com.example.linh.vietkitchen.vo.Status.LOADING -> {
-
+                    onStartRefresh()
                 }
                 com.example.linh.vietkitchen.vo.Status.ERROR -> {
                     onRequestRecipesFailed(resource.message)
+                    onStopRefresh()
                 }
 //                    Status.LOAD_MORE_ERROR -> {onLoadMoreFailed()}
 //                    Status.REFRESH -> {onStartRefresh()}
