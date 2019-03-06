@@ -194,7 +194,7 @@ abstract class AbsHomeFragment : AbsFullNavFragment(),
         return when(recyclerViewLayoutMode){
             RecyclerViewLayoutMode.MODE_STAGGERED_VERTICAL -> {
                 val margin = resources.getDimensionPixelSize(R.dimen.padding_16)
-                VerticalStaggeredSpaceItemDecoration(margin, margin, margin)
+                VerticalStaggeredSpaceItemDecoration(margin, 0, margin)
             }
             RecyclerViewLayoutMode.MODE_LINENEAR_VERTICAL -> {
                 val margin = resources.getDimensionPixelSize(R.dimen.padding_16)
