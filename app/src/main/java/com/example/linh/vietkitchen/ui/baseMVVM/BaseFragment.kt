@@ -47,16 +47,19 @@ abstract class BaseFragment : Fragment() {
     internal abstract fun getFragmentLayoutRes(): Int
 
     //==== inner methods ===========================================================================
-    fun showProgress() {
+    fun showProgress(title: String) {
         if (loadingDialog == null) {
-            loadingDialog = LoadingDialog.newInstance("delete")
+            loadingDialog = LoadingDialog.newInstance(title)
+        }
+        if (loadingDialog!!.isAdded || loadingDialog!!.isVisible){
+            return
         }
         loadingDialog!!.show(childFragmentManager, LoadingDialog::class.java.name)
     }
 
     fun hideProgress() {
         loadingDialog?.let { loadingDialog ->
-            if(loadingDialog.isVisible) loadingDialog.dismiss()
+            if(loadingDialog.isAdded) loadingDialog.dismiss()
         }
     }
 

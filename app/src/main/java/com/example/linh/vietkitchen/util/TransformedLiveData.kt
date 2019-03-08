@@ -14,12 +14,11 @@ class TransformedLiveData<Source, Output>(
     private val observer = Observer<Source> { source ->
         job?.cancel()
         job = GlobalScope.launch(runContext){
-            transformation(source)?.let { transformed ->
-                // Could have used postValue instead, but using the UI context I can guarantee that
-                // a canceled job will never emit values.
-                withContext(Dispatchers.Main) {
-                    value = transformed
-                }
+            val transformed = transformation(source)
+            // Could have used postValue instead, but using the UI context I can guarantee that
+            // a canceled job will never emit values.
+            withContext(Dispatchers.Main) {
+                value = transformed
             }
         }
     }
@@ -36,4 +35,5 @@ class TransformedLiveData<Source, Output>(
 
 fun <Source, Output> LiveData<Source>.transform(
         runContext: CoroutineContext = Dispatchers.Default,
-        transformation: (Source) -> Output) = TransformedLiveData(runContext, this, transformation)
+        transformation: (Source) -> Output)
+        = TransformedLiveData(runContext, this, transformation) as LiveData<Output>

@@ -25,7 +25,6 @@ import com.example.linh.vietkitchen.ui.adapter.SearchSuggestionAdapter
 import com.example.linh.vietkitchen.ui.adapter.viewholder.SearchSuggestionViewHolder
 import com.example.linh.vietkitchen.ui.baseMVVM.AbsJustToolbarFragment
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
-import com.example.linh.vietkitchen.ui.baseMVVM.Status
 import com.example.linh.vietkitchen.di.injector
 import com.example.linh.vietkitchen.di.viewModel
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
@@ -64,7 +63,6 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
             isSearchViewFocused = savedInstanceState.getBoolean(ARG_IS_SEARCH_VIEW_FOCUSED)
             currentQuery = savedInstanceState.getString(ARG_CURRENT_QUERY)
         }
-        viewModel.requestTags()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -125,7 +123,7 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
     //region MVP implements ======================================================================
     private fun onRecipesRequestSuccess(recipes: List<Entity>) {
         recipeAdapter.items = recipes
-        checkNoData()
+        checkNoData(recipes)
         hideProgress()
     }
 
@@ -133,8 +131,8 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
         hideProgress()
     }
 
-    fun onRefreshRecipe() {
-        showProgress()
+    private fun onRefreshRecipe() {
+        showProgress(getString(R.string.label_searching))
     }
 
     fun onLoadMoreSuccess(recipes: List<Recipe>) {
@@ -239,31 +237,32 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
         viewModel.filteredSuggestion.observe(this, Observer { listSearchItem ->
             listSearchItem?.let { onFilteredSuggestion(it) }
         })
-        viewModel.listRecipes.observe(this, Observer {listRecipes ->
-            listRecipes?.let { onRecipesRequestSuccess(it) }
-        })
-        viewModel.requestRecipesStatus.observe(this, Observer {
-            when(it){
-                Status.LOADING -> {}
-                Status.LOAD_MORE -> {}
-                Status.ERROR -> onRecipesRequestFailed("")
-                Status.LOAD_MORE_ERROR -> onLoadMoreFailed()
+
+        viewModel.listRecipes.removeObservers(this)
+        viewModel.listRecipes.observe(this, Observer {resource ->
+            when(resource.status){
+                com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
+                    resource.data?.let {
+                        onRecipesRequestSuccess(it)
+                    }
+                }
+                com.example.linh.vietkitchen.vo.Status.LOADING -> {
+                    onRefreshRecipe()
+                }
+                com.example.linh.vietkitchen.vo.Status.ERROR -> {
+                    onRecipesRequestFailed(resource.message ?: "")
+                }
             }
         })
-        viewModel.requestCategoriesStatus.observe(this, Observer {
-            when(it){
-                Status.LOADING -> {}
-                Status.LOAD_MORE -> {}
-                Status.ERROR -> onRequestCategoriesFailed("")
-                Status.LOAD_MORE_ERROR -> {}
-            }
-        })
-        viewModel.requestTagsStatus.observe(this, Observer {
-            when(it){
-                Status.LOADING -> {}
-                Status.LOAD_MORE -> {}
-                Status.ERROR -> onGetTagsFailed("")
-                Status.LOAD_MORE_ERROR -> {}
+        viewModel.listTagsLiveData.observe(this, Observer { resource ->
+            when(resource.status){
+                com.example.linh.vietkitchen.vo.Status.SUCCESS -> {
+                }
+                com.example.linh.vietkitchen.vo.Status.LOADING -> {
+                }
+                com.example.linh.vietkitchen.vo.Status.ERROR -> {
+                    onRecipesRequestFailed(resource.message ?: "")
+                }
             }
         })
         VietKitchenApp.category.observe(this, Observer {
@@ -278,7 +277,7 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
         getToolbar().setOnClickListener {
             forceSearchViewExpand()
         }
-        setTitle("")
+        setTitle(viewModel.searchItem?.query ?: "")
     }
 
     private fun setupAppbar(){
@@ -308,8 +307,8 @@ class SearchScreenFragment : AbsJustToolbarFragment(), OnItemClickListener,
         rcvRecipesResult.adapter = recipeAdapter
     }
 
-    private fun checkNoData(){
-        if (recipeAdapter.itemCount <= 0){
+    private fun checkNoData(recipes: List<Entity>) {
+        if (recipeAdapter.itemCount <= 0 && recipes.isEmpty()){
             txtNoData.visibility = View.VISIBLE
         }else{
             txtNoData.visibility = View.GONE

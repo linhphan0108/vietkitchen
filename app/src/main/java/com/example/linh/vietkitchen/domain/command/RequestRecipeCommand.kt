@@ -30,4 +30,12 @@ class RequestRecipeCommand @Inject constructor(private val provider: RecipeProvi
             else -> provider.requestRecipeByCategory(category, limit, startAtId)
         }
     }
+
+    fun reset(){
+        limit = Constants.PAGINATION_LENGTH
+        title = null
+        category = null
+        tag = null
+        startAtId = null
+    }
 }

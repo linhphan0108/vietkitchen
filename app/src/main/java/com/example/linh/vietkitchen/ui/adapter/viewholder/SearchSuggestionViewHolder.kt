@@ -11,6 +11,18 @@ class SearchSuggestionViewHolder(val parent: ViewGroup, val listener: OnItemList
         LayoutInflater.from(parent.context).inflate(R.layout.item_search_suggestion, parent, false)) {
 
     fun bindView(item: SearchItem){
+        val drawable = when(item.type){
+            SearchItem.SearchItemType.CATEGORY -> {
+                R.drawable.ic_outline_cat_24
+            }
+            SearchItem.SearchItemType.TAG -> {
+                R.drawable.ic_outline_tag_24
+            }
+            SearchItem.SearchItemType.TITLE -> {
+                0
+            }
+        }
+        itemView.txtRecipeName.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, 0, 0, 0)
         itemView.txtRecipeName.text = item.query
         itemView.setOnClickListener{
             listener.onItemClick(item)

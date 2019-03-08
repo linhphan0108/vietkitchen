@@ -20,7 +20,7 @@ class CategoryProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<List<CategoryGroup>> {
+            override fun callDb(): LiveData<List<CategoryGroup>?> {
                 return localDataSource.getCategories()
             }
 
@@ -37,7 +37,7 @@ class CategoryProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<Boolean> {
+            override fun callDb(): LiveData<Boolean?> {
                 return localDataSource.updateCategories(data)
             }
 

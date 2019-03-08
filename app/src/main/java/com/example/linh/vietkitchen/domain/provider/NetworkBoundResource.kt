@@ -63,7 +63,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>
         }
     }
 
-    private fun callNetwork(dbSource: LiveData<ResultType>) {
+    private fun callNetwork(dbSource: LiveData<ResultType?>) {
         val apiResponse = createCall()
         // we re-attach dbSource as a new source, it will dispatch its latest value quickly
         result.addSource(dbSource) { newData ->
@@ -107,7 +107,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>
     protected open fun shouldFetch(data: ResultType?) = data == null
 
     @MainThread
-    protected abstract fun callDb(): LiveData<ResultType>
+    protected abstract fun callDb(): LiveData<ResultType?>
 
     @MainThread
     protected abstract fun createCall(): LiveData<ApiResponse<RequestType>>

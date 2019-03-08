@@ -20,6 +20,7 @@
     <string name="label_new">new</string>
     <string name="label_delete">delete</string>
     <string name="label_search">search</string>
+    <string name="label_searching">searching</string>
     <string name="label_change_layout">change layout</string>
     <string name="title_options">options</string>
 

@@ -17,7 +17,7 @@ class TagsProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<Map<String, Boolean>> {
+            override fun callDb(): LiveData<Map<String, Boolean>?> {
                 return localDataSource.getTags()
             }
 
@@ -33,7 +33,7 @@ class TagsProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<Boolean> {
+            override fun callDb(): LiveData<Boolean?> {
                 return localDataSource.putTags(tags)
             }
 

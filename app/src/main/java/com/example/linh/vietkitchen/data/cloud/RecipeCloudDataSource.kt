@@ -10,6 +10,8 @@ import com.example.linh.vietkitchen.extension.*
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_CATEGORIES
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_CHILD_TAGS
 import com.example.linh.vietkitchen.util.Constants.STORAGE_RECIPES_PATH
+import com.example.linh.vietkitchen.util.TimberUtils
+import com.example.linh.vietkitchen.util.transform
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -185,7 +187,8 @@ class RecipeCloudDataSource @Inject constructor
         startAtId?.let { Timber.d("requestRecipesByCategory from $startAtId") }
 
         val responseLiveData = query.addListenerForSingleValueEventAwait()
-        return Transformations.map(responseLiveData){ response ->
+        return responseLiveData.transform { response ->
+            TimberUtils.checkNotMainThread()
             when(response){
                 is ApiSuccessResponse -> {
                     val dataSnapshot = response.data

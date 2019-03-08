@@ -11,6 +11,7 @@ import com.example.linh.vietkitchen.domain.model.Recipe
 import com.example.linh.vietkitchen.data.cloud.Recipe as RecipeData
 import com.example.linh.vietkitchen.util.Constants
 import com.example.linh.vietkitchen.util.ResponseCode
+import com.example.linh.vietkitchen.util.transform
 import com.example.linh.vietkitchen.vo.Resource
 import javax.inject.Inject
 
@@ -29,7 +30,7 @@ class RecipeProvider @Inject constructor(
                 return PagingResponse(convertedList, item.isEnd, item.lastId)
             }
 
-            override fun callDb(): LiveData<PagingResponse<List<Recipe>>> {
+            override fun callDb(): LiveData<PagingResponse<List<Recipe>>?> {
                 return Transformations.map(localDataSource.requestRecipesByCategory(cat, limit, startAtId)){ listRecipeData ->
                     listRecipeData?.let{
                         val list = mapper.convertToDomain(listRecipeData)
@@ -54,11 +55,13 @@ class RecipeProvider @Inject constructor(
                 return PagingResponse(convertedList, item.isEnd, item.lastId)
             }
 
-            override fun callDb(): LiveData<PagingResponse<List<Recipe>>> {
-                return Transformations.map(localDataSource.requestRecipesByTag(tag, limit, startAtId)){
-                    val list = mapper.convertToDomain(it)
-                    PagingResponse(list, false, null)
-                }
+            override fun callDb(): LiveData<PagingResponse<List<Recipe>>?> {
+                return localDataSource.requestRecipesByTag(tag, limit, startAtId)
+                        .transform {
+                            it?.let {
+                                PagingResponse(mapper.convertToDomain(it), false, null)
+                            }
+                        }
             }
 
             override fun createCall(): LiveData<ApiResponse<PagingResponse<List<RecipeData>>>> {
@@ -74,7 +77,7 @@ class RecipeProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<String> {
+            override fun callDb(): LiveData<String?> {
                 return localDataSource.putRecipe(data)
             }
 
@@ -91,7 +94,7 @@ class RecipeProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<Boolean> {
+            override fun callDb(): LiveData<Boolean?> {
                 return localDataSource.updateRecipe(data)
             }
 
@@ -111,7 +114,7 @@ class RecipeProvider @Inject constructor(
                 return mapper.convertToDomain(item)
             }
 
-            override fun callDb(): LiveData<List<Recipe>> {
+            override fun callDb(): LiveData<List<Recipe>?> {
                 return Transformations.map(localDataSource.getLikedRecipes(ids)){ list ->
                     list?.let { mapper.convertToDomain(it) }
                 }
@@ -129,7 +132,7 @@ class RecipeProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<List<ImageUpload>> {
+            override fun callDb(): LiveData<List<ImageUpload>?> {
                 return localDataSource.uploadImages(multiPartFileMap)
             }
 
@@ -145,7 +148,7 @@ class RecipeProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<Boolean> {
+            override fun callDb(): LiveData<Boolean?> {
                 return localDataSource.deleteImages(fileUrls)
             }
 
@@ -162,7 +165,7 @@ class RecipeProvider @Inject constructor(
                 return item
             }
 
-            override fun callDb(): LiveData<Boolean> {
+            override fun callDb(): LiveData<Boolean?> {
                 return localDataSource.deleteRecipe(id)
             }
 

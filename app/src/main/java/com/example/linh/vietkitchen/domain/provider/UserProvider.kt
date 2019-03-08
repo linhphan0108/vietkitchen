@@ -17,7 +17,7 @@ class UserProvider @Inject constructor
                 return item
             }
 
-            override fun callDb(): LiveData<String> {
+            override fun callDb(): LiveData<String?> {
                 return localDataSource.likeRecipe(uid, recipeKey)
             }
 
@@ -34,7 +34,7 @@ class UserProvider @Inject constructor
                 return item
             }
 
-            override fun callDb(): LiveData<Boolean> {
+            override fun callDb(): LiveData<Boolean?> {
                 return localDataSource.unLikeRecipe(uid, recipeKey)
             }
 
@@ -50,7 +50,7 @@ class UserProvider @Inject constructor
                 return item
             }
 
-            override fun callDb(): LiveData<List<String>> {
+            override fun callDb(): LiveData<List<String>?> {
                 return localDataSource.getLikedRecipesId(uid)
             }
 

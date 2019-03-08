@@ -17,6 +17,10 @@
         android:id="@+id/txtRecipeName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_8dp"
+        android:paddingStart="@dimen/padding_16"
+        android:paddingEnd="@dimen/padding_16"
+        android:paddingTop="@dimen/padding_8dp"
+        android:paddingBottom="@dimen/padding_8dp"
+        android:drawablePadding="@dimen/padding_6dp"
         android:textAppearance="?attr/textAppearanceSubtitle1"/>
 </androidx.cardview.widget.CardView>
