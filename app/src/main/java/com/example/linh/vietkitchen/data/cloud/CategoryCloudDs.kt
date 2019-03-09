@@ -11,6 +11,7 @@ import com.example.linh.vietkitchen.extension.addListenerForSingleValueEventAwai
 import com.example.linh.vietkitchen.extension.setValueAwait
 import com.example.linh.vietkitchen.domain.model.CategoryGroup
 import com.example.linh.vietkitchen.util.Constants.STORAGE_FOOD
+import com.example.linh.vietkitchen.util.transform
 import com.google.firebase.database.FirebaseDatabase
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ class CategoryCloudDs @Inject constructor(
     private val dbRef by lazy{ database.getReference(STORAGE_FOOD)}
 
     fun getCategories(): LiveData<ApiResponse<List<CategoryGroup>>> {
-        return Transformations.map(dbRef.addListenerForSingleValueEventAwait()){
+        return dbRef.addListenerForSingleValueEventAwait().transform{
             when(it){
                 is ApiSuccessResponse -> {
                     ApiResponse.createSuccess(mapper.toData(it.data))

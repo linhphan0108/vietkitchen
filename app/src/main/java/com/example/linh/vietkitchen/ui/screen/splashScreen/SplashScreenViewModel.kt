@@ -11,6 +11,7 @@ import com.example.linh.vietkitchen.ui.VietKitchenApp
 import com.example.linh.vietkitchen.ui.baseMVVM.BaseViewModel
 import com.example.linh.vietkitchen.ui.mapper.CategoryMapper
 import com.example.linh.vietkitchen.ui.model.DrawerNavGroupItem
+import com.example.linh.vietkitchen.util.transform
 import com.example.linh.vietkitchen.vo.Resource
 import com.example.linh.vietkitchen.vo.Status.*
 import com.firebase.ui.auth.AuthUI
@@ -83,23 +84,23 @@ class SplashScreenViewModel @Inject constructor(application: Application,
 
     fun requestCategory(): LiveData<Resource<List<DrawerNavGroupItem>>> {
             Timber.d("on launchDataLoad: ${Looper.myLooper() == Looper.getMainLooper()}")
-            val response = requestCategoryCommand.execute(getApplication())
-            return map(response){ resource ->
-                when(resource.status){
-                    SUCCESS -> {
-                        val data = categoryMapper.convertToUI(resource.data!!)
-                        VietKitchenApp.setCategory(data)
-                        Resource.success(null)
-                    }
+        return requestCategoryCommand.execute(getApplication())
+                .transform{ resource ->
+                    when(resource.status){
+                        SUCCESS -> {
+                            val data = categoryMapper.convertToUI(resource.data!!)
+                            VietKitchenApp.setCategory(data)
+                            Resource.success(null)
+                        }
 
-                    LOADING -> {
-                        Resource.loading()
-                    }
+                        LOADING -> {
+                            Resource.loading()
+                        }
 
-                    ERROR -> {
-                        Resource.error(resource.message)
+                        ERROR -> {
+                            Resource.error(resource.message)
+                        }
                     }
-                }
             }
     }
 
