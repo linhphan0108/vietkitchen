@@ -47,7 +47,7 @@ class VietKitchenApp : MultiDexApplication(), DaggerComponentProvider{
         }
 
         fun setCategory(newCat: List<DrawerNavGroupItem>){
-            _category.value = newCat
+            _category.postValue(newCat)
         }
     }
 
